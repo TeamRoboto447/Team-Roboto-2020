@@ -7,11 +7,12 @@
 
 package frc.robot;
 
-import org.opencv.core.Mat;
-
 import edu.wpi.cscore.*;
 import edu.wpi.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -32,6 +33,11 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+  
+  NetworkTable PIDTune;
+  NetworkTableInstance table;
+  NetworkTableEntry P, I, D, driveP, driveI, driveD;
+  
   @Override
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
@@ -47,6 +53,22 @@ public class Robot extends TimedRobot {
 
     camServer = CameraServer.getInstance().getServer();
     
+    this.table = NetworkTableInstance.getDefault();
+
+    this.PIDTune = this.table.getTable("chameleon-vision").getSubTable("PID");
+    this.P = this.PIDTune.getEntry("P");
+    this.I = this.PIDTune.getEntry("I");
+    this.D = this.PIDTune.getEntry("D");
+    this.P.setDouble(0.0144);
+    this.I.setDouble(0.0259459);
+    this.D.setDouble(0.001998);
+
+    this.driveP = this.PIDTune.getEntry("driveP");
+    this.driveI = this.PIDTune.getEntry("driveI");
+    this.driveD = this.PIDTune.getEntry("driveD");
+    this.driveP.setDouble(0.05);
+    this.driveI.setDouble(0);
+    this.driveD.setDouble(0);
   }
 
   /**
@@ -130,27 +152,20 @@ public class Robot extends TimedRobot {
 
     // If not being pressed, set the being pressed state
 
-    if(RobotContainer.driverLeft.getRawButton(1)) {
-      if(!this.beingPressed){
+    if(RobotContainer.driverRight.getRawButton(1)) {
+      if(!this.beingPressed) {
         this.lookForward = !this.lookForward;
         this.beingPressed = true;
-        if(this.lookForward){
-          camServer.setSource(camera0);
-        }else{
+        if(this.lookForward) {
           camServer.setSource(camera1);
+        } else {
+          camServer.setSource(camera0);
         }
         this.robot.driveSubsystem.setDriveInverted(!this.lookForward);
       }
-    }else{
+    } else {
       this.beingPressed = false;
     }
-
-    //System.out.println(RobotContainer.driverLeft.getRawButton(1));
-    // if(RobotContainer.driverLeft.getRawButton(1)) {
-    //   camServer.setSource(camera1);
-    // } else {
-    //   camServer.setSource(camera0);
-    // }
   }
 
   @Override

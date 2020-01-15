@@ -8,7 +8,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.RobotDriveSubsystem;
 
@@ -31,10 +30,20 @@ public class RobotDriveCommand extends CommandBase {
   public void execute() {
     // boolean driveInverted = RobotContainer.driverLeft.getRawButton(1);
 
-    double leftSpeed = RobotContainer.driverLeft.getY();
-    double rightSpeed = RobotContainer.driverRight.getY();
-    // driveSubsystem.tankDrive(leftSpeed, rightSpeed, driveInverted);
-    driveSubsystem.tankDrive(leftSpeed, rightSpeed, this.driveSubsystem.getDriveInverted());
+    double rightSpeed = RobotContainer.driverLeft.getY();
+    double leftSpeed = RobotContainer.driverRight.getY();
+    driveSubsystem.tankDrive(-leftSpeed, -rightSpeed, this.driveSubsystem.getDriveInverted());
+    
+    double testSpeed;
+    if(RobotContainer.operator.getRawButton(2)) {
+      testSpeed = -1;
+    } else if(RobotContainer.operator.getRawButton(3)) {
+      testSpeed = -0.85;
+    } else {
+      testSpeed = 0;
+    }
+    driveSubsystem.testMotor(testSpeed);
+
   }
 
   // Called once the command ends or is interrupted.
