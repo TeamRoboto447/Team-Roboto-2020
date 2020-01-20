@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.RobotDriveCommand;
 import frc.robot.commands.VisionCommand;
 import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -25,8 +26,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
+  public final VisionSubsystem visionSubsystem = new VisionSubsystem();
+
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
-  public final VisionCommand visionCommand = new VisionCommand(driveSubsystem);
+  public final VisionCommand visionCommand = new VisionCommand(driveSubsystem, visionSubsystem);
 
 
   /**

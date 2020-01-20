@@ -16,7 +16,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static int loggingLevel = 2; //Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
+    public static int loggingLevel = 3; //Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
 
     public static final int ballIntake = 0; // Ball intake spark, PWM channel 0.
 
@@ -26,7 +26,8 @@ public final class Constants {
       leftDriveB = 1, // Left drive motor victor, CAN ID 1.
       rightDrive = 2, // Right drive motor talon, CAN ID 2.
       rightDriveB = 3, // Right drive motor victor, CAN ID 3.
-      testSparkMax = 5; //test motor
+      testSparkMax = 4, //test motor
+      testSparkMax2 = 5; //test motor 2
   
     // PCM Channels on board 1 (pneumatics)
     public static final int 

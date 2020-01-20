@@ -7,17 +7,20 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.RobotDriveSubsystem;
 
 public class RobotDriveCommand extends CommandBase {
   private final RobotDriveSubsystem driveSubsystem;
-
+  NetworkTableInstance table;
   public RobotDriveCommand(RobotDriveSubsystem subsystem) {
     driveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
+    this.table = NetworkTableInstance.getDefault();
   }
 
   // Called when the command is initially scheduled.
@@ -38,9 +41,12 @@ public class RobotDriveCommand extends CommandBase {
     if(RobotContainer.operator.getRawButton(2)) {
       testSpeed = -1;
     } else if(RobotContainer.operator.getRawButton(3)) {
-      testSpeed = -0.85;
-    } else {
+      testSpeed = this.table.getTable("chameleon-vision").getEntry("shooterSpeed").getDouble(-0.90);
+    } else if(RobotContainer.operator.getRawButton(1)) {
+      testSpeed = 0.25;
+    }else {
       testSpeed = 0;
+      this.driveSubsystem.resetShooterIntegral();
     }
     driveSubsystem.testMotor(testSpeed);
 

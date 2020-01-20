@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import frc.robot.utils.Toggle;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -28,6 +29,7 @@ public class Robot extends TimedRobot {
   private RobotContainer robot;
   private UsbCamera camera0, camera1;
   private VideoSink camServer;
+  private Toggle lookForward;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -36,7 +38,8 @@ public class Robot extends TimedRobot {
   
   NetworkTable PIDTune;
   NetworkTableInstance table;
-  NetworkTableEntry P, I, D, driveP, driveI, driveD;
+  NetworkTableEntry P, I, D, driveP, driveI, driveD, FF;
+  public static double iterTime;
   
   @Override
   public void robotInit() {
@@ -56,19 +59,22 @@ public class Robot extends TimedRobot {
     this.table = NetworkTableInstance.getDefault();
 
     this.PIDTune = this.table.getTable("chameleon-vision").getSubTable("PID");
-    this.P = this.PIDTune.getEntry("P");
-    this.I = this.PIDTune.getEntry("I");
-    this.D = this.PIDTune.getEntry("D");
-    this.P.setDouble(0.0144);
-    this.I.setDouble(0.0259459);
-    this.D.setDouble(0.001998);
+    this.P = this.PIDTune.getEntry("kP");
+    this.I = this.PIDTune.getEntry("kI");
+    this.D = this.PIDTune.getEntry("kD");
+    this.FF = this.PIDTune.getEntry("kFF");
 
-    this.driveP = this.PIDTune.getEntry("driveP");
-    this.driveI = this.PIDTune.getEntry("driveI");
-    this.driveD = this.PIDTune.getEntry("driveD");
-    this.driveP.setDouble(0.05);
-    this.driveI.setDouble(0);
-    this.driveD.setDouble(0);
+    this.P.setDouble(0.01986);
+    this.I.setDouble(0.070042);
+    this.D.setDouble(0.001408);
+    this.FF.setDouble(0);
+
+    iterTime = 0.01;
+
+    this.table.getTable("chameleon-vision").getEntry("shooterSpeed").setDouble(-0.90);
+    this.lookForward = new Toggle(false);
+
+    this.table.getTable("adenLogging").getEntry("subsysToLog").setString("");
   }
 
   /**
@@ -132,14 +138,6 @@ public class Robot extends TimedRobot {
 
   }
 
-
-  private boolean lookForward = true;
-  public boolean getLookForward() {
-    return this.lookForward;
-  }
-  
-  private boolean beingPressed = false;
-
   /**
    * This function is called periodically during operator control.
    */
@@ -152,20 +150,15 @@ public class Robot extends TimedRobot {
 
     // If not being pressed, set the being pressed state
 
-    if(RobotContainer.driverRight.getRawButton(1)) {
-      if(!this.beingPressed) {
-        this.lookForward = !this.lookForward;
-        this.beingPressed = true;
-        if(this.lookForward) {
-          camServer.setSource(camera1);
-        } else {
-          camServer.setSource(camera0);
-        }
-        this.robot.driveSubsystem.setDriveInverted(!this.lookForward);
-      }
+    this.lookForward.runToggle(RobotContainer.driverRight.getRawButton(1));
+
+    if(this.lookForward.getState()) {
+      this.camServer.setSource(this.camera1);
     } else {
-      this.beingPressed = false;
+      this.camServer.setSource(this.camera0);
     }
+
+    this.robot.driveSubsystem.setDriveInverted(!this.lookForward.getState());
   }
 
   @Override
