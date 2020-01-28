@@ -19,15 +19,16 @@ public class Toggle {
         this.state = defaultState;
     }
 
+    // TODO: Consider changing this to return a true/false value when a change is "completed"
     public boolean runToggle(boolean button){
         if (button && !this.buttonPressed){
             toggle();
             this.buttonPressed = true;
         } else if(!button && this.buttonPressed) {
             this.buttonPressed = false;
+            return true;
         }
-
-        return this.state;
+        return false;
     }
 
     public boolean getState(){

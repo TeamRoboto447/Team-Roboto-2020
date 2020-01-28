@@ -10,8 +10,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.ControlPanelCommand;
 import frc.robot.commands.RobotDriveCommand;
 import frc.robot.commands.VisionCommand;
+import frc.robot.subsystems.ControlPanelSubsystem;
 import frc.robot.subsystems.RobotDriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,9 +29,11 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
   public final VisionSubsystem visionSubsystem = new VisionSubsystem();
+  public final ControlPanelSubsystem ctrlPanelSubsystem = new ControlPanelSubsystem();
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
   public final VisionCommand visionCommand = new VisionCommand(driveSubsystem, visionSubsystem);
+  public final ControlPanelCommand ctrlPanelCommand = new ControlPanelCommand(ctrlPanelSubsystem);
 
 
   /**

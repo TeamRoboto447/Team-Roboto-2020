@@ -14,32 +14,40 @@ import frc.robot.Constants;;
  * Add your docs here.
  */
 public class logging {
+    static NetworkTableEntry subsystemToDebug;
     public static void errors(String message, String name){
         if (Constants.loggingLevel >= 0){
-            adenLogging(message, name);
+            loggingBase(message, name);
         }
     }
+
     public static void warnings(String message, String name){
         if (Constants.loggingLevel >= 1){
-            adenLogging(message, name);
+            loggingBase(message, name);
         }
     }
+
     public static void debug(String message, String name) {
         if (Constants.loggingLevel >= 2){
-            adenLogging(message, name);
+            loggingBase(message, name);
         }
     }
+
     public static void info(String message, String name){
         if (Constants.loggingLevel >= 3){
-            adenLogging(message, name);
+            loggingBase(message, name);
         }
     }
-    private static void adenLogging(String message, String name){
-        NetworkTableEntry subsystemToDebug = NetworkTableInstance.getDefault().getTable("adenLogging").getEntry("subsysToLog");
+
+    private static void loggingBase(String message, String name){
         if (subsystemToDebug.getString("errored").contains("everything;")){
             System.out.println(message);
-        } else if (subsystemToDebug.getString("errored").contains(name+";")){
+        } else if ((";"+subsystemToDebug.getString("errored")).contains(";"+name+";")){
             System.out.println(message);
         }
+    }
+
+    public static void init() {
+        subsystemToDebug = NetworkTableInstance.getDefault().getTable("adenLogging").getEntry("subsysToLog");
     }
 }

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utils.Toggle;
 import io.github.pseudoresonance.pixy2api.Pixy2;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC.Block;
@@ -23,6 +22,7 @@ public class VisionSubsystem extends SubsystemBase {
    */
   
   Pixy2 pixy;
+  Pixy2CCC pixyCCC;
   Block ball = null;
   NetworkTableInstance tableInstance;
   NetworkTable table;
@@ -40,7 +40,9 @@ public class VisionSubsystem extends SubsystemBase {
     this.ballHeight = table.getEntry("ballHeight");
     this.ballArea = table.getEntry("ballArea");
     this.ballAge = table.getEntry("ballAge");
+    this.pixyCCC = pixy.getCCC();
   }
+
   boolean prevOn = true;
   public void setPixyLamp(boolean on) {
     if(on && !this.prevOn) {
@@ -95,12 +97,12 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public Block getLargestBall() {
-    int blockCount = pixy.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG1, 25);
+    int blockCount = pixyCCC.getBlocks(false, Pixy2CCC.CCC_SIG1, 25);
     if (blockCount <= 0) {
       this.ball = null;
       return null;
     }
-    ArrayList<Block> blocks = pixy.getCCC().getBlocks();
+    ArrayList<Block> blocks = pixyCCC.getBlocks();
     Block largestBlock = null;
     for(Block block : blocks) {
       if(largestBlock == null) {

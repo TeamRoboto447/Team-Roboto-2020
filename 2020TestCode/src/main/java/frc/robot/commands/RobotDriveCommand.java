@@ -7,8 +7,7 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.RobotDriveSubsystem;
@@ -16,6 +15,7 @@ import frc.robot.subsystems.RobotDriveSubsystem;
 public class RobotDriveCommand extends CommandBase {
   private final RobotDriveSubsystem driveSubsystem;
   NetworkTableInstance table;
+  NetworkTableEntry distanceEntry, shooterSpeed;
   public RobotDriveCommand(RobotDriveSubsystem subsystem) {
     driveSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -26,6 +26,8 @@ public class RobotDriveCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.distanceEntry = table.getTable("PID").getEntry("Distance");
+    this.shooterSpeed = this.table.getTable("chameleon-vision").getEntry("shooterSpeed");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,17 +41,20 @@ public class RobotDriveCommand extends CommandBase {
     
     double testSpeed;
     if(RobotContainer.operator.getRawButton(2)) {
-      testSpeed = -1;
+      testSpeed = 1;
     } else if(RobotContainer.operator.getRawButton(3)) {
-      testSpeed = this.table.getTable("chameleon-vision").getEntry("shooterSpeed").getDouble(-0.90);
+      testSpeed = this.shooterSpeed.getDouble(0.90);
     } else if(RobotContainer.operator.getRawButton(1)) {
-      testSpeed = 0.25;
-    }else {
+      testSpeed = -0.25;
+    } else if(RobotContainer.operator.getRawButton(4)) {
+      testSpeed = 0.0085603 * this.distanceEntry.getDouble(0) + 0.689525;
+      this.shooterSpeed.setDouble(testSpeed);
+    } else {
       testSpeed = 0;
       this.driveSubsystem.resetShooterIntegral();
     }
-    driveSubsystem.testMotor(testSpeed);
 
+    driveSubsystem.runShooterAtSpeed(testSpeed);
   }
 
   // Called once the command ends or is interrupted.
