@@ -7,25 +7,33 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import frc.robot.utils.PID;
+import frc.robot.utils.logging;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities;
 import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class VisionCommand extends CommandBase {
   RobotDriveSubsystem driveSubsystem;
-  Double
+  VisionSubsystem visionSubsystem;
+  double
     poseX,
     poseY,
+    poseAngle,
     yaw,
     pitch,
     latency,
     distance;
   Boolean validTarget;
-  NetworkTable camInfo, PIDInfo;
+  NetworkTable camInfo, PIDInfo, PIDTuningInfo;
   NetworkTableInstance table;
+  NetworkTableEntry validTargetEntry, yawEntry, pitchEntry, latencyEntry, targetPoseEntry, distanceEntry,
+    PEntry, IEntry, DEntry, FFEntry, ballXEntry;
 
   //Vision Distance Values
   Double focal = 67.4799;
@@ -37,23 +45,43 @@ public class VisionCommand extends CommandBase {
   double target = 0;
   double driveTargetLeft, driveTargetRight;
   double driveTargetInch = 11;
-  double P, I, D, driveP, driveI, driveD;
-  double iterTime = 0.01;
+  double P, I, D, FF;
   //PID Variables
-  double integral, previousError, driveIntegral, previousDriveError = 0;
+  PID turnPID, turnToBallPID;
 
+  double ballX;
+  
   boolean driveTargetCalculated = false;
+
   /**
    * Creates a new VisionCommand.
    */
-  public VisionCommand(final RobotDriveSubsystem subsystem) {
-    driveSubsystem = subsystem;
+  public VisionCommand(final RobotDriveSubsystem subsystem, final VisionSubsystem vSubsystem) {
+    this.driveSubsystem = subsystem;
+    this.visionSubsystem = vSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(driveSubsystem);
+    addRequirements(this.driveSubsystem);
+    addRequirements(this.visionSubsystem);
 
     this.table = NetworkTableInstance.getDefault();
     this.camInfo = this.table.getTable("chameleon-vision").getSubTable("Shooter Targeting");
-    this.PIDInfo = this.table.getTable("chameleon-vision").getSubTable("PID");
+    turnPID = new PID(0.0, 0.0207, 0.0414, 0.002588, 0.0, 0.0);
+    //turnToBallPID = new PID(0.0, 0.003, 0.00433884297, 0.00051857142, 0.0, 0.0);
+    turnToBallPID = new PID(0.0, 0.003, 0.0005, 0.0, 0.0, 0.0);
+    
+    this.PIDInfo = this.table.getTable("PID");
+    this.PIDTuningInfo = this.table.getTable("PIDTuning");
+    this.validTargetEntry = this.camInfo.getEntry("isValid");
+    this.yawEntry = this.camInfo.getEntry("targetYaw");
+    this.pitchEntry = this.camInfo.getEntry("targetPitch");
+    this.latencyEntry = this.camInfo.getEntry("latency");
+    this.targetPoseEntry = this.camInfo.getEntry("targetPose");
+    this.distanceEntry = this.PIDInfo.getEntry("Distance");
+    this.PEntry = this.PIDTuningInfo.getEntry("turnkP");
+    this.IEntry = this.PIDTuningInfo.getEntry("turnkI");
+    this.DEntry = this.PIDTuningInfo.getEntry("turnkD");
+    this.FFEntry = this.PIDTuningInfo.getEntry("turnkFF");
+    this.ballXEntry = this.table.getTable("PixyVision").getEntry("ballX");
   }
 
   // Called when the command is initially scheduled.
@@ -65,8 +93,9 @@ public class VisionCommand extends CommandBase {
   @Override
   public void execute() {
     getValues();
-    Utilities.logging("\nTarget Valid: " + this.validTarget + "\nYaw: " + this.yaw + "\nPitch: " + this.pitch
-        + "\nCamera Latency: " + this.latency, "INFO");
+    updateTurningPIDValues();
+    logging.info("\nTarget Valid: " + this.validTarget + "\nYaw: " + this.yaw + "\nPitch: " + this.pitch
+        + "\nCamera Latency: " + this.latency, "shooterVision");
     if (RobotContainer.operator.getRawButton(7)) {
       this.driveTargetCalculated = false;
       turnToTarget();
@@ -80,11 +109,18 @@ public class VisionCommand extends CommandBase {
     if(RobotContainer.operator.getRawButton(6)) {
       this.driveSubsystem.tankDrive(0.2, 0.2, false);
     }
+
+    // this.visionSubsystem.setPixyLamp(false);
+    if(RobotContainer.operator.getRawButton(1)) {
+      turnToBall();
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(final boolean interrupted) {
+    this.turnPID.resetIntegral();
+    this.visionSubsystem.reset();
   }
 
   // Returns true when the command should end.
@@ -94,62 +130,60 @@ public class VisionCommand extends CommandBase {
   }
 
   private void getValues() {
-    this.validTarget = this.camInfo.getEntry("isValid").getBoolean(false);
-    this.yaw = this.camInfo.getEntry("targetYaw").getDouble(-1);
-    this.pitch = this.camInfo.getEntry("targetPitch").getDouble(-1);
-    this.latency = this.camInfo.getEntry("latency").getDouble(-1);
+    this.validTarget = this.validTargetEntry.getBoolean(false);
+    this.yaw = this.yawEntry.getDouble(-1);
+    this.pitch = this.pitchEntry.getDouble(-1);
+    this.latency = this.latencyEntry.getDouble(-1);
+    double defaultPose[] = new double[]{0, 0, 0};
+    this.poseX = this.targetPoseEntry.getDoubleArray(defaultPose)[0];
+    this.poseY = this.targetPoseEntry.getDoubleArray(defaultPose)[1];
+    this.poseY = this.targetPoseEntry.getDoubleArray(defaultPose)[2];
 
-    this.poseX = this.camInfo.getEntry("targetPose").getDoubleArray(new double[]{0, 0})[0];
-    this.poseY = this.camInfo.getEntry("targetPose").getDoubleArray(new double[]{0, 0})[1];
-
-    this.P = this.PIDInfo.getEntry("P").getDouble(0.0207);
-    this.I = this.PIDInfo.getEntry("I").getDouble(0.0414);
-    this.D = this.PIDInfo.getEntry("D").getDouble(0.002588);
-
-    this.driveP = this.PIDInfo.getEntry("driveP").getDouble(0.03);
-    this.driveI = this.PIDInfo.getEntry("driveI").getDouble(0);
-    this.driveD = this.PIDInfo.getEntry("driveD").getDouble(0);
-    
-    /*
-    double tangentR = this.yaw / this.focal;
-    double thetaT = Math.atan(tangentR) + this.thetaC;
-    double tangentT = Math.tan(thetaT);
-    this.distance = this.deltaHeight / tangentT;
-    */
-
-    this.distance = (4.237885 * this.poseX) - 3.997617;
-    this.PIDInfo.getEntry("Distance").setValue(this.distance);
+    this.distance = this.distanceEntry.getDouble(-1);
+    this.ballX = this.ballXEntry.getDouble(-1000);
   }
 
   private void turnToTarget() {
     if (this.validTarget) {
-      final double speed = PID();
-      Utilities.logging("Aiming PID Output Value: " + speed, "DEBUG");
+      double distanceToInner = this.getDistanceToInner(this.poseAngle, this.distance, Constants.distanceFromInnerToOuterPort);
+      double adjustAngle = this.getAngleOffset(this.poseAngle, distanceToInner, Constants.distanceFromInnerToOuterPort);
+      if (adjustAngle  > Math.PI/4 || adjustAngle < -Math.PI/4){
+        adjustAngle = 0;
+      }
+      double targetPos = this.yaw + adjustAngle + 0.9;
+      double speed = turnPID.run(targetPos); //magic 0.2 to adjust for the temp mount
+      logging.debug("Aiming PID Output Value: " + speed + "\nAiming PV: " + targetPos, "aimingPID");
       this.driveSubsystem.tankDrive(speed, -speed, false);
     } else {
       this.driveSubsystem.turnToZeroVeryInnacurate();
     }
   }
+  private double getDistanceToInner( double angle, double distance, double targetDelta ){
+    return Math.sqrt(Math.pow(targetDelta, 2) + Math.pow(distance,2) - targetDelta*distance*Math.cos(angle));
+  }
+  private double getAngleOffset( double angle, double distance, double targetDelta){
+    return Math.asin(targetDelta / distance * Math.sin(angle));
+  }
 
   private void driveToTarget() {
     if (this.validTarget) {
-      Utilities.logging("Drive target calculated: "+this.driveTargetCalculated, "DEBUG");
+      logging.debug("Drive target calculated: "+this.driveTargetCalculated, "shooterVision");
       final double leftEncodePos = this.driveSubsystem.leftTalon.getSelectedSensorPosition();
       final double rightEncodePos = this.driveSubsystem.rightTalon.getSelectedSensorPosition();
       if(this.driveTargetCalculated) {
 
         this.driveSubsystem.driveToEncode(this.driveTargetLeft, this.driveTargetRight);
-        Utilities.logging("Driving to distance", "INFO");
-        Utilities.logging("Target encoder positions:\n    Left: "+this.driveTargetLeft+
+        logging.debug("Driving to distance", "shooterVision");
+        logging.debug("Target encoder positions:\n    Left: "+this.driveTargetLeft+
           "\n    Right: "+this.driveTargetRight+
           "\nCurrent encoder positions:\n    Left: "+leftEncodePos+
-          "\n    Right: "+rightEncodePos, "DEBUG");
+          "\n    Right: "+rightEncodePos, "shooterVision");
 
       } else {
         this.driveSubsystem.leftTalon.setSelectedSensorPosition(0);
         this.driveSubsystem.rightTalon.setSelectedSensorPosition(0);
         double encodeFromTarget = Utilities.encoderToInch((this.distance - this.driveTargetInch)*12);
-        Utilities.logging("Difference between target and distance: " + (this.distance - this.driveTargetInch), "DEBUG");
+        logging.debug("Difference between target and distance: " + (this.distance - this.driveTargetInch), "shooterVision");
         this.driveTargetLeft = encodeFromTarget;
         this.driveTargetRight = encodeFromTarget;
 
@@ -158,21 +192,30 @@ public class VisionCommand extends CommandBase {
     }
   }
 
-  public double PID() {
-    final double error = this.target - this.yaw;
-    this.integral += (error * this.iterTime);
-    final double derivitive = (error - this.previousError) / this.iterTime;
-    this.previousError = error;
-    return this.P*error + this.I*this.integral + this.D*derivitive;
+  public void updateTurningPIDValues() {
+
+    this.P = this.PEntry.getDouble(0.01986);
+    this.I = this.IEntry.getDouble(0.070042);
+    this.D = this.DEntry.getDouble(0.001408);
+    this.FF = this.FFEntry.getDouble(0);
+
+    logging.debug("Aiming PID Values: kP: "+ this.P +" kI: "+ this.I + " kD: "+this.D, "aimingPID");
+    this.turnPID.updateP(this.P);
+    this.turnPID.updateI(this.I);
+    this.turnPID.updateD(this.D);
+    this.turnPID.updateFF(this.FF, 0.0);
   }
 
-  /*public double PIDDrive() {
-    final double driveError = this.driveTarget - this.distance;
-    this.driveIntegral += (driveError * this.iterTime);
-    final double driveDerivitive = (driveError - this.previousDriveError) / this.iterTime;
-    this.previousDriveError = driveError;
-    return this.driveP*driveError + this.driveI*this.driveIntegral + this.driveD*driveDerivitive;
-  }*/
+  public void turnToBall() {
+    if(this.ballX != -1000) {
+      if(this.ballX < -25 || this.ballX > 25) {
+        double speed = this.turnToBallPID.run(this.ballX);
+        this.driveSubsystem.tankDrive(0.7+speed, 0.7-speed, true);
+      } else {
+        this.driveSubsystem.tankDrive(1, 1, true);
+      }
+    }
+  }
 
   private void stop() {
     this.driveSubsystem.tankDrive(0, 0, false);

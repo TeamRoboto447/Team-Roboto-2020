@@ -10,11 +10,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.RobotDriveCommand;
-import frc.robot.commands.VisionCommand;
-import frc.robot.subsystems.RobotDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -25,8 +25,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
+  public final VisionSubsystem visionSubsystem = new VisionSubsystem();
+  public final ControlPanelSubsystem ctrlPanelSubsystem = new ControlPanelSubsystem();
+  public final TurretSubsystem turretSubsystem = new TurretSubsystem();
+
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
-  public final VisionCommand visionCommand = new VisionCommand(driveSubsystem);
+  public final VisionCommand visionCommand = new VisionCommand(driveSubsystem, visionSubsystem);
+  public final ControlPanelCommand ctrlPanelCommand = new ControlPanelCommand(ctrlPanelSubsystem);
+  public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);
 
 
   /**
@@ -37,7 +43,7 @@ public class RobotContainer {
     configureButtonBindings();
     
     driveSubsystem.setDefaultCommand(driveCommand);
-    //driveSubsystem.setDefaultCommand(visionCommand);
+    turretSubsystem.setDefaultCommand(turretCommand);
 
   }
 

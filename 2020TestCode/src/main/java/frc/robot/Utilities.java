@@ -1,6 +1,11 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 public class Utilities {
+    static NetworkTableEntry subsystemToDebug;
+
     public static double encoderToInch(double target) {
         double encoderRes = 4096;
         double wheelDiameter = 6;
@@ -11,33 +16,17 @@ public class Utilities {
         return output;
     }
 
-    public static void debug(String message) {
-        // TODO
-    }
-
-    public static void logging(String message, String loggingType) {
-        switch(loggingType) {
-            case("INFO"):
-                if(Constants.loggingLevel >= 3) {
-                    System.out.println("INFO: "+message);
-                }
-                break;
-            case("DEBUG"): 
-                if(Constants.loggingLevel >= 2) {
-                    System.out.println("DEBUG: "+message);
-                }
-                break;
-            case("WARNING"): 
-                if(Constants.loggingLevel >= 1) {
-                    System.out.println("WARNING: "+message);
-                }
-                break;
-            case("ERROR"): 
-                if(Constants.loggingLevel >= 0) {
-                    System.out.println("ERROR: "+message);
-                }
-                break;
-            default: System.out.println("You attempted to use logging, but didn't use a valid log type (DEBUG, WARNING, INFO, WAT)");
+    public static void adenLogging(String message, String name){
+        
+        if (subsystemToDebug.getString("errored").contains("everything;")){
+            System.out.println(message);
+        } else if (subsystemToDebug.getString("errored").contains(name+";")){
+            System.out.println(message);
         }
     }
+
+    public static void init() {
+        subsystemToDebug = NetworkTableInstance.getDefault().getTable("adenLogging").getEntry("subsysToLog");
+    }
+
 }

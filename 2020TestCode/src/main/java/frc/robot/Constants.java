@@ -16,7 +16,9 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static int loggingLevel = 2; //Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
+    public static int loggingLevel = -1; //Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
+
+    public static final boolean bypassShooterPID = false;
 
     public static final int ballIntake = 0; // Ball intake spark, PWM channel 0.
 
@@ -26,10 +28,22 @@ public final class Constants {
       leftDriveB = 1, // Left drive motor victor, CAN ID 1.
       rightDrive = 2, // Right drive motor talon, CAN ID 2.
       rightDriveB = 3, // Right drive motor victor, CAN ID 3.
-      testSparkMax = 5; //test motor
+      shooterSparkMax = 4, //test motor
+      shooterSparkMax2 = 5; //test motor 2
   
     // PCM Channels on board 1 (pneumatics)
     public static final int 
       transmissionLow = 0, // Drive transmission low channel, PCM channel 0.
       transmissionHigh = 1; // Drive transmission high channel, PCM channel 1.
+    
+    public static final double
+      shooterkP = 0.0003,//0.0003, //original vals are commented
+      shooterkI = 0.0013815,//0.000931,
+      shooterkD = 0.000016,//0.000024,
+      shooterkFFm = 0.0001774, //0.000172,
+      shooterkFFb = -0.003214,//-0.002191,
+      speedkM = 0.0135274,
+      speedkB = 0.6368884,
+      pidIntegralResetTime = 2,
+      distanceFromInnerToOuterPort = 2;
 }
