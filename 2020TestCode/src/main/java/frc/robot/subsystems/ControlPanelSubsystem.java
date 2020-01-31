@@ -45,6 +45,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
     this.colorName.setString("");
 
     // Create known colors.
+    //TODO Magic Numbers
     this.blueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
     this.greenTarget = ColorMatch.makeColor(0.192, 0.561, 0.240);
     this.redTarget = ColorMatch.makeColor(0.62, 0.302, 0.069);
@@ -83,6 +84,7 @@ public class ControlPanelSubsystem extends SubsystemBase {
   }
 
   public String getColorName() {
+    //TODO conider using a java.lang.Map, possibly more efficient (uses hash tables)
     String colorName = "";
     Color color = getColor();
     ColorMatchResult match = colorMatcher.matchClosestColor(color);
