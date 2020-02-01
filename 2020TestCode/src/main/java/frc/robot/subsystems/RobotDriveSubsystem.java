@@ -105,8 +105,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
   }
 
   public void driveToInch(final double targetLeft, final double targetRight) {
-    leftTalon.set(ControlMode.MotionMagic, Utilities.encoderToInch(targetLeft));
-    rightTalon.set(ControlMode.MotionMagic, Utilities.encoderToInch(targetRight));
+    leftTalon.set(ControlMode.MotionMagic, Utilities.inchToEncoder(targetLeft));
+    rightTalon.set(ControlMode.MotionMagic, Utilities.inchToEncoder(targetRight));
   }
 
   public void driveToEncode(final double targetLeft, final double targetRight) {

@@ -45,5 +45,21 @@ public final class Constants {
       speedkM = 0.0135274,
       speedkB = 0.6368884,
       pidIntegralResetTime = 2,
-      distanceFromInnerToOuterPort = 2;
+      distanceFromInnerToOuterPort = 2,
+      maxInnerPortAjustmentAngle = Math.PI / 4;
+    public static final double //values for turning PID
+      turnkP = 0.01986, // 0.0207, //we had 2 sets of values, I (Aden) put the ones in I thought were write
+      turnkI = 0.070042, //0.0414,
+      turnkD = 0.001408, // 0.002588,
+      turnkFFm = 0.0,
+      turnkFFb = 0.0,
+      turnTargetAjust = 0.9;
+    public static final double
+      turnToBallP = 0.003,
+      turnToBallI = 0.0005,
+      turnToBallD = 0.0,
+      turnToBallFFm = 0.0,
+      turnToBallFFb = 0.0,
+      turnToBallThreshold = 25,
+      turnToBallBaseSpeed = 0.7;
 }

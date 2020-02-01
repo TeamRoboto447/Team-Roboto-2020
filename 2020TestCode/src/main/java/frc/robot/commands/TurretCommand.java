@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.*;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.controlmaps.OperaterMap;
 
 public class TurretCommand extends CommandBase {
   /**
@@ -40,14 +41,13 @@ public class TurretCommand extends CommandBase {
   public void execute() {
     
     double testSpeed;
-    //TODO adjust button maping
-    if(RobotContainer.operator.getRawButton(2)) {
+    if(RobotContainer.operator.getRawButton(OperaterMap.A)) {
       testSpeed = 1;
-    } else if(RobotContainer.operator.getRawButton(3)) {
+    } else if(RobotContainer.operator.getRawButton(OperaterMap.B)) {
       testSpeed = this.shooterSpeed.getDouble(0.90);
-    } else if(RobotContainer.operator.getRawButton(1)) {
+    } else if(RobotContainer.operator.getRawButton(OperaterMap.X)) {
       testSpeed = -0.25;
-    } else if(RobotContainer.operator.getRawButton(4)) {
+    } else if(RobotContainer.operator.getRawButton(OperaterMap.Y)) {
       testSpeed = Constants.speedkM * this.distanceEntry.getDouble(0) + Constants.speedkB;
       this.shooterSpeed.setDouble(testSpeed);
     } else {

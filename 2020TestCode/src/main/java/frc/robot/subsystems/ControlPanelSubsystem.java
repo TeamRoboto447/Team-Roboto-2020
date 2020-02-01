@@ -55,10 +55,10 @@ public class ControlPanelSubsystem extends SubsystemBase {
     this.colorMatcher = new ColorMatch();
 
     // Add known colors.
-    this.colorMatcher.addColorMatch(blueTarget);
-    this.colorMatcher.addColorMatch(greenTarget);
-    this.colorMatcher.addColorMatch(redTarget);
-    this.colorMatcher.addColorMatch(yellowTarget);
+    this.colorMatcher.addColorMatch(this.blueTarget);
+    this.colorMatcher.addColorMatch(this.greenTarget);
+    this.colorMatcher.addColorMatch(this.redTarget);
+    this.colorMatcher.addColorMatch(this.yellowTarget);
   }
 
   @Override
@@ -84,7 +84,6 @@ public class ControlPanelSubsystem extends SubsystemBase {
   }
 
   public String getColorName() {
-    //TODO conider using a java.lang.Map, possibly more efficient (uses hash tables)
     String colorName = "";
     Color color = getColor();
     ColorMatchResult match = colorMatcher.matchClosestColor(color);

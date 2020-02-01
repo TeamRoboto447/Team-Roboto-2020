@@ -6,10 +6,18 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Utilities {
     static NetworkTableEntry subsystemToDebug;
 
-    public static double encoderToInch(double target) { //TODO this is not encoderToInch, but inchToEncoder
+    public static double feetToEncoder(double target){
+        return inchToEncoder(target * 12);
+    }
+    public static boolean marginOfError(double maxError, double setpoint, double processingVar){
+        double error = Math.abs(setpoint - processingVar);
+        return error <= maxError;
+    }
+
+    public static double inchToEncoder(double target) {
         double encoderRes = 4096;
         double wheelDiameter = 6;
-        double circum = wheelDiameter*3.1415926; //TODO Math.PI????????
+        double circum = wheelDiameter * Math.PI;
         double encodePerInch = encoderRes/circum;
         double output = Math.round(encodePerInch * target);
         
