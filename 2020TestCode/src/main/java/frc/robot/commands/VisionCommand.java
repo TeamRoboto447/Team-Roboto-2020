@@ -16,11 +16,14 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities;
 import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class VisionCommand extends CommandBase {
   RobotDriveSubsystem driveSubsystem;
   VisionSubsystem visionSubsystem;
+  TurretSubsystem turretSubsystem;
+
   double
     poseX,
     poseY,
@@ -56,12 +59,14 @@ public class VisionCommand extends CommandBase {
   /**
    * Creates a new VisionCommand.
    */
-  public VisionCommand(final RobotDriveSubsystem subsystem, final VisionSubsystem vSubsystem) {
+  public VisionCommand(final RobotDriveSubsystem subsystem, final VisionSubsystem vSubsystem, final TurretSubsystem tSubsystem) {
     this.driveSubsystem = subsystem;
     this.visionSubsystem = vSubsystem;
+    this.turretSubsystem = tSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.driveSubsystem);
     addRequirements(this.visionSubsystem);
+    addRequirements(this.turretSubsystem);
 
     this.table = NetworkTableInstance.getDefault();
     this.camInfo = this.table.getTable("chameleon-vision").getSubTable("Shooter Targeting");

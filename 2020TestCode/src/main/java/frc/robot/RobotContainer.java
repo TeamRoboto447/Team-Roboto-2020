@@ -30,7 +30,7 @@ public class RobotContainer {
   public final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
-  public final VisionCommand visionCommand = new VisionCommand(driveSubsystem, visionSubsystem);
+  public final VisionCommand visionCommand = new VisionCommand(driveSubsystem, visionSubsystem, turretSubsystem);
   public final ControlPanelCommand ctrlPanelCommand = new ControlPanelCommand(ctrlPanelSubsystem);
   public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);
 
@@ -60,7 +60,7 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    visionButton.whileHeld(visionCommand);
+    visionButton.whileHeld(this.visionCommand);
   }
 
 
