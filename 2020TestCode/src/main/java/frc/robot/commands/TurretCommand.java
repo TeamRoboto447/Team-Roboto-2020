@@ -40,6 +40,7 @@ public class TurretCommand extends CommandBase {
   public void execute() {
     
     double testSpeed;
+    //TODO adjust button maping
     if(RobotContainer.operator.getRawButton(2)) {
       testSpeed = 1;
     } else if(RobotContainer.operator.getRawButton(3)) {

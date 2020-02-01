@@ -70,6 +70,7 @@ public class VisionCommand extends CommandBase {
 
     this.table = NetworkTableInstance.getDefault();
     this.camInfo = this.table.getTable("chameleon-vision").getSubTable("Shooter Targeting");
+    //TODO Magic Numbers
     turnPID = new PID(0.0, 0.0207, 0.0414, 0.002588, 0.0, 0.0);
     //turnToBallPID = new PID(0.0, 0.003, 0.00433884297, 0.00051857142, 0.0, 0.0);
     turnToBallPID = new PID(0.0, 0.003, 0.0005, 0.0, 0.0, 0.0);
@@ -101,6 +102,7 @@ public class VisionCommand extends CommandBase {
     updateTurningPIDValues();
     logging.info("\nTarget Valid: " + this.validTarget + "\nYaw: " + this.yaw + "\nPitch: " + this.pitch
         + "\nCamera Latency: " + this.latency, "shooterVision");
+    //TODO Label Buttons Posibly using maps to give names
     if (RobotContainer.operator.getRawButton(7)) {
       this.driveTargetCalculated = false;
       turnToTarget();
@@ -110,7 +112,7 @@ public class VisionCommand extends CommandBase {
       this.driveTargetCalculated = false;
       stop();
     }
-
+    //TODO WHAT?????????
     if(RobotContainer.operator.getRawButton(6)) {
       this.driveSubsystem.tankDrive(0.2, 0.2, false);
     }
@@ -152,10 +154,11 @@ public class VisionCommand extends CommandBase {
     if (this.validTarget) {
       double distanceToInner = this.getDistanceToInner(this.poseAngle, this.distance, Constants.distanceFromInnerToOuterPort);
       double adjustAngle = this.getAngleOffset(this.poseAngle, distanceToInner, Constants.distanceFromInnerToOuterPort);
+      //TODO make maximum adjust angle not hard coded (Magic Numbers)
       if (adjustAngle  > Math.PI/4 || adjustAngle < -Math.PI/4){
         adjustAngle = 0;
       }
-      double targetPos = this.yaw + adjustAngle + 0.9;
+      double targetPos = this.yaw + adjustAngle + 0.9; //TODO chage manual angle to a constant
       double speed = turnPID.run(targetPos); //magic 0.2 to adjust for the temp mount
       logging.debug("Aiming PID Output Value: " + speed + "\nAiming PV: " + targetPos, "aimingPID");
       this.driveSubsystem.tankDrive(speed, -speed, false);
@@ -187,7 +190,7 @@ public class VisionCommand extends CommandBase {
       } else {
         this.driveSubsystem.leftTalon.setSelectedSensorPosition(0);
         this.driveSubsystem.rightTalon.setSelectedSensorPosition(0);
-        double encodeFromTarget = Utilities.encoderToInch((this.distance - this.driveTargetInch)*12);
+        double encodeFromTarget = Utilities.encoderToInch((this.distance - this.driveTargetInch)*12); // Is this right? Yes, but function naming is confusing
         logging.debug("Difference between target and distance: " + (this.distance - this.driveTargetInch), "shooterVision");
         this.driveTargetLeft = encodeFromTarget;
         this.driveTargetRight = encodeFromTarget;
@@ -198,7 +201,7 @@ public class VisionCommand extends CommandBase {
   }
 
   public void updateTurningPIDValues() {
-
+    //TODO more magic numbers
     this.P = this.PEntry.getDouble(0.01986);
     this.I = this.IEntry.getDouble(0.070042);
     this.D = this.DEntry.getDouble(0.001408);
@@ -212,6 +215,9 @@ public class VisionCommand extends CommandBase {
   }
 
   public void turnToBall() {
+    
+    //TODO Magic Numbers galore.
+    
     if(this.ballX != -1000) {
       if(this.ballX < -25 || this.ballX > 25) {
         double speed = this.turnToBallPID.run(this.ballX);

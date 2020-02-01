@@ -58,6 +58,7 @@ public class VisionSubsystem extends SubsystemBase {
     if(this.ball == null) {
       return -1000;
     }
+    //TODO magic numbers
     return this.ball.getX() - (316/2);
   }
 
