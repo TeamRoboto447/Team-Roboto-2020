@@ -16,7 +16,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static int loggingLevel = -1; //Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
+    public static int loggingLevel = 4; //Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
 
     public static final boolean bypassShooterPID = false;
 

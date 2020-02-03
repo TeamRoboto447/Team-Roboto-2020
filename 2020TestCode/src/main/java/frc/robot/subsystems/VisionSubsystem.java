@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.logging;
 import io.github.pseudoresonance.pixy2api.Pixy2;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC.Block;
@@ -104,6 +105,7 @@ public class VisionSubsystem extends SubsystemBase {
       return null;
     }
     ArrayList<Block> blocks = pixyCCC.getBlocks();
+    logging.debug("arraySize: "+blockCount, "pixycam");
     Block largestBlock = null;
     for(Block block : blocks) {
       if(largestBlock == null) {
@@ -117,7 +119,7 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public void sendDataToShuffleboard() {
-    getLargestBall();
+    //getLargestBall();
     this.ballX.setDouble(getBallX());
     this.ballY.setDouble(getBallY());
     this.ballWidth.setDouble(getBallWidth());
@@ -132,6 +134,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    this.getLargestBall();
     sendDataToShuffleboard();
   }
 }

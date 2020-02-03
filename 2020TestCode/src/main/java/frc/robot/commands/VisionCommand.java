@@ -72,7 +72,7 @@ public class VisionCommand extends CommandBase {
     this.table = NetworkTableInstance.getDefault();
     this.camInfo = this.table.getTable("chameleon-vision").getSubTable("Shooter Targeting");
     turnPID = new PID(0.0, Constants.turnkP, Constants.turnkI, Constants.turnkD, Constants.turnkFFm, Constants.turnkFFb);
-    turnToBallPID = new PID(0.0, Constants.turnToBallP, Constants.turnToBallI, Constants.turnToBallP, Constants.turnToBallFFm, Constants.turnToBallFFb);
+    turnToBallPID = new PID(0.0, Constants.turnToBallP, Constants.turnToBallI, Constants.turnToBallD, Constants.turnToBallFFm, Constants.turnToBallFFb);
     
     this.PIDInfo = this.table.getTable("PID");
     this.PIDTuningInfo = this.table.getTable("PIDTuning");
@@ -212,8 +212,9 @@ public class VisionCommand extends CommandBase {
 
   public void turnToBall() {
     if(this.ballX != -1000) {
-      if(Utilities.marginOfError(Constants.turnToBallThreshold, 0, this.ballX)) { //this.ballX < -25 || this.ballX > 25
+      if(! Utilities.marginOfError(Constants.turnToBallThreshold, 0, this.ballX)) { //this.ballX < -25 || this.ballX > 25 //! Utilities.marginOfError(Constants.turnToBallThreshold, 0, this.ballX)
         double speed = this.turnToBallPID.run(this.ballX);
+        logging.debug(speed+"", "turntoball");
         this.driveSubsystem.tankDrive(Constants.turnToBallBaseSpeed + speed, Constants.turnToBallBaseSpeed - speed, true);
       } else {
         this.driveSubsystem.tankDrive(1, 1, true);

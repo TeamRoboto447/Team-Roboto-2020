@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.lang.Runtime;
 
@@ -34,6 +35,7 @@ public class Robot extends TimedRobot {
   private VideoSink camServer;
   private Toggle lookForward;
   private Runtime rt;
+  private Timer iterTimer;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -94,6 +96,9 @@ public class Robot extends TimedRobot {
     this.table.getTable("adenLogging").getEntry("subsysToLog").setString("");
     this.rt =  Runtime.getRuntime();
 
+    this.iterTimer = new Timer();
+    this.iterTimer.start();
+
     Utilities.init();
     logging.init();
 
@@ -113,7 +118,9 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+    iterTimer.reset();
     CommandScheduler.getInstance().run();
+    logging.debug(iterTimer.get() + "s", "itertime");
     // logLowMemory();
   }
 
