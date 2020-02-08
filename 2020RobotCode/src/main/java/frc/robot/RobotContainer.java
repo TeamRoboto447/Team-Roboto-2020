@@ -7,15 +7,13 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.*;
+import frc.robot.commands.*;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import frc.robot.controlmaps.OperaterMap;
-import frc.robot.commands.*;
-import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -25,34 +23,23 @@ import frc.robot.subsystems.*;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
-  public final VisionSubsystem visionSubsystem = new VisionSubsystem();
-  public final ControlPanelSubsystem ctrlPanelSubsystem = new ControlPanelSubsystem();
-  public final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
-  public final VisionCommand visionCommand = new VisionCommand(driveSubsystem, visionSubsystem, turretSubsystem);
-  public final ControlPanelCommand ctrlPanelCommand = new ControlPanelCommand(ctrlPanelSubsystem);
-  public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);
 
-
+  public static Joystick driverLeft = new Joystick(0);
+  public static Joystick driverRight = new Joystick(1);
+  public static Joystick operator = new Joystick(2);
+  
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
+    this.driveSubsystem.setDefaultCommand(this.driveCommand);
     configureButtonBindings();
-    
-    driveSubsystem.setDefaultCommand(driveCommand);
-    turretSubsystem.setDefaultCommand(turretCommand);
-
   }
-
-  public static Joystick driverLeft = new Joystick(0);
-  public static Joystick driverRight = new Joystick(1);
-  public static Joystick operator = new Joystick(2);
-
-  public static JoystickButton visionButton = new JoystickButton(operator, OperaterMap.LB);
 
   /**
    * Use this method to define your button->command mappings.  Buttons can be created by
@@ -61,7 +48,6 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    visionButton.whileHeld(this.visionCommand);
   }
 
 
