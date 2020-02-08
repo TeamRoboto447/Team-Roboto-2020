@@ -8,8 +8,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.controlmaps.OperaterMap;
 
 public class RobotDriveCommand extends CommandBase {
   /**
@@ -31,6 +33,7 @@ public class RobotDriveCommand extends CommandBase {
   @Override
   public void execute() {
     this.driveSubsystem.tankDrive(RobotContainer.driverLeft.getY(), RobotContainer.driverRight.getY());
+    this.driveSubsystem.setInvertedDrive(RobotContainer.driverRight.getRawButton(1));
   }
 
   // Called once the command ends or is interrupted.

@@ -27,6 +27,7 @@ public class RobotContainer {
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
+  public final BinaryDriveCommand bDriveCommand = new BinaryDriveCommand(driveSubsystem);
 
   public static Joystick driverLeft = new Joystick(0);
   public static Joystick driverRight = new Joystick(1);
@@ -37,7 +38,11 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Configure the button bindings
-    this.driveSubsystem.setDefaultCommand(this.driveCommand);
+    if (Constants.Secret){
+      this.driveSubsystem.setDefaultCommand(this.bDriveCommand);
+    } else{
+      this.driveSubsystem.setDefaultCommand(this.driveCommand);
+    }
     configureButtonBindings();
   }
 

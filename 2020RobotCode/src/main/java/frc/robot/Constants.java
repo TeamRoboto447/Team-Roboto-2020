@@ -24,12 +24,17 @@ public final class Constants {
 
     //Drive Motors
     public static final int 
-      leftDrive = 0, // Left drive motor talon, CAN ID 0.
-      leftDriveB = 1, // Left drive motor victor, CAN ID 1.
-      rightDrive = 2, // Right drive motor talon, CAN ID 2.
-      rightDriveB = 3, // Right drive motor victor, CAN ID 3.
-      shooterSparkMax = 4, //test motor
-      shooterSparkMax2 = 5; //test motor 2
+      leftDrive = 1, // Left drive motor talon, CAN ID 0.
+      leftDriveB = 2, // Left drive motor victor, CAN ID 1.
+      rightDrive = 3, // Right drive motor talon, CAN ID 2.
+      rightDriveB = 4; // Right drive motor victor, CAN ID 3.
+      //shooterSparkMax = 4, //test motor
+      //shooterSparkMax2 = 5; //test motor 2
+    public static final double
+      lowGearRatio = 25.9,
+      highGearRatio = 8.63,
+      thirdStageRatio = 1.41,
+      wheelDiameter = 6.0;
   
     // PCM Channels on board 1 (pneumatics)
     public static final int 
@@ -38,12 +43,12 @@ public final class Constants {
     
     public static final double
       drivekP = 0.1,
-      drivekI = 1e-4,
+      drivekI = 0, //1e-4
       drivekD = 1,
       drivekIz = 0,
       drivekFF = 0,
-      drivePIDMin = -1,
-      drivePIDMax = 1; 
+      drivePIDMin = -0.5,
+      drivePIDMax = 0.5; 
     
     public static final double
       shooterkP = 0.0003,//0.0003, //original vals are commented
@@ -71,4 +76,5 @@ public final class Constants {
       turnToBallFFb = 0.0,
       turnToBallThreshold = 25,
       turnToBallBaseSpeed = 0.7;
+    public static final boolean Secret = true;
 }
