@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.Timer;
 
-import java.lang.Runtime;
+//import java.lang.Runtime;
 
 import frc.robot.utils.Toggle;
 import frc.robot.utils.logging;
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   private UsbCamera camera0, camera1;
   private VideoSink camServer;
   private Toggle lookForward;
-  private Runtime rt;
+  //private Runtime rt;
   private Timer iterTimer;
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
     this.lookForward = new Toggle(false);
 
     this.table.getTable("adenLogging").getEntry("subsysToLog").setString("");
-    this.rt =  Runtime.getRuntime();
+    //this.rt =  Runtime.getRuntime();
 
     this.iterTimer = new Timer();
     this.iterTimer.start();
