@@ -37,11 +37,11 @@ public final class Constants {
       transmissionHigh = 1; // Drive transmission high channel, PCM channel 1.
     
     public static final double
-      shooterkP = 0.0003,//0.0003, //original vals are commented
-      shooterkI = 0.0013815,//0.000931,
-      shooterkD = 0.000016,//0.000024,
-      shooterkFFm = 0.0001774, //0.000172,
-      shooterkFFb = -0.003214,//-0.002191,
+      shooterkP = 0.000270,//0.0003, //original vals are commented
+      shooterkI = 0.001261,//0.000931,
+      shooterkD = 0.000014,//0.000024,
+      shooterkFFm = 0.000176, //0.000172,
+      shooterkFFb = -0.009218,//-0.002191,
       speedkM = 0.0135274,
       speedkB = 0.6368884,
       pidIntegralResetTime = 2,

@@ -137,7 +137,7 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.gyroAngle.setDouble(angle);
     this.time.setDouble(System.currentTimeMillis());
     double poseX = this.targetPose.getDoubleArray(new double[]{0, 0})[0];
-    double distance = (3.349506 * poseX) - 2.2405898;
+    double distance = (3.402467057 * poseX) - 2.8026899;
     this.distanceToTarget.push(distance);
     this.distanceEntry.setDouble(this.distanceToTarget.getAverage());
   }

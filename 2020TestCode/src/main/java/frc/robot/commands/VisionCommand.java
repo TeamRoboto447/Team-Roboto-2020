@@ -110,7 +110,7 @@ public class VisionCommand extends CommandBase {
       this.driveTargetCalculated = false;
       stop();
     }
-    //TODO WHAT?????????
+    
     if(RobotContainer.operator.getRawButton(OperaterMap.RB)) {
       this.driveSubsystem.tankDrive(0.2, 0.2, false);
     }
