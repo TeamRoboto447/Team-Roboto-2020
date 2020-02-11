@@ -28,8 +28,8 @@ public final class Constants {
       leftDriveB = 1, // Left drive motor victor, CAN ID 1.
       rightDrive = 2, // Right drive motor talon, CAN ID 2.
       rightDriveB = 3, // Right drive motor victor, CAN ID 3.
-      shooterSparkMax = 4, //test motor
-      shooterSparkMax2 = 5; //test motor 2
+      shooterSparkMaxLeft = 6, // Shooter Left Spark Max, CAN ID 6.
+      shooterSparkMaxRight = 7; // Shooter Right Spark Max, CAN ID 7.
   
     // PCM Channels on board 1 (pneumatics)
     public static final int 
@@ -47,6 +47,7 @@ public final class Constants {
       pidIntegralResetTime = 2,
       distanceFromInnerToOuterPort = 2,
       maxInnerPortAjustmentAngle = Math.PI / 4;
+
     public static final double //values for turning PID
       turnkP = 0.01986, // 0.0207, //we had 2 sets of values, I (Aden) put the ones in I thought were write
       turnkI = 0.070042, //0.0414,
@@ -54,6 +55,7 @@ public final class Constants {
       turnkFFm = 0.0,
       turnkFFb = 0.0,
       turnTargetAjust = 0.9;
+
     public static final double
       turnToBallP = 0.003,
       turnToBallI = 0.0005,

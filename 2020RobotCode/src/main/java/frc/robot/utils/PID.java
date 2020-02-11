@@ -8,7 +8,7 @@
 package frc.robot.utils;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
-import frc.robot.utils.logging;
+import frc.robot.utils.Logging;
 /*
  * Add your docs here.
  */
@@ -67,12 +67,12 @@ public class PID {
         this.iterTime.start();
         this.iterTime.reset();
         
-        if (this.integralTimer.get()>=Constants.pidIntegralResetTime){
+        if (this.integralTimer.get()>=Constants.shooterPidIntegralResetTime){
             this.resetIntegral();
             this.integralTimer.reset();
         }
 
-        logging.info("PID time: "+iterTime,"PIDtime");
+        Logging.info("PID time: "+iterTime,"PIDtime");
 
         final double error = this.setpoint - processingVar;
         this.integral += (error * iterTime);
@@ -84,7 +84,7 @@ public class PID {
             this.integral = this.maxInt;
         }
         
-        logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive,"PIDvals");
+        Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive,"PIDvals");
 
         this.previousError = error;
         return this.P*error + this.I*this.integral + this.D*derivitive + this.feedforward();
@@ -95,11 +95,11 @@ public class PID {
     } 
     
     public void resetIntegral() {
-        logging.debug("Integral reset prev val: "+this.integral, "shootIntegral");
+        Logging.debug("Integral reset prev val: "+this.integral, "shootIntegral");
         this.integral = 0;
         this.iterTime.reset();
         this.iterTime.stop();
-        logging.debug("Integral reset after val: "+this.integral, "shootIntegral");
+        Logging.debug("Integral reset after val: "+this.integral, "shootIntegral");
     } 
     
     public void updateP(double kP){
@@ -121,5 +121,25 @@ public class PID {
 
     public void updateSetpoint(double kSetpoint){
         this.setpoint = kSetpoint;
+    }
+
+    public double getP() {
+        return this.P;
+    }
+
+    public double getI() {
+        return this.I;
+    }
+
+    public double getD() {
+        return this.D;
+    }
+
+    public double[] getFF() {
+        return new double[]{this.FFm, this.FFb};
+    }
+    
+    public double getSetpoint() {
+        return this.setpoint;
     }
 }

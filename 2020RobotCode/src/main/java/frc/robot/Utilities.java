@@ -6,6 +6,13 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Utilities {
     static NetworkTableEntry subsystemToDebug;
 
+    public static double adjustForDeadzone(double value, double deadzone) {
+        if(Math.abs(value) < deadzone) {
+            return 0;
+        }
+        return value;
+    }
+
     public static double feetToEncoder(double target){
         return inchToEncoder(target * 12);
     }

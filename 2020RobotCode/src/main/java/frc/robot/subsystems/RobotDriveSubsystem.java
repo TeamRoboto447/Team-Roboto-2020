@@ -11,6 +11,9 @@ import java.lang.Math;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.SPI;
+
+import com.kauailabs.navx.frc.AHRS;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANEncoder;
@@ -21,6 +24,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import frc.robot.Constants;
 
 import frc.robot.utils.EdgeDetector;
+import frc.robot.Utilities;
 
 public class RobotDriveSubsystem extends SubsystemBase {
   /**
@@ -36,7 +40,10 @@ public class RobotDriveSubsystem extends SubsystemBase {
   boolean firstDrivingTo;
   EdgeDetector stopDriveTo;
 
+  AHRS gyro;
+
   public RobotDriveSubsystem() {
+    this.gyro = new AHRS(SPI.Port.kMXP);
     this.drivingTo=false;
     this.firstDrivingTo=true;
     // Set up motors
@@ -93,8 +100,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
   }
 
   public void tankDrive(double leftSpeed, double rightSpeed) {
-    if(Math.abs(leftSpeed) < 0.1) leftSpeed = 0;
-    if(Math.abs(rightSpeed) < 0.1) rightSpeed = 0;
+    double deadzone = 0.1;
+    leftSpeed = Utilities.adjustForDeadzone(leftSpeed, deadzone);
+    rightSpeed = Utilities.adjustForDeadzone(rightSpeed, deadzone);
     
     this.setRelativeLeft(leftSpeed);
     this.setRelativeRight(rightSpeed);
@@ -114,7 +122,6 @@ public class RobotDriveSubsystem extends SubsystemBase {
     }
     this.leftPIDController.setReference(rotations, ControlType.kPosition);
     this.rightPIDController.setReference(rotations, ControlType.kPosition);
-    //System.out.println("LC:" + this.leftEncoder.getPosition() + ", RC:" + this.rightEncoder.getPosition() + ", SP:" + rotations);
   }
   public void driveToEncoder(double rotations) {
     double encRotations = rotations * Constants.lowGearRatio;
@@ -136,6 +143,7 @@ public class RobotDriveSubsystem extends SubsystemBase {
       this.leftDrive.set(speed);
     }
   }
+
   private void setRelativeRight(double speed) {
     if (this.driveInverted) {
       this.leftDrive.set(speed);
@@ -143,8 +151,17 @@ public class RobotDriveSubsystem extends SubsystemBase {
       this.rightDrive.set(speed);
     }
   }
+
   private void resetEncoders(){
     this.rightEncoder.setPosition(0);
     this.leftEncoder.setPosition(0);
+  }
+
+  public double getAngle() {
+    return gyro.getAngle();
+  }
+
+  public void resetAngle() {
+    this.gyro.reset();
   }
 }

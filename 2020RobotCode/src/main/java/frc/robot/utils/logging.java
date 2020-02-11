@@ -13,7 +13,7 @@ import frc.robot.Constants;
 /**
  * Add your docs here.
  */
-public class logging {
+public class Logging {
     static NetworkTableEntry subsystemToDebug;
     public static void errors(String message, String name){
         if (Constants.loggingLevel >= 0){
@@ -49,5 +49,6 @@ public class logging {
 
     public static void init() {
         subsystemToDebug = NetworkTableInstance.getDefault().getTable("adenLogging").getEntry("subsysToLog");
+        subsystemToDebug.setString("");
     }
 }

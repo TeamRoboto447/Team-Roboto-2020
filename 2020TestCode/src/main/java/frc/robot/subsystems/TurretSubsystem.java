@@ -33,33 +33,17 @@ public class TurretSubsystem extends SubsystemBase {
   Boolean bypassShooterPID;
   Double shootP, shootI, shootD, shootFFm, shootFFb;
   
-  CANSparkMax shootingMotor, shootingMotor2;
+  CANSparkMax shooterSparkMaxLeft, shooterSparkMaxRight;
   CANEncoder encoder;
   public TurretSubsystem() {
     // Set up Network Tables
-    this.table = NetworkTableInstance.getDefault();
-    this.PIDInfo = this.table.getTable("PID");
-    this.pidTuningPVs = this.table.getTable("pidTuningPVs");
-    this.camInfo = this.table.getTable("chameleon-vision").getSubTable("Shooter Targeting");
-    
-    this.shootPEntry = this.PIDInfo.getEntry("shootkP");
-    this.shootIEntry = this.PIDInfo.getEntry("shootkI");
-    this.shootDEntry = this.PIDInfo.getEntry("shootkD");
-    this.shootFFmEntry = this.PIDInfo.getEntry("shootkFFm");
-    this.shootFFbEntry = this.PIDInfo.getEntry("shootkFFb");
-    this.bypassShooterPIDEntry = this.PIDInfo.getEntry("bypassShooterPID");
-    this.shooterSpeedEntry = this.PIDInfo.getEntry("shootTargetSpeed");
-    this.shooterCurrSpeedEntry = this.pidTuningPVs.getEntry("Shooter Speed");
-
-    this.shooterCurrSpeedEntry.setDouble(0);
-
-
+    setupNetworkTable();
 
     // Set up Motors
-    this.shootingMotor = new CANSparkMax(Constants.shooterSparkMax, MotorType.kBrushless);
-    this.shootingMotor2 = new CANSparkMax(Constants.shooterSparkMax2, MotorType.kBrushless);
+    this.shooterSparkMaxLeft = new CANSparkMax(Constants.shooterSparkMaxLeft, MotorType.kBrushless);
+    this.shooterSparkMaxRight = new CANSparkMax(Constants.shooterSparkMaxRight, MotorType.kBrushless);
     if (Features.Shooter){
-      this.encoder = this.shootingMotor.getEncoder();
+      this.encoder = this.shooterSparkMaxLeft.getEncoder();
     }
     
     //like our magic numbers?
@@ -80,6 +64,30 @@ public class TurretSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     updateShooterPIDValues();
     updateNetworkTables();
+  }
+
+  private void setupNetworkTable() {
+    this.table = NetworkTableInstance.getDefault();
+    this.PIDInfo = this.table.getTable("PID");
+    this.pidTuningPVs = this.table.getTable("pidTuningPVs");
+    this.camInfo = this.table.getTable("chameleon-vision").getSubTable("Shooter Targeting");
+
+    this.shootPEntry = this.PIDInfo.getEntry("shootkP");
+    this.shootIEntry = this.PIDInfo.getEntry("shootkI");
+    this.shootDEntry = this.PIDInfo.getEntry("shootkD");
+    this.shootFFmEntry = this.PIDInfo.getEntry("shootkFFm");
+    this.shootFFbEntry = this.PIDInfo.getEntry("shootkFFb");
+    this.bypassShooterPIDEntry = this.PIDInfo.getEntry("bypassShooterPID");
+    this.shooterSpeedEntry = this.PIDInfo.getEntry("shootTargetSpeed");
+    this.shooterCurrSpeedEntry = this.pidTuningPVs.getEntry("Shooter Speed");
+
+    this.shootPEntry.setDouble(Constants.shooterkP);
+    this.shootIEntry.setDouble(Constants.shooterkI);
+    this.shootDEntry.setDouble(Constants.shooterkD);
+    this.shootFFmEntry.setDouble(Constants.shooterkFFm);
+    this.shootFFbEntry.setDouble(Constants.shooterkFFb);
+    this.bypassShooterPIDEntry.setBoolean(Constants.bypassShooterPID);
+    this.shooterCurrSpeedEntry.setDouble(0);
   }
 
 
@@ -112,8 +120,8 @@ public class TurretSubsystem extends SubsystemBase {
       workingSpeed = speed; //Bypass PID if it's going nuts
     }
     
-    shootingMotor.set(workingSpeed);
-    shootingMotor2.set(-workingSpeed);
+    shooterSparkMaxLeft.set(workingSpeed);
+    shooterSparkMaxRight.set(-workingSpeed);
     //System.out.println("Input:"+workingSpeed+" Shooter:"+this.encoder.getVelocity()+" Target:"+targetVel);
     //System.out.println("Shooter speed: "+this.encoder.getVelocity());
     //Utilities.logging("Shooter speed: "+this.encoder.getVelocity(), "DEBUG");

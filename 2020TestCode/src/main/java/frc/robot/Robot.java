@@ -76,20 +76,6 @@ public class Robot extends TimedRobot {
     this.FF.setDouble(0);
     this.dummyDist.setDouble(0);
 
-    this.shootP = this.PIDTune.getEntry("shootkP");
-    this.shootI = this.PIDTune.getEntry("shootkI");
-    this.shootD = this.PIDTune.getEntry("shootkD");
-    this.shootFFm = this.PIDTune.getEntry("shootkFFm");
-    this.shootFFb = this.PIDTune.getEntry("shootkFFb");
-    this.bypassShooterPID = this.PIDTune.getEntry("bypassShooterPID");
-
-    this.shootP.setDouble(Constants.shooterkP);
-    this.shootI.setDouble(Constants.shooterkI);
-    this.shootD.setDouble(Constants.shooterkD);
-    this.shootFFm.setDouble(Constants.shooterkFFm);
-    this.shootFFb.setDouble(Constants.shooterkFFb);
-    this.bypassShooterPID.setBoolean(Constants.bypassShooterPID);
-
     this.table.getTable("chameleon-vision").getEntry("shooterSpeed").setDouble(0);
     this.lookForward = new Toggle(false);
 

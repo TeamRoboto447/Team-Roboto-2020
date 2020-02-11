@@ -9,7 +9,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
-import frc.robot.controlmaps.OperaterMap;
+import frc.robot.controlmaps.OperatorMap;
 import frc.robot.subsystems.RobotDriveSubsystem;
 
 public class BinaryDriveCommand extends CommandBase {
@@ -32,17 +32,17 @@ public class BinaryDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (RobotContainer.operator.getRawButton(OperaterMap.X)){ 
+    if (RobotContainer.operator.getRawButton(OperatorMap.X)){ 
       double distance = this.getNumber(1);
       this.driveSubsystem.driveToFeet(distance);
-    } else if (RobotContainer.operator.getRawButton(OperaterMap.A)) {
+    } else if (RobotContainer.operator.getRawButton(OperatorMap.A)) {
       this.driveSubsystem.setInvertedDrive(false);
       double speed = this.getNumber(1.0 / 15);
-      this.driveSubsystem.arcadeDrive(speed, RobotContainer.operator.getRawAxis(OperaterMap.lJoyX)/2);
-    } else if (RobotContainer.operator.getRawButton(OperaterMap.B)) {
+      this.driveSubsystem.arcadeDrive(speed, RobotContainer.operator.getRawAxis(OperatorMap.lJoyX)/2);
+    } else if (RobotContainer.operator.getRawButton(OperatorMap.B)) {
       this.driveSubsystem.setInvertedDrive(true);
       double speed = this.getNumber(1.0 / 15);
-      this.driveSubsystem.arcadeDrive(speed, RobotContainer.operator.getRawAxis(OperaterMap.lJoyX)/2);
+      this.driveSubsystem.arcadeDrive(speed, RobotContainer.operator.getRawAxis(OperatorMap.lJoyX)/2);
     } else{
       this.driveSubsystem.setInvertedDrive(RobotContainer.driverRight.getRawButton(1));
       this.driveSubsystem.tankDrive(RobotContainer.driverLeft.getY(), RobotContainer.driverRight.getY());
@@ -50,16 +50,16 @@ public class BinaryDriveCommand extends CommandBase {
   }
   private double getNumber(double base){
     double out=0.0;
-    if (RobotContainer.operator.getRawButton(OperaterMap.RT)){
+    if (RobotContainer.operator.getRawButton(OperatorMap.RT)){
       out += Math.pow(2,0)*base;
     }
-    if(RobotContainer.operator.getRawButton(OperaterMap.RB)){
+    if(RobotContainer.operator.getRawButton(OperatorMap.RB)){
       out += Math.pow(2,1)*base;
     }
-    if(RobotContainer.operator.getRawButton(OperaterMap.LB)){
+    if(RobotContainer.operator.getRawButton(OperatorMap.LB)){
       out += Math.pow(2,2)*base;
     }
-    if(RobotContainer.operator.getRawButton(OperaterMap.LT)){
+    if(RobotContainer.operator.getRawButton(OperatorMap.LT)){
       out += Math.pow(2,3)*base;
     }
     return out;

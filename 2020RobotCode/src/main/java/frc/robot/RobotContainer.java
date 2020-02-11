@@ -25,9 +25,11 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
+  public final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem);
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
   public final BinaryDriveCommand bDriveCommand = new BinaryDriveCommand(driveSubsystem);
+  public final TurretCommand turretCommand = new TurretCommand(turretSubsystem, driveSubsystem);
 
   public static Joystick driverLeft = new Joystick(0);
   public static Joystick driverRight = new Joystick(1);
@@ -36,13 +38,11 @@ public class RobotContainer {
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
-  public RobotContainer() {
+  public RobotContainer() {    
+    // Set default commands
+    setDefaultCommands();
+
     // Configure the button bindings
-    if (Constants.Secret){
-      this.driveSubsystem.setDefaultCommand(this.bDriveCommand);
-    } else{
-      this.driveSubsystem.setDefaultCommand(this.driveCommand);
-    }
     configureButtonBindings();
   }
 
@@ -53,6 +53,16 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+  }
+
+  private void setDefaultCommands() {
+    if (Constants.Secret){
+      this.driveSubsystem.setDefaultCommand(this.bDriveCommand);
+    } else{
+      this.driveSubsystem.setDefaultCommand(this.driveCommand);
+    }
+    
+    this.turretSubsystem.setDefaultCommand(this.turretCommand);
   }
 
 

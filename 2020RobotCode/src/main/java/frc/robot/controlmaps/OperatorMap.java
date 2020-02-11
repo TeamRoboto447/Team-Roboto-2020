@@ -10,11 +10,10 @@ package frc.robot.controlmaps;
 /**
  * Button Map for the operater
  */
-public class OperaterMap{
-    public final static int
-        X = 1, A = 2, B = 3, Y = 4,
-        LB = 5, RB = 6, LT = 7, RT = 8,
-        back = 9, start = 10,
-        lJoyPress = 11, rJoyPress = 12,
+public class OperatorMap {
+    public final static int // Buttons
+        X = 1, A = 2, B = 3, Y = 4, LB = 5, RB = 6, LT = 7, RT = 8, back = 9, start = 10, lJoyPress = 11, rJoyPress = 12;
+
+    public final static int // Axis
         lJoyX = 0, lJoyY = 1, rJoyX = 2, rJoyY = 3;
 }
