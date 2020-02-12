@@ -9,6 +9,7 @@ package frc.robot.utils;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.utils.Logging;
+import frc.robot.utils.ff.FFbase;
 /*
  * Add your docs here.
  */
@@ -19,39 +20,38 @@ public class PID {
         P, 
         I, 
         D,
-        FFm,
-        FFb, 
         setpoint,
         maxInt,
         minInt,
-        minIntErr;
+        izone;
     Timer 
         iterTime,
         integralTimer;
+    FFbase FF;
 
     public PID (double kSetpoint, double kP, double kI,
-    double kD, double kFFm, double kFFb,
-    double minIntegral, double maxIntegral) {
-        this.P = kP;
-        this.I = kI;
-        this.D = kD;
-        this.FFm = kFFm;
-        this.FFb = kFFb;
-        this.setpoint = kSetpoint;
-        this.iterTime = new Timer();
-        this.iterTime.reset();
-        this.iterTime.stop();
-        this.integralTimer = new Timer();
-        this.integralTimer.reset();
+     double kD, FFbase kFF,
+     double minIntegral, double maxIntegral) {
+        this(kSetpoint, kP, kI, kD, kFF);
         this.minInt=minIntegral;
         this.maxInt=maxIntegral;
     }
-    public PID (double kSetpoint, double kP, double kI, double kD, double kFFm, double kFFb) {
+    public PID (double kSetpoint, double kP, double kI, double kD, FFbase kFF, double kiZone){
+        this(kSetpoint, kP, kI, kD, kFF);
+        this.izone = kiZone;
+    }
+    public PID (double kSetpoint, double kP, double kI, double kD, FFbase kFF,
+     double kiZone, double minIntegral, double maxIntegral){
+        this(kSetpoint, kP, kI, kD, kFF);
+        this.izone=kiZone;
+        this.minInt=minIntegral;
+        this.maxInt=maxIntegral;
+    }
+    public PID (double kSetpoint, double kP, double kI, double kD, FFbase kFF) {
         this.P = kP;
         this.I = kI;
         this.D = kD;
-        this.FFm = kFFm;
-        this.FFb = kFFb;
+        this.FF = kFF;
         this.setpoint = kSetpoint;
         this.iterTime = new Timer();
         this.iterTime.reset();
@@ -60,6 +60,7 @@ public class PID {
         this.integralTimer.reset();
         this.minInt=0;
         this.maxInt=0;
+        this.izone=0;        
     }
 
     public double run(double processingVar) {
@@ -75,24 +76,22 @@ public class PID {
         Logging.info("PID time: "+iterTime,"PIDtime");
 
         final double error = this.setpoint - processingVar;
-        this.integral += (error * iterTime);
-        final double derivitive = (error - this.previousError) / iterTime;
-        
+        if ( Math.abs(error) <= this.izone || this.izone==0){
+            this.integral += (error * iterTime);
+        }
         if (this.minInt != 0 && this.integral<this.minInt){
             this.integral = this.minInt;
         } else if (this.maxInt != 0 && this.integral>this.maxInt){
             this.integral = this.maxInt;
         }
+
+        final double derivitive = (error - this.previousError) / iterTime;
         
         Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive,"PIDvals");
 
         this.previousError = error;
-        return this.P*error + this.I*this.integral + this.D*derivitive + this.feedforward();
+        return this.P*error + this.I*this.integral + this.D*derivitive + this.FF.getFF(setpoint,processingVar);
     }
-
-    private double feedforward() {
-        return this.FFm * this.setpoint + this.FFb;
-    } 
     
     public void resetIntegral() {
         Logging.debug("Integral reset prev val: "+this.integral, "shootIntegral");
@@ -114,11 +113,6 @@ public class PID {
         this.D = kD;
     }
 
-    public void updateFF(double kFFm, double kFFb){
-        this.FFm = kFFm;
-        this.FFb = kFFb;
-    }
-
     public void updateSetpoint(double kSetpoint){
         this.setpoint = kSetpoint;
     }
@@ -134,12 +128,14 @@ public class PID {
     public double getD() {
         return this.D;
     }
-
-    public double[] getFF() {
-        return new double[]{this.FFm, this.FFb};
-    }
     
     public double getSetpoint() {
         return this.setpoint;
+    }
+    public void setFF(FFbase kFF){
+        this.FF = kFF;
+    }
+    public FFbase getFF(){
+        return this.FF;
     }
 }

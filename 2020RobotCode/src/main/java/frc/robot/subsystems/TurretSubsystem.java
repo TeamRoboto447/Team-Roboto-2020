@@ -13,6 +13,7 @@ import frc.robot.utils.Logging;
 import frc.robot.utils.PID;
 import frc.robot.Constants;
 import frc.robot.Utilities;
+import frc.robot.utils.ff.ConstantFF;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANEncoder;
@@ -270,12 +271,12 @@ public class TurretSubsystem extends SubsystemBase {
     // notConnectedYet Constants.shooterkFFb,
     // notConnectedYet -Constants.shooterIZone, // Minimum integral
     // notConnectedYet Constants.shooterIZone); // Maximum integral
-
+  
     this.turretPositionPID = new PID(0, // Default setpoint
-        Constants.turretkP, Constants.turretkI, Constants.turretkD, Constants.turretFFm, Constants.turretFFb,
+        Constants.turretkP, Constants.turretkI, Constants.turretkD, new ConstantFF(0.0),
         -Constants.turretIZone, // Minimum integral
         Constants.turretIZone); // Maximum integral
-  }
+}
 
   private void setupNetworkTables() {
     this.table = NetworkTableInstance.getDefault();
@@ -339,7 +340,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     double distanceLineEqM = 3.5729109;
     double distanceLineEqB = -4.02731519;
-    this.distance = this.poseY < 0 ? -1 : distanceLineEqM + this.poseY + distanceLineEqB;
+    this.distance = this.poseX < 0 ? -1 : (distanceLineEqM * this.poseX) + distanceLineEqB;
     this.turretLastTargetEntry.setDouble(this.lastTargetPos);
     this.turretLastTargetOffsetEntry.setDouble(this.turretOffset);
   }
