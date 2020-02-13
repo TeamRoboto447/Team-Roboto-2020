@@ -7,17 +7,17 @@
 
 package frc.robot.commands;
 
-//import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.subsystems.ControlPanelSubsystem;
 
-public class RobotDriveCommand extends CommandBase {
-  private final RobotDriveSubsystem driveSubsystem;
-  public RobotDriveCommand(RobotDriveSubsystem subsystem) {
-    driveSubsystem = subsystem;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+public class ControlPanelCommand extends CommandBase {
+  /**
+   * Creates a new ControlPanelCommand.
+   */
+  ControlPanelSubsystem ctrlPanelSubsystem;
+  public ControlPanelCommand(ControlPanelSubsystem subsystem) {
+    this.ctrlPanelSubsystem = subsystem;
+    addRequirements(this.ctrlPanelSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -28,11 +28,6 @@ public class RobotDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // boolean driveInverted = RobotContainer.driverLeft.getRawButton(1);
-
-    double rightSpeed = RobotContainer.driverLeft.getY();
-    double leftSpeed = RobotContainer.driverRight.getY();
-    driveSubsystem.tankDrive(-leftSpeed, -rightSpeed, this.driveSubsystem.getDriveInverted());
   }
 
   // Called once the command ends or is interrupted.

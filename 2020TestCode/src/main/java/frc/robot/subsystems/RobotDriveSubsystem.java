@@ -11,28 +11,32 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANPIDController;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.Constants;
 import frc.robot.Utilities;
+import frc.robot.utils.Features;
+import frc.robot.utils.logging;
+import frc.robot.utils.MovingAverage;
 
 public class RobotDriveSubsystem extends SubsystemBase {
-  public TalonSRX leftTalon;
-public TalonSRX rightTalon;
+  public TalonSRX leftTalon, rightTalon;
   VictorSPX leftVictor, rightVictor;
-  CANSparkMax testMotor;
-  public Gyro gyro;
-  NetworkTable gyroInfo;
-  public NetworkTableEntry gyroAngle, time;
+  CANPIDController pid;
+  public AHRS gyro;
+  MovingAverage distanceToTarget;
 
+  NetworkTable pidTuningPVs, PIDInfo, camInfo;
+  NetworkTableInstance table;
+  public NetworkTableEntry gyroAngle, shooterSpeed, time, targetPose,
+    shootPEntry, shootIEntry, shootDEntry, shootFFmEntry, shootFFbEntry,
+    distanceEntry, shooterSpeedEntry, bypassShooterPIDEntry;
 
   private boolean driveInverted = false;
   public boolean getDriveInverted() {
@@ -44,21 +48,33 @@ public TalonSRX rightTalon;
   }
 
   public RobotDriveSubsystem() {
-    this.gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
-    this.gyro.calibrate();
+    this.gyro = new AHRS(SPI.Port.kMXP);
+    this.gyro.reset();
 
-    this.gyroInfo = NetworkTableInstance.getDefault().getTable("gyroInfo");
 
-    this.gyroAngle = this.gyroInfo.getEntry("Angle");
-    this.gyroAngle.setValue(0);
-    this.time = this.gyroInfo.getEntry("Time");
-    this.time.setValue(0);
+    // Get all used NT entries
+    this.table = NetworkTableInstance.getDefault();
+    this.pidTuningPVs = this.table.getTable("pidTuningPVs");
 
-    testMotor = new CANSparkMax(Constants.testSparkMax, MotorType.kBrushless);
-    leftTalon = new TalonSRX(Constants.leftDrive);
-    leftVictor = new VictorSPX(Constants.leftDriveB);
-    rightTalon = new TalonSRX(Constants.rightDrive);
-    rightVictor = new VictorSPX(Constants.rightDriveB);
+    this.gyroAngle = this.pidTuningPVs.getEntry("Angle");
+    this.time = this.pidTuningPVs.getEntry("Time");
+    this.PIDInfo = this.table.getTable("PID");
+    this.camInfo = this.table.getTable("chameleon-vision").getSubTable("Shooter Targeting");
+    this.targetPose = this.camInfo.getEntry("targetPose");
+    this.distanceEntry = this.PIDInfo.getEntry("Distance");
+
+    this.gyroAngle.setDouble(0);
+    this.time.setDouble(0);
+
+
+
+    if (Features.Shooter) {
+    }
+    this.leftTalon = new TalonSRX(Constants.leftDrive);
+    this.leftVictor = new VictorSPX(Constants.leftDriveB);
+    this.rightTalon = new TalonSRX(Constants.rightDrive);
+    this.rightVictor = new VictorSPX(Constants.rightDriveB);
+    
 
     leftTalon.setInverted(false);
     leftTalon.setSensorPhase(false);
@@ -70,15 +86,16 @@ public TalonSRX rightTalon;
     rightVictor.follow(rightTalon);
     rightVictor.setInverted(InvertType.FollowMaster);
 
+    this.distanceToTarget = new MovingAverage(20);
   }
 
   @Override
   public void periodic() {
-    updateGyro();
+    updateNetworkTable();
   }
 
-  public void tankDrive(double leftSpeed, double rightSpeed, boolean driveInverted) {
-    if(driveInverted) {
+  public void tankDrive(final double leftSpeed, final double rightSpeed, final boolean driveInverted) {
+    if (driveInverted) {
       leftTalon.set(ControlMode.PercentOutput, -rightSpeed);
       rightTalon.set(ControlMode.PercentOutput, -leftSpeed);
     } else {
@@ -87,39 +104,43 @@ public TalonSRX rightTalon;
     }
   }
 
-  public void driveToInch(double targetLeft, double targetRight) {
-    leftTalon.set(ControlMode.MotionMagic, Utilities.encoderToInch(targetLeft));
-    rightTalon.set(ControlMode.MotionMagic, Utilities.encoderToInch(targetRight));
+  public void driveToInch(final double targetLeft, final double targetRight) {
+    leftTalon.set(ControlMode.MotionMagic, Utilities.inchToEncoder(targetLeft));
+    rightTalon.set(ControlMode.MotionMagic, Utilities.inchToEncoder(targetRight));
   }
 
-  public void driveToEncode(double targetLeft, double targetRight) {
+  public void driveToEncode(final double targetLeft, final double targetRight) {
     leftTalon.set(ControlMode.MotionMagic, targetLeft);
     rightTalon.set(ControlMode.MotionMagic, targetRight);
   }
 
   public void turnToZeroVeryInnacurate() {
-    double speed = 0.75;
-    double angle = gyroAngle.getDouble(0);
-    Utilities.logging(angle+"", "DEBUG");
-    if(angle >= 0 && angle <= 180) {
+    final double speed = 0.75;
+    final double angle = gyroAngle.getDouble(0);
+    if (angle >= 0 && angle <= 180) {
       this.tankDrive(speed, -speed, false);
-    } else if(angle <= 359 && angle >= 181) {
+    } else if (angle <= 359 && angle >= 181) {
       this.tankDrive(-speed, speed, false);
     }
   }
 
-  public void updateGyro() {
+  public void updateNetworkTable() {
     double angle = this.gyro.getAngle();
-    if(angle > 360) {
+    logging.info("Gyro angle:"+angle, "gyro");
+    logging.debug("Time:"+System.currentTimeMillis(), "time");
+    if (angle > 360) {
       angle -= 360;
-    } else if(angle < 0) {
+    } else if (angle < 0) {
       angle += 360;
     }
-    this.gyroAngle.setValue(angle);
-    this.time.setValue(System.currentTimeMillis());
+
+    this.gyroAngle.setDouble(angle);
+    this.time.setDouble(System.currentTimeMillis());
+    double poseX = this.targetPose.getDoubleArray(new double[]{0, 0})[0];
+    double distance = (3.402467057 * poseX) - 2.8026899;
+    this.distanceToTarget.push(distance);
+    this.distanceEntry.setDouble(this.distanceToTarget.getAverage());
   }
 
-  public void testMotor(double speed) {
-    testMotor.set(speed);
-  }
+  
 }

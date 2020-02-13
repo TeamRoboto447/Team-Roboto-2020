@@ -16,7 +16,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static int loggingLevel = 4; //Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
+    public static int loggingLevel = 4; // Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
 
     public static final boolean bypassShooterPID = false;
 
@@ -24,12 +24,21 @@ public final class Constants {
 
     //Drive Motors
     public static final int 
-      leftDrive = 0, // Left drive motor talon, CAN ID 0.
-      leftDriveB = 1, // Left drive motor victor, CAN ID 1.
-      rightDrive = 2, // Right drive motor talon, CAN ID 2.
-      rightDriveB = 3, // Right drive motor victor, CAN ID 3.
+      leftDrive = 3, // Left Drive Spark Max, CAN ID 1
+      leftDriveB = 4, // Left Drive Spark Max, CAN ID 2.
+      rightDrive = 1, // Right Drive Spark Max, CAN ID 3.
+      rightDriveB = 2, // Right Drive Spark Max, CAN ID 4.
+      turretSparkMax = 5, // Turret Rotation Spark Max, CAN ID 5.
       shooterSparkMaxLeft = 6, // Shooter Left Spark Max, CAN ID 6.
       shooterSparkMaxRight = 7; // Shooter Right Spark Max, CAN ID 7.
+
+    public static final double
+      // Gear ratios for calculating encoder ticks per rotation
+      lowGearRatio = 25.9,
+      highGearRatio = 8.63,
+      thirdStageRatio = 1.41,
+      // Wheel diameter for calculating inches per rotation
+      wheelDiameter = 6.0;
   
     // PCM Channels on board 1 (pneumatics)
     public static final int 
@@ -37,31 +46,37 @@ public final class Constants {
       transmissionHigh = 1; // Drive transmission high channel, PCM channel 1.
     
     public static final double
-      shooterkP = 0.000270,//0.0003, //original vals are commented
-      shooterkI = 0.001261,//0.000931,
-      shooterkD = 0.000014,//0.000024,
-      shooterkFFm = 0.000176, //0.000172,
-      shooterkFFb = -0.009218,//-0.002191,
+      drivekP = 0.1,
+      drivekI = 0, //1e-4
+      drivekD = 1,
+      drivekIz = 0,
+      drivekFF = 0,
+      drivePIDMin = -0.5,
+      drivePIDMax = 0.5; 
+    
+    // Shooter PID info
+    public static final double
+      shooterkP = 0.0003,//0.0003, //original vals are commented
+      shooterkI = 0.0013815,//0.000931,
+      shooterkD = 0.000016,//0.000024,
+      shooterkFFm = 0.0001774, //0.000172,
+      shooterkFFb = -0.003214,//-0.002191,
+      shooterIZone = 100,
       speedkM = 0.0135274,
       speedkB = 0.6368884,
-      pidIntegralResetTime = 2,
+      shooterPidIntegralResetTime = 2,
       distanceFromInnerToOuterPort = 2,
       maxInnerPortAjustmentAngle = Math.PI / 4;
 
-    public static final double //values for turning PID
-      turnkP = 0.01986, // 0.0207, //we had 2 sets of values, I (Aden) put the ones in I thought were write
-      turnkI = 0.070042, //0.0414,
-      turnkD = 0.001408, // 0.002588,
-      turnkFFm = 0.0,
-      turnkFFb = 0.0,
-      turnTargetAjust = 0.9;
-
+    // Turning PID info
     public static final double
-      turnToBallP = 0.003,
-      turnToBallI = 0.0005,
-      turnToBallD = 0.0,
-      turnToBallFFm = 0.0,
-      turnToBallFFb = 0.0,
-      turnToBallThreshold = 25,
-      turnToBallBaseSpeed = 0.7;
+      turretkP = 0.01,
+      turretkI = 0.009,
+      turretkD = 0.001,
+      turretFFm = 0,
+      turretFFb = 0,
+      turretIZone = 10,
+      turretSpinLimit = 190;
+
+    public static final boolean Secret = false;
 }

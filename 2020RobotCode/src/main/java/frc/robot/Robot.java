@@ -7,21 +7,14 @@
 
 package frc.robot;
 
-import edu.wpi.cscore.*;
-import edu.wpi.cscore.VideoSource.ConnectionStrategy;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj.Timer;
+import frc.robot.utils.Logging;
 
-//import java.lang.Runtime;
-
-import frc.robot.utils.Toggle;
-import frc.robot.utils.logging;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -29,66 +22,26 @@ import frc.robot.utils.logging;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Command autoCommand;
-  private RobotContainer robot;
-  private UsbCamera camera0, camera1;
-  private VideoSink camServer;
-  private Toggle lookForward;
-  //private Runtime rt;
-  private Timer iterTimer;
+  private Command autonomousCommand;
+
+  private RobotContainer robotContainer;
+  NetworkTable pidTuningPVs;
+  NetworkTableInstance table;
+  NetworkTableEntry timeEntry;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  
-  NetworkTable PIDTune;
-  NetworkTableInstance table;
-  NetworkTableEntry P, I, D, FF, shootP, shootI, shootD, shootFFm, shootFFb, bypassShooterPID, dummyDist;
-  public static double iterTime;
-  
   @Override
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    robot = new RobotContainer();
-    camera0 = CameraServer.getInstance().startAutomaticCapture(0);
-    camera0.setResolution(160, 120);
-    camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-
-    camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-    camera1.setResolution(160, 120);
-    camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-
-    camServer = CameraServer.getInstance().getServer();
-    
+    robotContainer = new RobotContainer();
+    robotContainer.driveSubsystem.resetAngle();
+    Logging.init();
     this.table = NetworkTableInstance.getDefault();
-
-    this.PIDTune = this.table.getTable("PID");
-    this.P = this.PIDTune.getEntry("turnkP");
-    this.I = this.PIDTune.getEntry("turnkI");
-    this.D = this.PIDTune.getEntry("turnkD");
-    this.FF = this.PIDTune.getEntry("turnkFF");
-    this.dummyDist = this.PIDTune.getEntry("dummyDist");
-
-    this.P.setDouble(0.01986);
-    this.I.setDouble(0.070042);
-    this.D.setDouble(0.001408);
-    this.FF.setDouble(0);
-    this.dummyDist.setDouble(0);
-
-    this.table.getTable("chameleon-vision").getEntry("shooterSpeed").setDouble(0);
-    this.lookForward = new Toggle(false);
-
-    this.table.getTable("adenLogging").getEntry("subsysToLog").setString("");
-    //this.rt =  Runtime.getRuntime();
-
-    this.iterTimer = new Timer();
-    this.iterTimer.start();
-
-    Utilities.init();
-    logging.init();
-
-    setRobotFront();
+    this.pidTuningPVs = table.getTable("pidTuningPVs");
+    this.timeEntry = pidTuningPVs.getEntry("timeMS");
   }
 
   /**
@@ -98,26 +51,16 @@ public class Robot extends TimedRobot {
    * <p>This runs after the mode specific periodic functions, but before
    * LiveWindow and SmartDashboard integrated updating.
    */
+
   @Override
   public void robotPeriodic() {
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
-    iterTimer.reset();
     CommandScheduler.getInstance().run();
-    logging.debug(iterTimer.get() + "s", "itertime");
-    // logLowMemory();
+    this.timeEntry.setDouble(System.currentTimeMillis());
   }
-
-  // private void logLowMemory() {
-  //   double freeMemory = this.rt.freeMemory() / Math.pow(2,20);
-  //   logging.info(Double.toString( freeMemory ),"memory");
-  //   if (freeMemory < 2.0){
-  //     System.err.println("Low Memory: "+freeMemory+"MB");
-  //     System.gc();
-  //   }
-  // }
 
   /**
    * This function is called once each time the robot enters Disabled mode.
@@ -135,11 +78,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    autoCommand = robot.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
-    if (autoCommand != null) {
-      autoCommand.schedule();
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
     }
   }
 
@@ -156,10 +99,9 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (autoCommand != null) {
-      autoCommand.cancel();
+    if (autonomousCommand != null) {
+      autonomousCommand.cancel();
     }
-
   }
 
   /**
@@ -167,16 +109,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    // If pressed and wasn't pressed on the last cycle
-    // then flip the boolean value 
-    // then set the is being pressed state
-    // then set the camera to the inverse camera
-
-    // If not being pressed, set the being pressed state
-    
-    if (this.lookForward.runToggle(RobotContainer.driverRight.getRawButton(1))){
-      setRobotFront();
-    }
   }
 
   @Override
@@ -190,14 +122,5 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-  }
-
-  private void setRobotFront() {
-    if(this.lookForward.getState()) {
-      this.camServer.setSource(this.camera1);
-    } else {
-      this.camServer.setSource(this.camera0);
-    }
-    this.robot.driveSubsystem.setDriveInverted(!this.lookForward.getState());
   }
 }
