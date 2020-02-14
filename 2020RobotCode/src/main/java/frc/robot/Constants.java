@@ -86,4 +86,6 @@ public final class Constants {
 
         public static final double kRamseteB = 2;
         public static final double kRamseteZeta = 0.7;
+        
+        public static final double turretToMoterRatio = 100.0;
 }
