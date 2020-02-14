@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 def main():
     NT.initialize(server="10.4.47.2")
     print("Please wait while the NetworkTable connects")
-    sleep(3)
+    while not NT.isConnected():
+        sleep(0.1)
 
     table = NT.getTable('PID')
     distance = table.getEntry('Distance')
@@ -16,6 +17,11 @@ def main():
     measurements = [[0, 0, 0], [0, 0, 0]]
     while(iteration <= 2):
         speed = float(input("What speed are you shooting?\n> "))
+        if not NT.isConnected():
+            print("NT Server disconnected... trying to reconnect")
+            NT.initialize(server="10.4.47.2")
+            while not NT.isConnected():
+                sleep(0.1)
         print("Logging measurements..")
         measurements[0][iteration] = speed
         averageX = 0

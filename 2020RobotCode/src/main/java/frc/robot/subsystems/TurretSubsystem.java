@@ -127,7 +127,7 @@ public class TurretSubsystem extends SubsystemBase {
     shootingMotorPID.updateP(this.shootP);
     shootingMotorPID.updateI(this.shootI);
     shootingMotorPID.updateD(this.shootD);
-    shootingMotorPID.updateFF(this.shootFFm, this.shootFFb);
+    //shootingMotorPID.updateFF(this.shootFFm, this.shootFFb);
   }
 
   public void setTurretTarget(double angle) {
