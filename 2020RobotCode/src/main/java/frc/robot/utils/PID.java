@@ -90,7 +90,7 @@ public class PID {
         Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive,"PIDvals");
 
         this.previousError = error;
-        return this.P*error + this.I*this.integral + this.D*derivitive + this.FF.getFF(setpoint,processingVar);
+        return this.P*error + this.I*this.integral + this.D*derivitive + this.FF.getFF(setpoint,processingVar,iterTime);
     }
     
     public void resetIntegral() {

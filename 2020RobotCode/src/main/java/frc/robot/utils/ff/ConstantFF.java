@@ -16,7 +16,7 @@ public class ConstantFF extends FFbase {
         this.v = kV;
     }
     @Override
-    public double getFF(double setpoint, double processingVar){
+    public double getFF(double setpoint, double processingVar, double iterTime){
         if (setpoint > processingVar){
             return this.v;
         } else if (setpoint < processingVar) {

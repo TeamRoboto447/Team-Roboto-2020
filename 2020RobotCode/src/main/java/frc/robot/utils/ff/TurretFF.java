@@ -30,11 +30,11 @@ public class TurretFF extends FFbase {
     }
 
     @Override
-    public double getFF(double setpoint, double processingVar){
+    public double getFF(double setpoint, double processingVar, double iterTime){
         double lSetpoint = this.lastSetpoint;
         this.lastSetpoint = setpoint;
-        double turretAngularVelosity = this.getTurretSpeed();
-        double imageAngularVelosity = (lSetpoint - setpoint) * this.setpointToRotations;
+        double turretAngularVelosity = this.getTurretSpeed(); 
+        double imageAngularVelosity = (setpoint - lSetpoint) * this.setpointToRotations / iterTime;
         double targetAngularVelosity = turretAngularVelosity + imageAngularVelosity;
         double targetAngularVelosityMotor = targetAngularVelosity * Constants.turretToMoterRatio;
         return this.M * targetAngularVelosityMotor + this.B;

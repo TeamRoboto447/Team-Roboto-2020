@@ -19,7 +19,7 @@ public class LinearFF extends FFbase {
         this.B = kB;
     }
     @Override
-    public double getFF(double setpoint, double processingVar){
+    public double getFF(double setpoint, double processingVar, double iterTime){
        return this.M * setpoint + this.B;
     }
     @Override
