@@ -2,10 +2,18 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import com.kauailabs.navx.frc.AHRS;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 
+import com.kauailabs.navx.frc.AHRS;
+import com.opencsv.CSVWriter;
+
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -41,22 +49,38 @@ public class TestDriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   private DifferentialDriveOdometry m_odometry;
 
+  private CSVWriter odometryWriter;
+  private Path deployPath;
+
+  public double leftOutputVoltage, rightOutputVoltage, leftSetpoint, rightSetpoint;
+  public boolean odometryWriterActive, loggingEnabled = false;
+  public double startingTime;
+
   /**
    * Creates a new DriveSubsystem.
    */
   public TestDriveSubsystem() {
     this.leftDrive = new CANSparkMax(Constants.leftDrive, MotorType.kBrushless);
     this.leftDriveB = new CANSparkMax(Constants.leftDriveB, MotorType.kBrushless);
+
     this.leftDrive.setInverted(false);
     this.leftDriveB.setInverted(false);
 
+    this.leftDrive.setIdleMode(IdleMode.kCoast);
+    this.leftDriveB.setIdleMode(IdleMode.kCoast);
+
     this.rightDrive = new CANSparkMax(Constants.rightDrive, MotorType.kBrushless);
     this.rightDriveB = new CANSparkMax(Constants.rightDriveB, MotorType.kBrushless);
+
     this.rightDrive.setInverted(true);
     this.rightDriveB.setInverted(true);
+    
+    this.rightDrive.setIdleMode(IdleMode.kCoast);
+    this.rightDriveB.setIdleMode(IdleMode.kCoast);
 
     this.m_leftMotors = new SpeedControllerGroup(leftDrive, leftDriveB);
     this.m_rightMotors = new SpeedControllerGroup(rightDrive, rightDriveB);
+
     this.m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
     this.m_leftEncoder = leftDrive.getEncoder();
     this.m_rightEncoder = rightDrive.getEncoder();
@@ -64,20 +88,64 @@ public class TestDriveSubsystem extends SubsystemBase {
 
     resetEncoders();
     this.m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+    this.deployPath = Filesystem.getDeployDirectory().toPath();
+    File odometryLogging = new File(deployPath.resolve("csv/Odometry.csv").toString());
+    try {
+      this.odometryWriter = new CSVWriter(new FileWriter(odometryLogging));
+      this.odometryWriterActive = true;
+    } catch (IOException e) {
+      System.err.println("Failed to open odometryWriter because:");
+      System.err.println(e.toString());
+      this.odometryWriterActive = false;
+    }
+
+    this.startingTime = System.currentTimeMillis();
+  }
+
+  public void enableLogging(boolean enabled) {
+    this.loggingEnabled = enabled;
+  }
+
+  public void closeCSVs() {
+    if(this.odometryWriterActive) {
+      try {
+        this.odometryWriter.close();
+      } catch (IOException e) {
+  
+      }
+    }
+    this.odometryWriterActive = false;
   }
 
   @Override
   public void periodic() {
+    double leftOutputRotations = Utilities.driveshaftIntputToOutput(this.m_leftEncoder.getPosition(), "low");
+    double leftOutputMeters = Utilities.rotationsToMeter(leftOutputRotations);
 
-    double leftEncoder = Utilities.encoderToMeter(Utilities.intputToOutput(this.m_leftEncoder.getPosition(), "low"));
-    double rightEncoder = Utilities.encoderToMeter(Utilities.intputToOutput(this.m_rightEncoder.getPosition(), "low"));
+    double rightOutputRotations = Utilities.driveshaftIntputToOutput(this.m_rightEncoder.getPosition(), "low");
+    double rightOutputMeters = Utilities.rotationsToMeter(rightOutputRotations);
 
-    this.m_odometry.update(Rotation2d.fromDegrees(getHeading()), leftEncoder, rightEncoder);
+    this.m_odometry.update(Rotation2d.fromDegrees(getHeading()), leftOutputMeters, rightOutputMeters);
 
     SmartDashboard.putNumber("PoseX", getPose().getTranslation().getX());
     SmartDashboard.putNumber("PoseY", getPose().getTranslation().getY());
-    SmartDashboard.putNumber("Left Encoder in Meters", leftEncoder);
-    SmartDashboard.putNumber("Right Encoder in Meters", rightEncoder);
+    SmartDashboard.putNumber("Left Encoder in Meters", leftOutputMeters);
+    SmartDashboard.putNumber("Right Encoder in Meters", rightOutputMeters);
+
+    String recordsString = String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", getPose().getTranslation().getX(), // PoseX
+        getPose().getTranslation().getY(), // PoseY
+        getHeading(), // PoseHeading
+        getWheelSpeeds().leftMetersPerSecond, // Left Wheel Speed (m/s)
+        getWheelSpeeds().rightMetersPerSecond, // Right Wheel Speed (m/s)
+        this.leftOutputVoltage, // Left Voltage
+        this.rightOutputVoltage, // Right Voltage
+        this.leftSetpoint, // Left Setpoint (m/s)
+        this.rightSetpoint, // Right Setpoint (m/s)
+        System.currentTimeMillis()-this.startingTime);
+    String[] records = recordsString.split(",");
+    if (this.odometryWriterActive && this.loggingEnabled) {
+      this.odometryWriter.writeNext(records);
+    }
   }
 
   /**
@@ -95,7 +163,11 @@ public class TestDriveSubsystem extends SubsystemBase {
    * @return The current wheel speeds.
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(this.m_leftEncoder.getVelocity(), this.m_rightEncoder.getVelocity());
+    double leftVelocityRPM = this.m_leftEncoder.getVelocity();
+    double rightVelocityRPM = this.m_rightEncoder.getVelocity();
+    double leftVelocityMPS = Utilities.RPMtoMPS(leftVelocityRPM);
+    double rightVelocityMPS = Utilities.RPMtoMPS(rightVelocityRPM);
+    return new DifferentialDriveWheelSpeeds(leftVelocityMPS, rightVelocityMPS);
   }
 
   /**
@@ -128,6 +200,9 @@ public class TestDriveSubsystem extends SubsystemBase {
     this.m_leftMotors.setVoltage(leftVolts);
     this.m_rightMotors.setVoltage(rightVolts);
     this.m_drive.feed();
+
+    this.leftOutputVoltage = leftVolts;
+    this.rightOutputVoltage = rightVolts;
   }
 
   /**
@@ -198,5 +273,9 @@ public class TestDriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return this.m_gyro.getRate() * (Constants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  public void stop() {
+    //TODO
   }
 }

@@ -22,8 +22,9 @@ public class IndexerSubsystem extends SubsystemBase {
    * Creates a new IndexerSubsystem.
    */
   public IndexerSubsystem() {
-    indexingMotor = new CANSparkMax(Constants.indexingSparkMax, MotorType.kBrushless);
-    intakeMotor = new Spark(Constants.intakeSpark);
+    this.indexingMotor = new CANSparkMax(Constants.indexingSparkMax, MotorType.kBrushless);
+    this.indexingMotor.setSmartCurrentLimit(Constants.miniNeoSafeAmps);
+    this.intakeMotor = new Spark(Constants.intakeSpark);
   }
 
   @Override
@@ -36,10 +37,14 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public void intakeRaw(double speed) {
-    intakeMotor.set(speed);
+    this.intakeMotor.set(speed);
   }
 
   public void indexerRaw(double speed) {
-    indexingMotor.set(speed);
+    this.indexingMotor.set(speed);
+  }
+
+  public void stop() {
+    //TODO
   }
 }

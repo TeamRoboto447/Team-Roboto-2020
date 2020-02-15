@@ -31,15 +31,25 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+    if(RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       runIntake();
+    } else {
+      stopIntake();
+    }
+
+    if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       runIndexer();
+    } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
+      reverseIndexer();
+    } else {
+      stopIndexer();
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+
   }
 
   // Returns true when the command should end.
@@ -49,12 +59,24 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void runIntake() {
-    double speed = 1;
+    double speed = -0.5;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
+  private void stopIntake() {
+    this.indexerSubsystem.intakeRaw(0);
+  }
+
+  private void stopIndexer() {
+    this.indexerSubsystem.indexerRaw(0);
+  }
+
+  private void reverseIndexer() {
+    this.indexerSubsystem.indexerRaw(-1);
+  }
+
   private void runIndexer() {
-    double speed = 0.5;
+    double speed = 1;
     this.indexerSubsystem.indexerRaw(speed);
   }
 }

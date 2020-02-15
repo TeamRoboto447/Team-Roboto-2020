@@ -124,7 +124,7 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.rightPIDController.setReference(rotations, ControlType.kPosition);
   }
   public void driveToEncoder(double rotations) {
-    double encRotations = rotations * Constants.lowGearRatio;
+    double encRotations = Utilities.driveshaftOutputToInput(rotations, "Low");
     this.rawDriveToEncoder(encRotations);
   }
   public void driveToInches(double inches){
@@ -163,5 +163,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
   public void resetAngle() {
     this.gyro.reset();
+  }
+
+  public void stop() {
+    //TODO
   }
 }

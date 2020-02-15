@@ -16,8 +16,6 @@ import frc.robot.commands.*;
 
 // import edu.wpi.first.wpilibj.DriverStation;
 // import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 // import edu.wpi.first.wpilibj.controller.PIDController;
 // import edu.wpi.first.wpilibj.controller.RamseteController;
 // import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -29,8 +27,11 @@ import edu.wpi.first.wpilibj.Joystick;
 // import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 // import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 // import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
-import edu.wpi.first.wpilibj2.command.Command;
 // import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -46,15 +47,12 @@ public class RobotContainer {
   public final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem);
   public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
 
-  // public final TestDriveSubsystem testDriveSubsystem = new
-  // TestDriveSubsystem();
-
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
   public final TurretCommand turretCommand = new TurretCommand(turretSubsystem, driveSubsystem);
   public final IntakeCommand intakeCommand = new IntakeCommand(indexerSubsystem);
 
-  // public final TestDriveCommand testDriveCommand = new
-  // TestDriveCommand(testDriveSubsystem);
+  //public final TestDriveSubsystem testDriveSubsystem = new TestDriveSubsystem();
+  //public final TestDriveCommand testDriveCommand = new TestDriveCommand(testDriveSubsystem);
 
   public static Joystick driverLeft = new Joystick(0);
   public static Joystick driverRight = new Joystick(1);
@@ -63,6 +61,8 @@ public class RobotContainer {
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
+  public Timer movementTimer;
+
   public RobotContainer() {
     // Set default commands
     setDefaultCommands();
@@ -86,7 +86,7 @@ public class RobotContainer {
     this.turretSubsystem.setDefaultCommand(this.turretCommand);
     this.indexerSubsystem.setDefaultCommand(this.intakeCommand);
 
-    // this.testDriveSubsystem.setDefaultCommand(this.testDriveCommand);
+    //this.testDriveSubsystem.setDefaultCommand(this.testDriveCommand);
 
   }
 
@@ -95,65 +95,77 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
-    // Create a voltage constraint to ensure we don't accelerate too fast
-    // var autoVoltageConstraint =
-    // new DifferentialDriveVoltageConstraint(
-    // new SimpleMotorFeedforward(Constants.ksVolts,
-    // Constants.kvVoltSecondsPerMeter,
-    // Constants.kaVoltSecondsSquaredPerMeter),
-    // Constants.kDriveKinematics,
-    // 10);
+    // // Create a voltage constraint to ensure we don't accelerate too fast
+    // var autoVoltageConstraint = new DifferentialDriveVoltageConstraint(new
+    // SimpleMotorFeedforward(Constants.ksVolts,
+    // Constants.kvVoltSecondsPerMeter, Constants.kaVoltSecondsSquaredPerMeter),
+    // Constants.kDriveKinematics, 10);
 
     // // Create config for trajectory
-    // TrajectoryConfig config =
-    // new TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond,
+    // TrajectoryConfig config = new
+    // TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond,
     // Constants.kMaxAccelerationMetersPerSecondSquared)
     // // Add kinematics to ensure max speed is actually obeyed
     // .setKinematics(Constants.kDriveKinematics)
     // // Apply the voltage constraint
-    // .addConstraint(autoVoltageConstraint);
+    // .addConstraint(autoVoltageConstraint).setReversed(false);
+
+    // Trajectory exampleTrajectory;
 
     // // An example trajectory to follow. All units in meters.
-    // Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+    // Trajectory backupTrajectory = TrajectoryGenerator.generateTrajectory(
     // // Start at the origin facing the +X direction
     // new Pose2d(0, 0, new Rotation2d(0)),
-    // // Pass through these two interior waypoints, making an 's' curve path
-    // List.of(
-    // new Translation2d(1, 1),
-    // new Translation2d(2, -1)
-    // ),
-    // // End 3 meters straight ahead of where we started, facing forward
-    // new Pose2d(3, 0, new Rotation2d(0)),
+    // // Passthrough these two interior waypoints, making an 's' curve path
+    // List.of(new Translation2d(2, 1), new Translation2d(4, -1)),
+    // // End 6 meters straight ahead of where we started, facing forward
+    // new Pose2d(6, 0, new Rotation2d(0)),
     // // Pass config
-    // config
-    // );
+    // config);
 
-    // RamseteCommand ramseteCommand = new RamseteCommand(
-    // exampleTrajectory,
+    // boolean useSavedTrajectory = false;
+    // if(useSavedTrajectory) {
+    // String trajectoryJSON = "paths/testPath.wpilib.json";
+    // try {
+    // Path trajectoryPath =
+    // Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+    // exampleTrajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    // } catch (IOException ex) {
+    // DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON,
+    // ex.getStackTrace());
+    // exampleTrajectory = backupTrajectory;
+    // }
+    // } else {
+    // exampleTrajectory = backupTrajectory;
+    // }
+
+    // PIDController leftPID = new PIDController(Constants.kPDriveVel,
+    // Constants.kIDriveVel, Constants.kDDriveVel);
+    // PIDController rightPID = new PIDController(Constants.kPDriveVel,
+    // Constants.kIDriveVel, Constants.kDDriveVel);
+
+    // RamseteCommand ramseteCommand = new RamseteCommand(exampleTrajectory,
     // this.testDriveSubsystem::getPose,
     // new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
     // new SimpleMotorFeedforward(Constants.ksVolts,
     // Constants.kvVoltSecondsPerMeter,
     // Constants.kaVoltSecondsSquaredPerMeter),
-    // Constants.kDriveKinematics,
-    // this.testDriveSubsystem::getWheelSpeeds,
-    // new PIDController(Constants.kPDriveVel, 0, 0),
-    // new PIDController(Constants.kPDriveVel, 0, 0),
+    // Constants.kDriveKinematics, this.testDriveSubsystem::getWheelSpeeds, leftPID,
+    // rightPID,
     // // RamseteCommand passes volts to the callback
-    // this.testDriveSubsystem::tankDriveVolts,
-    // this.testDriveSubsystem
-    // );
+    // this.testDriveSubsystem::tankDriveVolts, this.testDriveSubsystem);
+
+    // exampleTrajectory.sample(this.movementTimer.get());
 
     // // Run path following command, then stop at the end.
     // return ramseteCommand.andThen(() -> this.testDriveSubsystem.tankDriveVolts(0,
     // 0));
 
     return null;
+  }
+
+  public void resetTimer() {
+    this.movementTimer.reset();
   }
 }

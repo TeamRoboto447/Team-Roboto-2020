@@ -8,7 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities;
 import frc.robot.controlmaps.OperatorMap;
@@ -45,6 +45,27 @@ public class TurretCommand extends CommandBase {
     } else {
       turretLock();
     }
+
+    if (RobotContainer.operator.getRawButton(OperatorMap.X)) {
+      double testSpeed = this.turretSubsystem.getSpeedFromDist();
+      this.turretSubsystem.runShooterAtSpeed(testSpeed);
+      if (this.turretSubsystem.shooterAtSpeed()) {
+        this.turretSubsystem.feedShooter();
+      } else {
+        this.turretSubsystem.stopFeeder();
+      }
+    } else if (RobotContainer.operator.getRawButton(OperatorMap.Y)) {
+      this.turretSubsystem.runShooterAtSpeed(this.turretSubsystem.getManualSpeed());
+      if (this.turretSubsystem.shooterAtSpeed()) {
+        this.turretSubsystem.feedShooter();
+      } else {
+        this.turretSubsystem.stopFeeder();
+      }
+    } else {
+      this.turretSubsystem.runShooterRaw(0);
+      this.turretSubsystem.stopFeeder();
+    }
+
   }
 
   // Called once the command ends or is interrupted.
