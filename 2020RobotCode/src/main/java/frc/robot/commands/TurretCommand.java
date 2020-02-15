@@ -17,11 +17,9 @@ import frc.robot.subsystems.TurretSubsystem;
 
 public class TurretCommand extends CommandBase {
   TurretSubsystem turretSubsystem;
-  RobotDriveSubsystem driveSubsystem;
 
-  public TurretCommand(TurretSubsystem turretSub, RobotDriveSubsystem driveSub) {
+  public TurretCommand(TurretSubsystem turretSub) {
     this.turretSubsystem = turretSub;
-    this.driveSubsystem = driveSub;
 
     addRequirements(this.turretSubsystem);
   }
@@ -80,8 +78,6 @@ public class TurretCommand extends CommandBase {
   }
 
   private void turretLock() {
-    // int lockPosition = Math.round(this.driveSubsystem.getAngle() -
-    // this.turretSubsystem.lastTargetPos);
     int lockPosition = 0;
     this.turretSubsystem.turnToAngle(lockPosition);
   }

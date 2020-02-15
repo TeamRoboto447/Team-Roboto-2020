@@ -48,10 +48,10 @@ public class RobotContainer {
   public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
-  public final TurretCommand turretCommand = new TurretCommand(turretSubsystem, driveSubsystem);
+  public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);
   public final IntakeCommand intakeCommand = new IntakeCommand(indexerSubsystem);
 
-  //public final TestDriveSubsystem testDriveSubsystem = new TestDriveSubsystem();
+  
   //public final TestDriveCommand testDriveCommand = new TestDriveCommand(testDriveSubsystem);
 
   public static Joystick driverLeft = new Joystick(0);

@@ -89,7 +89,7 @@ public final class Constants {
                         kTrackWidthMeters);
 
         public static final double kMaxSpeedMetersPerSecond = 2.1336;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 1;
 
         public static final double kRamseteB = 2;
         public static final double kRamseteZeta = 0.7;

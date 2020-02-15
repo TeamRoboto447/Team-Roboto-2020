@@ -10,15 +10,15 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities;
-import frc.robot.subsystems.TestDriveSubsystem;
+import frc.robot.subsystems.RobotDriveSubsystem;
 
 public class TestDriveCommand extends CommandBase {
 
-  TestDriveSubsystem driveSubsystem;
+  RobotDriveSubsystem driveSubsystem;
   /**
    * Creates a new TestDriveCommand.
    */
-  public TestDriveCommand(TestDriveSubsystem dSubsystem) {
+  public TestDriveCommand(RobotDriveSubsystem dSubsystem) {
     this.driveSubsystem = dSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.driveSubsystem);
