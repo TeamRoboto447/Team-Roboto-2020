@@ -86,11 +86,12 @@ public class PID {
         }
 
         final double derivitive = (error - this.previousError) / iterTime;
+        final double feedforward = this.FF.getFF(this.setpoint,processingVar,iterTime);
         
         Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive,"PIDvals");
 
         this.previousError = error;
-        return this.P*error + this.I*this.integral + this.D*derivitive + this.FF.getFF(setpoint,processingVar,iterTime);
+        return this.P*error + this.I*this.integral + this.D*derivitive + feedforward;
     }
     
     public void resetIntegral() {
