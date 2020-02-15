@@ -49,7 +49,7 @@ public class RobotContainer {
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
   public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);
-  public final IntakeCommand intakeCommand = new IntakeCommand(indexerSubsystem);
+  public final IntakeCommand intakeCommand = new IntakeCommand(indexerSubsystem, turretSubsystem);
 
   
   //public final TestDriveCommand testDriveCommand = new TestDriveCommand(testDriveSubsystem);

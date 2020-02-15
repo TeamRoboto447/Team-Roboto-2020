@@ -43,27 +43,33 @@ public class TurretCommand extends CommandBase {
     }
 
     if (RobotContainer.operator.getRawButton(OperatorMap.X)) {
+      this.turretSubsystem.enableShooterLogging(true);
       double testSpeed = this.turretSubsystem.getSpeedFromDist();
       this.turretSubsystem.runShooterAtSpeed(testSpeed);
-      if (this.turretSubsystem.shooterAtSpeed()) {
-        this.turretSubsystem.feedShooter();
-      } else {
-        this.turretSubsystem.stopFeeder();
-      }
+      runFeeder();
     } else if (RobotContainer.operator.getRawButton(OperatorMap.Y)) {
+      this.turretSubsystem.enableShooterLogging(true);
       this.turretSubsystem.runShooterAtSpeed(this.turretSubsystem.getManualSpeed());
-      if (this.turretSubsystem.shooterAtSpeed()) {
-        this.turretSubsystem.feedShooter();
-      } else {
-        this.turretSubsystem.stopFeeder();
-      }
+      runFeeder();
+    } else if(RobotContainer.operator.getRawButton(OperatorMap.start)) {
+      this.turretSubsystem.enableShooterLogging(true);
+      this.turretSubsystem.runShooterAtSpeed(this.turretSubsystem.getManualSpeed());
+      this.turretSubsystem.feedShooter();
     } else {
+      this.turretSubsystem.enableShooterLogging(false);
       this.turretSubsystem.runShooterRaw(0);
       this.turretSubsystem.stopFeeder();
     }
 
   }
 
+  private void runFeeder() {
+    if (this.turretSubsystem.shooterAtSpeed() && RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+      this.turretSubsystem.feedShooter();
+    } else {
+      this.turretSubsystem.stopFeeder();
+    }
+  }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {

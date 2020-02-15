@@ -11,14 +11,17 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.controlmaps.OperatorMap;
 import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class IntakeCommand extends CommandBase {
   IndexerSubsystem indexerSubsystem;
+  TurretSubsystem turretSubsystem;
   /**
    * Creates a new IntakeCommand.
    */
-  public IntakeCommand(IndexerSubsystem iSubsystem) {
+  public IntakeCommand(IndexerSubsystem iSubsystem, TurretSubsystem tSubsystem) {
     this.indexerSubsystem = iSubsystem;
+    this.turretSubsystem = tSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.indexerSubsystem);
   }
@@ -37,7 +40,7 @@ public class IntakeCommand extends CommandBase {
       stopIntake();
     }
 
-    if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+    if(RobotContainer.operator.getRawButton(OperatorMap.LT) && this.turretSubsystem.shooterAtSpeed()) {
       runIndexer();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
       reverseIndexer();
@@ -72,11 +75,10 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void reverseIndexer() {
-    this.indexerSubsystem.indexerRaw(-1);
+    this.indexerSubsystem.indexerRaw(1);
   }
 
   private void runIndexer() {
-    double speed = 1;
-    this.indexerSubsystem.indexerRaw(speed);
+    this.indexerSubsystem.indexerRaw(-1);
   }
 }

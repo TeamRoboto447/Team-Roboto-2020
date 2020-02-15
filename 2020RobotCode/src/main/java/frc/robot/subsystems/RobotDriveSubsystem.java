@@ -286,9 +286,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
   }
   private void setRelativeDrive(double leftSpeed, double rightSpeed) {
     if (this.driveInverted) {
-      this.m_drive.tankDrive(leftSpeed, rightSpeed);
+      this.m_drive.tankDrive(-leftSpeed, rightSpeed);
     } else {
-      this.m_drive.tankDrive(rightSpeed, leftSpeed);
+      this.m_drive.tankDrive(rightSpeed, -leftSpeed);
     }
   }
 

@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    //robotContainer.testDriveSubsystem.enableLogging(false);
+    robotContainer.driveSubsystem.enableLogging(false);
     robotContainer.resetTimer();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -105,7 +105,7 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    //robotContainer.testDriveSubsystem.enableLogging(false);
+    robotContainer.driveSubsystem.enableLogging(false);
   }
 
   /**
@@ -119,7 +119,9 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    //robotContainer.testDriveSubsystem.closeCSVs();    
+    robotContainer.driveSubsystem.closeCSVs();    
+    robotContainer.turretSubsystem.closeShooterLogging();
+
   }
 
   /**

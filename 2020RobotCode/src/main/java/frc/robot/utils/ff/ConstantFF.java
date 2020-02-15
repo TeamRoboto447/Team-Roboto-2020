@@ -26,8 +26,8 @@ public class ConstantFF extends FFbase {
         }
     }
     @Override
-    public void update(double kV){
-        this.v = kV;
+    public void updateValues(double[] values){
+        this.v = values[0];
     }
 
 }

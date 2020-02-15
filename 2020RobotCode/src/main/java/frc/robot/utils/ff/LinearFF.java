@@ -23,9 +23,13 @@ public class LinearFF extends FFbase {
        return this.M * setpoint + this.B;
     }
     @Override
-    public void update(double kM, double kB){
-        this.M = kM;
-        this.B = kB;
+    public double[] getValues(){
+        return new double[] {this.M, this.B};
+    }
+    @Override
+    public void updateValues(double[] values){
+        this.M = values[0];
+        this.B = values[1];
     }
     public double getM(){
         return this.M;

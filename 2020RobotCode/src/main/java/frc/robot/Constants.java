@@ -60,16 +60,23 @@ public final class Constants {
                         drivekD = 1, drivekIz = 0, drivekFF = 0, drivePIDMin = -0.5, drivePIDMax = 0.5;
 
         // Shooter PID info
-        public static final double shooterkP = 0.0003, // 0.0003, //original vals are commented
-                        shooterkI = 0.0013815, // 0.000931,
-                        shooterkD = 0.000016, // 0.000024,
-                        shooterkFFm = 0.0001774, // 0.000172,
-                        shooterkFFb = -0.003214, // -0.002191,
-                        shooterIZone = 100, speedkM = 0.0135274, speedkB = 0.6368884, shooterPidIntegralResetTime = 2,
-                        distanceFromInnerToOuterPort = 2, maxInnerPortAjustmentAngle = Math.PI / 4;
+        public static final double 
+                        shooterkP = 0.000170,
+                        shooterkI = 0.001275,
+                        shooterkD = 0.000014,
+                        shooterkFFm = 0.000170,
+                        shooterkFFb = -0.009414,
+                        shooterIZone = 200, shooterSZone = 100, speedkM = 0.0135274, speedkB = 0.6368884, shooterPidIntegralResetTime = 2,
+                        distanceFromInnerToOuterPort = 29.5/12, maxInnerPortAjustmentAngle = Math.PI / 4,
+                        shooterMarginOfError = 60;
+
+        public static final double
+        distanceLineEqM = 3.53368385,
+        distanceLineEqB = -3.637379;
+
 
         // Turning PID info
-        public static final double turretkP = 0.01, turretkI = 0.009, turretkD = 0.001, turretFFm = 0, turretFFb = 0,
+        public static final double turretkP = 0.01, turretkI = 0.001, turretkD = 0.0005, turretFFm = 0, turretFFb = 0,
                         turretIZone = 10, turretSpinLimit = 190;
 
         public static final double encoderRes = 4096;
