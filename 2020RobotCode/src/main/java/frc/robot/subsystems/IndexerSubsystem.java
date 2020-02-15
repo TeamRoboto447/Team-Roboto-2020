@@ -45,6 +45,7 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    //TODO
+    this.intakeMotor.set(0);
+    this.indexingMotor.set(0);
   }
 }

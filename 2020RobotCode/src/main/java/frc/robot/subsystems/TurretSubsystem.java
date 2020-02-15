@@ -382,6 +382,9 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    //TODO
+    this.shootFeeder.set(0);
+    this.shootingMotorLeft.set(0);
+    this.shootingMotorRight.set(0);
+    this.turretMotor.set(0);
   }
 }

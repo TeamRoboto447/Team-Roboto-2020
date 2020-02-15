@@ -282,23 +282,13 @@ public class RobotDriveSubsystem extends SubsystemBase {
     leftSpeed = Utilities.adjustForDeadzone(leftSpeed, deadzone);
     rightSpeed = Utilities.adjustForDeadzone(rightSpeed, deadzone);
     
-    this.setRelativeLeft(leftSpeed);
-    this.setRelativeRight(rightSpeed);
+    this.setRelativeDrive(leftSpeed, rightSpeed);
   }
-
-  private void setRelativeLeft(double speed) {
+  private void setRelativeDrive(double leftSpeed, double rightSpeed) {
     if (this.driveInverted) {
-      this.rightDrive.set(speed);
+      this.m_drive.tankDrive(leftSpeed, rightSpeed);
     } else {
-      this.leftDrive.set(speed);
-    }
-  }
-
-  private void setRelativeRight(double speed) {
-    if (this.driveInverted) {
-      this.leftDrive.set(speed);
-    } else {
-      this.rightDrive.set(speed);
+      this.m_drive.tankDrive(rightSpeed, leftSpeed);
     }
   }
 
@@ -309,6 +299,6 @@ public class RobotDriveSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    //TODO
+    this.m_drive.tankDrive(0, 0);
   }
 }
