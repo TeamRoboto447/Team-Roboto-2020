@@ -14,7 +14,9 @@ public class FFbase {
     public double getFF(double setpoint, double processingVar, double iterTime){
         return 0.0;
     }
-    public void update(double kV){}
-    public void update(double kM,double kV){}
+    public double[] getValues(){
+        return new double[]{};
+    }
+    public void updateValues(double[] Values){}
     
 }

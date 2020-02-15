@@ -8,20 +8,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import frc.robot.RobotContainer;
 import frc.robot.Utilities;
 import frc.robot.controlmaps.OperatorMap;
-import frc.robot.subsystems.RobotDriveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class TurretCommand extends CommandBase {
   TurretSubsystem turretSubsystem;
-  RobotDriveSubsystem driveSubsystem;
 
-  public TurretCommand(TurretSubsystem turretSub, RobotDriveSubsystem driveSub) {
+  public TurretCommand(TurretSubsystem turretSub) {
     this.turretSubsystem = turretSub;
-    this.driveSubsystem = driveSub;
 
     addRequirements(this.turretSubsystem);
   }
@@ -45,11 +41,39 @@ public class TurretCommand extends CommandBase {
     } else {
       turretLock();
     }
+
+    if (RobotContainer.operator.getRawButton(OperatorMap.X)) {
+      this.turretSubsystem.enableShooterLogging(true);
+      double testSpeed = this.turretSubsystem.getSpeedFromDist();
+      this.turretSubsystem.runShooterAtSpeed(testSpeed);
+      runFeeder();
+    } else if (RobotContainer.operator.getRawButton(OperatorMap.Y)) {
+      this.turretSubsystem.enableShooterLogging(true);
+      this.turretSubsystem.runShooterAtSpeed(this.turretSubsystem.getManualSpeed());
+      runFeeder();
+    } else if(RobotContainer.operator.getRawButton(OperatorMap.start)) {
+      this.turretSubsystem.enableShooterLogging(true);
+      this.turretSubsystem.runShooterAtSpeed(this.turretSubsystem.getManualSpeed());
+      this.turretSubsystem.feedShooter();
+    } else {
+      this.turretSubsystem.enableShooterLogging(false);
+      this.turretSubsystem.runShooterRaw(0);
+      this.turretSubsystem.stopFeeder();
+    }
+
   }
 
+  private void runFeeder() {
+    if (this.turretSubsystem.shooterAtSpeed() && RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+      this.turretSubsystem.feedShooter();
+    } else {
+      this.turretSubsystem.stopFeeder();
+    }
+  }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    this.turretSubsystem.stop();
   }
 
   // Returns true when the command should end.
@@ -59,8 +83,6 @@ public class TurretCommand extends CommandBase {
   }
 
   private void turretLock() {
-    // int lockPosition = Math.round(this.driveSubsystem.getAngle() -
-    // this.turretSubsystem.lastTargetPos);
     int lockPosition = 0;
     this.turretSubsystem.turnToAngle(lockPosition);
   }

@@ -39,6 +39,7 @@ public class RobotDriveCommand extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(final boolean interrupted) {
+    this.driveSubsystem.stop();
   }
 
   // Returns true when the command should end.

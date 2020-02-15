@@ -142,7 +142,6 @@ public class VisionCommand extends CommandBase {
     double defaultPose[] = new double[]{0, 0, 0};
     this.poseX = this.targetPoseEntry.getDoubleArray(defaultPose)[0];
     this.poseY = this.targetPoseEntry.getDoubleArray(defaultPose)[1];
-    this.poseZ = this.targetPoseEntry.getDoubleArray(defaultPose)[2];
 
     this.distance = this.distanceEntry.getDouble(-1);
     this.ballX = this.ballXEntry.getDouble(-1000);

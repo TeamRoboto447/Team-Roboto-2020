@@ -11,14 +11,17 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.controlmaps.OperatorMap;
 import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class IntakeCommand extends CommandBase {
   IndexerSubsystem indexerSubsystem;
+  TurretSubsystem turretSubsystem;
   /**
    * Creates a new IntakeCommand.
    */
-  public IntakeCommand(IndexerSubsystem iSubsystem) {
+  public IntakeCommand(IndexerSubsystem iSubsystem, TurretSubsystem tSubsystem) {
     this.indexerSubsystem = iSubsystem;
+    this.turretSubsystem = tSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(this.indexerSubsystem);
   }
@@ -31,15 +34,25 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+    if(RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       runIntake();
+    } else {
+      stopIntake();
+    }
+
+    if(RobotContainer.operator.getRawButton(OperatorMap.LT) && this.turretSubsystem.shooterAtSpeed()) {
       runIndexer();
+    } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
+      reverseIndexer();
+    } else {
+      stopIndexer();
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    this.indexerSubsystem.stop();
   }
 
   // Returns true when the command should end.
@@ -49,12 +62,23 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void runIntake() {
-    double speed = 1;
+    double speed = -0.5;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
+  private void stopIntake() {
+    this.indexerSubsystem.intakeRaw(0);
+  }
+
+  private void stopIndexer() {
+    this.indexerSubsystem.indexerRaw(0);
+  }
+
+  private void reverseIndexer() {
+    this.indexerSubsystem.indexerRaw(1);
+  }
+
   private void runIndexer() {
-    double speed = 0.5;
-    this.indexerSubsystem.indexerRaw(speed);
+    this.indexerSubsystem.indexerRaw(-1);
   }
 }

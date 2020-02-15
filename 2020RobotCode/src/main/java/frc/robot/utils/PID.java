@@ -133,7 +133,7 @@ public class PID {
     public double getSetpoint() {
         return this.setpoint;
     }
-    public void setFF(FFbase kFF){
+    public void updateFF(FFbase kFF){
         this.FF = kFF;
     }
     public FFbase getFF(){
