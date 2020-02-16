@@ -25,10 +25,11 @@ def main():
         print("Logging measurements..")
         measurements[0][iteration] = speed
         averageX = 0
-        for i in range(20):
+        sampleSize = 500
+        for i in range(sampleSize):
             averageX += distance.getDouble(0)
-            sleep(0.05)
-        averageX /= 20
+            sleep(0.02)
+        averageX /= sampleSize
         print(averageX)
         measurements[1][iteration] = averageX
         iteration += 1
