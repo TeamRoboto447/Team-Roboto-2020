@@ -84,7 +84,7 @@ public final class Constants {
 
 
         // Turning PID info
-        public static final double turretkP = 0.012000, turretkI = 0.072816, turretkD = 0.0007, turretFFm = 0, turretFFb = 0,
+        public static final double turretkP = 0.035, turretkI = 0.05, turretkD = 0.0009, turretFFm = 0, turretFFb = 0,
                         turretIZone = 10, turretSpinLimit = 190;
 
         public static final double encoderRes = 4096;
