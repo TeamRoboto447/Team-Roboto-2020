@@ -129,10 +129,10 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
     this.m_odometry.update(Rotation2d.fromDegrees(getHeading()), leftOutputMeters, rightOutputMeters);
 
-    SmartDashboard.putNumber("PoseX", getPose().getTranslation().getX());
-    SmartDashboard.putNumber("PoseY", getPose().getTranslation().getY());
-    SmartDashboard.putNumber("Left Encoder in Meters", leftOutputMeters);
-    SmartDashboard.putNumber("Right Encoder in Meters", rightOutputMeters);
+    // SmartDashboard.putNumber("PoseX", getPose().getTranslation().getX());
+    // SmartDashboard.putNumber("PoseY", getPose().getTranslation().getY());
+    // SmartDashboard.putNumber("Left Encoder in Meters", leftOutputMeters);
+    // SmartDashboard.putNumber("Right Encoder in Meters", rightOutputMeters);
 
     String recordsString = String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", getPose().getTranslation().getX(), // PoseX
         getPose().getTranslation().getY(), // PoseY

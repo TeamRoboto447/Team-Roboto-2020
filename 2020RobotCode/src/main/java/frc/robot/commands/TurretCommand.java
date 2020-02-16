@@ -42,7 +42,7 @@ public class TurretCommand extends CommandBase {
       turretLock();
     }
 
-    if (RobotContainer.operator.getRawButton(OperatorMap.X)) {
+    if (RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       this.turretSubsystem.enableShooterLogging(true);
       double testSpeed = this.turretSubsystem.getSpeedFromDist();
       shoot(testSpeed);

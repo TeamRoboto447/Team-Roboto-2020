@@ -34,7 +34,7 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(RobotContainer.operator.getRawButton(OperatorMap.RT)) {
+    if(RobotContainer.operator.getRawButton(OperatorMap.X)) {
       runIntake();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.RB)) {
       reverseIntake();
@@ -63,13 +63,15 @@ public class IntakeCommand extends CommandBase {
     return false;
   }
 
+  double systemSpeed = 0.5;
+
   private void runIntake() {
-    double speed = -0.5;
+    double speed = -this.systemSpeed/2;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
   private void reverseIntake() {
-    double speed = 0.5;
+    double speed = this.systemSpeed/2;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
@@ -82,10 +84,10 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void reverseIndexer() {
-    this.indexerSubsystem.indexerRaw(1);
+    this.indexerSubsystem.indexerRaw(this.systemSpeed);
   }
 
   private void runIndexer() {
-    this.indexerSubsystem.indexerRaw(-1);
+    this.indexerSubsystem.indexerRaw(-this.systemSpeed);
   }
 }

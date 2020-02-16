@@ -1,27 +1,30 @@
 from networktables import NetworkTables
 import time
 
-P = "shootkP"
-I = "shootkI"
-D = "shootkD"
+P = "turretkP"
+I = "turretkI"
+D = "turretkD"
 
 
 def networktable():
     NetworkTables.initialize(server='roboRIO-447-frc.local')
     end=time.time()+30
+    print("Connecting...")
     while not NetworkTables.isConnected():
         time.sleep(0.1)
         if time.time()>=end:
-            raise 
-    kp=0.0007
+            raise
+        
+    print("Connected")
+    kp=0.021
     gi=NetworkTables.getTable("pidTuningPVs")
     cv=NetworkTables.getTable('chameleon-vision')
     PID=NetworkTables.getTable('PID')
     PID.getEntry(P).setDouble(kp)
     PID.getEntry(I).setDouble(0)
     PID.getEntry(D).setDouble(0)
-    PID.getEntry("bypassShooterPID").setBoolean(False)
-    cv.getEntry("shooterSpeed").setDouble(0.6)
+    #PID.getEntry("bypassShooterPID").setBoolean(False)
+    #cv.getEntry("shooterSpeed").setDouble(0.6)
     outTime=[]
     outTarg=[]
     ltime=0
@@ -33,8 +36,8 @@ def networktable():
     endTime=time.time()+10
     while time.time() < endTime:
         time.sleep(.01)
-        ang=gi.getEntry('Shooter Speed').value
-        mtime=gi.getEntry('Time').value/1000
+        ang=gi.getEntry('Turret Position').value
+        mtime=gi.getEntry('timeMS').value/1000
         if mtime==ltime:
             continue
         ltime=mtime
