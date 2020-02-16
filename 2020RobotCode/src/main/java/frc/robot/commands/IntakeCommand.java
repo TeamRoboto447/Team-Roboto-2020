@@ -63,7 +63,7 @@ public class IntakeCommand extends CommandBase {
     return false;
   }
 
-  double systemSpeed = 0.5;
+  double systemSpeed = 0.7;
 
   private void runIntake() {
     double speed = -this.systemSpeed/2;

@@ -13,10 +13,9 @@ import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.Logging;
+import frc.robot.utils.MovingAverage;
 import frc.robot.utils.PID;
 import frc.robot.Constants;
-import frc.robot.Utilities;
-//import frc.robot.utils.ff.ConstantFF;
 import frc.robot.utils.ff.LinearFF;
 
 import com.revrobotics.CANSparkMax;
@@ -35,6 +34,8 @@ import com.opencsv.CSVWriter;
 public class TurretSubsystem extends SubsystemBase {
   CSVWriter shooterLogging;
   boolean shooterWriterActive, enableShooterLogging = false;
+
+  MovingAverage distanceAverage;
 
   NetworkTableInstance table;
   NetworkTable PIDInfo, pidTuningPVs, camInfo;
@@ -71,6 +72,7 @@ public class TurretSubsystem extends SubsystemBase {
 
   public TurretSubsystem(RobotDriveSubsystem driveSub) {
     this.driveSubsystem = driveSub;
+    this.distanceAverage = new MovingAverage(50);
     setupLogging();
     setupNetworkTables();
     setupMotorsAndEncoders();
@@ -238,11 +240,11 @@ public class TurretSubsystem extends SubsystemBase {
       this.pastLimit = Math.abs(this.getTurretPos()) > Constants.turretSpinLimit;
       //double distanceToInner = this.getDistanceToInner(this.poseAngle, this.distance,
       //    Constants.distanceFromInnerToOuterPort);
-      double adjustAngle = 0;//this.getAngleOffset(this.poseAngle, distanceToInner, Constants.distanceFromInnerToOuterPort);
-      if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0, adjustAngle)) {
+      double adjustAngle = 4;//this.getAngleOffset(this.poseAngle, distanceToInner, Constants.distanceFromInnerToOuterPort);
+      /*if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0, adjustAngle)) {
         adjustAngle = 0.0;
-      }
-      double processingVar = this.yaw;
+      }*/
+      double processingVar = this.yaw+adjustAngle;
       double speed = this.turretPositionPID.run(processingVar);
 
       Logging.debug("Aiming PID Output Value: " + speed + "\nAiming PV: " + processingVar, "aimingPID");
@@ -398,7 +400,8 @@ public class TurretSubsystem extends SubsystemBase {
     this.poseY = this.targetPoseEntry.getDoubleArray(defaultPose)[1];
     this.poseAngle = this.targetPoseEntry.getDoubleArray(defaultPose)[2];
 
-    this.distance = this.poseX < 0 ? -1 : (Constants.distanceLineEqM * this.poseX) + Constants.distanceLineEqB;
+    this.distanceAverage.push(this.poseX < 0 ? -1 : (Constants.distanceLineEqM * this.poseX) + Constants.distanceLineEqB);
+    this.distance = this.distanceAverage.getAverage();
     this.turretLastTargetEntry.setDouble(this.lastTargetPos);
     this.turretLastTargetOffsetEntry.setDouble(this.turretOffset);
     this.shooterSetSpeed = this.shooterSpeedEntry.getDouble(0.5);

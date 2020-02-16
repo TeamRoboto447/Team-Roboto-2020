@@ -71,20 +71,20 @@ public final class Constants {
                         shooterkFFb = -0.018051, 
                         shooterIZone = 150,
                         shooterSZone = 100,
-                        speedkM = 0.015039636033160777,
-                        speedkB = 0.6302241797734098,
+                        speedkM = 0.0078859,
+                        speedkB = 0.6975444,
                         shooterPidIntegralResetTime = 2,
                         distanceFromInnerToOuterPort = 29.5/12,
                         maxInnerPortAjustmentAngle = Math.PI / 4,
-                        shooterMarginOfError = 150;
+                        shooterMarginOfError = 60;
 
         public static final double
-        distanceLineEqM = 3.53368385,
-        distanceLineEqB = -3.637379;
+        distanceLineEqM = 3.322622173196587,
+        distanceLineEqB = -1.5053081308055845;
 
 
         // Turning PID info
-        public static final double turretkP = 0.015000, turretkI = 0.072816, turretkD = 0.000773, turretFFm = 0, turretFFb = 0,
+        public static final double turretkP = 0.012000, turretkI = 0.072816, turretkD = 0.0007, turretFFm = 0, turretFFb = 0,
                         turretIZone = 10, turretSpinLimit = 190;
 
         public static final double encoderRes = 4096;

@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Utilities;
@@ -68,8 +68,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.leftDrive.setInverted(false);
     this.leftDriveB.setInverted(false);
 
-    this.leftDrive.setIdleMode(IdleMode.kCoast);
-    this.leftDriveB.setIdleMode(IdleMode.kCoast);
+    this.leftDrive.setIdleMode(IdleMode.kBrake);
+    this.leftDriveB.setIdleMode(IdleMode.kBrake);
 
     this.rightDrive = new CANSparkMax(Constants.rightDrive, MotorType.kBrushless);
     this.rightDriveB = new CANSparkMax(Constants.rightDriveB, MotorType.kBrushless);
@@ -77,8 +77,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.rightDrive.setInverted(true);
     this.rightDriveB.setInverted(true);
     
-    this.rightDrive.setIdleMode(IdleMode.kCoast);
-    this.rightDriveB.setIdleMode(IdleMode.kCoast);
+    this.rightDrive.setIdleMode(IdleMode.kBrake);
+    this.rightDriveB.setIdleMode(IdleMode.kBrake);
 
     this.m_leftMotors = new SpeedControllerGroup(leftDrive, leftDriveB);
     this.m_rightMotors = new SpeedControllerGroup(rightDrive, rightDriveB);
@@ -296,6 +296,13 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.driveInverted = invert;
     this.rightDrive.setInverted(!this.driveInverted);
     this.leftDrive.setInverted(this.driveInverted);
+  }
+
+  public void setMotorIdleMode() {
+    this.leftDrive.setIdleMode(IdleMode.kBrake);
+    this.leftDriveB.setIdleMode(IdleMode.kBrake);
+    this.leftDrive.setIdleMode(IdleMode.kBrake);
+    this.leftDriveB.setIdleMode(IdleMode.kBrake);
   }
 
   public void stop() {

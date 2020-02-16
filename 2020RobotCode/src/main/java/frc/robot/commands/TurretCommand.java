@@ -27,6 +27,7 @@ public class TurretCommand extends CommandBase {
   public void initialize() {
   }
 
+  
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -95,7 +96,7 @@ public class TurretCommand extends CommandBase {
     this.turretSubsystem.enableTargetting(true);
     double position = -Utilities.adjustForDeadzone(RobotContainer.operator.getRawAxis(OperatorMap.lJoyX), 0.025);
     double angle = 180 * position;
-    this.turretSubsystem.turnToAngle(angle, 5);
+    this.turretSubsystem.turnToAngle(angle, 0.5);
   }
 
   private void target() {
