@@ -27,9 +27,6 @@ public class TurretCommand extends CommandBase {
   public void initialize() {
   }
 
-  boolean lockedDistanceBool = false;
-  double lockedDistance = 0;
-
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -47,28 +44,38 @@ public class TurretCommand extends CommandBase {
 
     if (RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       this.turretSubsystem.enableShooterLogging(true);
-      this.turretSubsystem.lockDistance();
       shootAtDistance();
       runFeeder();
     } else if (RobotContainer.operator.getRawButton(OperatorMap.Y)) {
-      this.turretSubsystem.unlockDistance();
       this.turretSubsystem.enableShooterLogging(true);
       shootAtSpeed();
       runFeeder();
 
     } else if(RobotContainer.operator.getRawButton(OperatorMap.start)) {
-      this.turretSubsystem.unlockDistance();
       this.turretSubsystem.enableShooterLogging(true);
       shootAtSpeed();
       this.turretSubsystem.feedShooter();
 
     } else {
-      this.turretSubsystem.unlockDistance();
       this.turretSubsystem.enableShooterLogging(false);
       this.turretSubsystem.runShooterRaw(0);
       this.turretSubsystem.stopFeeder();
     }
 
+    if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+      lockDist();
+    } else {
+      unlockDist();
+    }
+
+  }
+
+  private void lockDist() {
+    this.turretSubsystem.lockDistance();
+  }
+
+  private void unlockDist() {
+    this.turretSubsystem.unlockDistance();
   }
 
   private void shootAtDistance() {

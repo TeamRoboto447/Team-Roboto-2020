@@ -46,7 +46,7 @@ public final class Constants {
         public static final int lightRelay = 0;
 
         public static final int // Set safe current max for NEO motors (amps)
-        miniNeoSafeAmps = 25, neoSafeAmps = 50;
+        miniNeoSafeAmps = 15, neoSafeAmps = 50;
 
         public static final double
         // Gear ratios for calculating encoder ticks per rotation
@@ -95,16 +95,16 @@ public final class Constants {
         public static final double ksVolts = 0.122;
         public static final double kvVoltSecondsPerMeter = 6.68;
         public static final double kaVoltSecondsSquaredPerMeter = 0.604;
-        public static final double kPDriveVel = 0.03;
+        public static final double kPDriveVel = 0.005;
         public static final double kIDriveVel = 0.0;
-        public static final double kDDriveVel = 0.0;
+        public static final double kDDriveVel = 0.01;
 
         public static final double kTrackWidthMeters = 0.693702941073319;
         public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
                         kTrackWidthMeters);
 
         public static final double kMaxSpeedMetersPerSecond = 2.1336;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5;
 
         public static final double kRamseteB = 2;
         public static final double kRamseteZeta = 0.7;

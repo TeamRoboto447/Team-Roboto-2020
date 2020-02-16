@@ -226,14 +226,14 @@ public class TurretSubsystem extends SubsystemBase {
   // Directly related to turret
   public void turnToAngle(double angle) {
     this.setTurretTarget(angle);
-    double speed = this.turretPositionPID.run(this.getTurretPos());
+    double speed = this.turretPositionPID.run(this.getTurretPosRaw());
     this.turretMotor.set(speed);
 
   }
 
   public void turnToAngle(double angle, double maxSpeed) {
     this.setTurretTarget(angle);
-    double speed = this.turretPositionPID.run(this.getTurretPos());
+    double speed = this.turretPositionPID.run(this.getTurretPosRaw());
     if (Math.abs(speed) > maxSpeed) {
       double sign = speed > 0 ? 1 : -1;
       speed = maxSpeed * sign;
@@ -302,6 +302,11 @@ public class TurretSubsystem extends SubsystemBase {
 
   }
 
+  private double getTurretPosRaw() {
+    double turretPosition = (this.turretEncoder.getPosition() * 3.6);
+    return turretPosition;
+  }
+
   private double getTurretPos() {
     double turretPositionDegrees = (this.turretEncoder.getPosition() * 3.6) % 360;
     double turretPositionClamped = this.clamp(turretPositionDegrees);
@@ -331,9 +336,11 @@ public class TurretSubsystem extends SubsystemBase {
   private void setupMotorsAndEncoders() {
     // Set up Motors
     this.turretMotor = new CANSparkMax(Constants.turretSparkMax, MotorType.kBrushless);
-    this.turretMotor.setSmartCurrentLimit(Constants.miniNeoSafeAmps);
+    this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
+    
     this.shootingMotorLeft = new CANSparkMax(Constants.shooterSparkMaxLeft, MotorType.kBrushless);
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
+    
     this.shootingMotorRight = new CANSparkMax(Constants.shooterSparkMaxRight, MotorType.kBrushless);
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
     this.shootFeeder = new Spark(Constants.shooterFeedSpark);
