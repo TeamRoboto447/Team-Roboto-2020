@@ -68,17 +68,13 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.leftDrive.setInverted(false);
     this.leftDriveB.setInverted(false);
 
-    this.leftDrive.setIdleMode(IdleMode.kBrake);
-    this.leftDriveB.setIdleMode(IdleMode.kBrake);
-
     this.rightDrive = new CANSparkMax(Constants.rightDrive, MotorType.kBrushless);
     this.rightDriveB = new CANSparkMax(Constants.rightDriveB, MotorType.kBrushless);
 
     this.rightDrive.setInverted(true);
     this.rightDriveB.setInverted(true);
     
-    this.rightDrive.setIdleMode(IdleMode.kBrake);
-    this.rightDriveB.setIdleMode(IdleMode.kBrake);
+    setMotorIdleMode(IdleMode.kCoast);
 
     this.m_leftMotors = new SpeedControllerGroup(leftDrive, leftDriveB);
     this.m_rightMotors = new SpeedControllerGroup(rightDrive, rightDriveB);
@@ -298,11 +294,11 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.leftDrive.setInverted(this.driveInverted);
   }
 
-  public void setMotorIdleMode() {
-    this.leftDrive.setIdleMode(IdleMode.kBrake);
-    this.leftDriveB.setIdleMode(IdleMode.kBrake);
-    this.leftDrive.setIdleMode(IdleMode.kBrake);
-    this.leftDriveB.setIdleMode(IdleMode.kBrake);
+  public void setMotorIdleMode(IdleMode mode) {
+    this.leftDrive.setIdleMode(mode);
+    this.leftDriveB.setIdleMode(mode);
+    this.rightDrive.setIdleMode(mode);
+    this.rightDriveB.setIdleMode(mode);
   }
 
   public void stop() {
