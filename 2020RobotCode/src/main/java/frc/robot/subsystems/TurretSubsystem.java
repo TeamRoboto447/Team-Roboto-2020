@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.Logging;
@@ -63,6 +64,8 @@ public class TurretSubsystem extends SubsystemBase {
   CANEncoder shooterEncoder, turretEncoder;
 
   Spark shootFeeder;
+
+  Relay targettingRelay;
 
   RobotDriveSubsystem driveSubsystem;
 
@@ -218,6 +221,14 @@ public class TurretSubsystem extends SubsystemBase {
   private double lastTargetPos = 0;
   private double lastValidTurretPos = 0;
 
+  public void enableTargetting(boolean enable) {
+    if(enable) {
+      this.targettingRelay.set(Relay.Value.kOn);
+    } else {
+      this.targettingRelay.set(Relay.Value.kOff);
+    }
+  }
+
   public void turnToTarget() {
     setTurretTarget(0);
     Logging.debug("Turret limit: " + Constants.turretSpinLimit + "\nTurret Position: " + this.getTurretPos()
@@ -290,6 +301,9 @@ public class TurretSubsystem extends SubsystemBase {
     this.shootingMotorRight = new CANSparkMax(Constants.shooterSparkMaxRight, MotorType.kBrushless);
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
     this.shootFeeder = new Spark(Constants.shooterFeedSpark);
+
+    // Set up targetting relay
+    this.targettingRelay = new Relay(0);
 
     // Set up Encoders
     this.turretEncoder = this.turretMotor.getEncoder();

@@ -42,6 +42,9 @@ public final class Constants {
                         intakeSpark = 0, // Intake Spark, PWM 0.
                         shooterFeedSpark = 1; // Shooter Feed Spark, PWM 1.
 
+        // Targetting Light Relay
+        public static final int lightRelay = 0;
+
         public static final int // Set safe current max for NEO motors (amps)
         miniNeoSafeAmps = 25, neoSafeAmps = 50;
 

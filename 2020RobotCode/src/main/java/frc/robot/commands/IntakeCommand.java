@@ -36,6 +36,8 @@ public class IntakeCommand extends CommandBase {
   public void execute() {
     if(RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       runIntake();
+    } else if(RobotContainer.operator.getRawButton(OperatorMap.RB)) {
+      reverseIntake();
     } else {
       stopIntake();
     }
@@ -63,6 +65,11 @@ public class IntakeCommand extends CommandBase {
 
   private void runIntake() {
     double speed = -0.5;
+    this.indexerSubsystem.intakeRaw(speed);
+  }
+
+  private void reverseIntake() {
+    double speed = 0.5;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
