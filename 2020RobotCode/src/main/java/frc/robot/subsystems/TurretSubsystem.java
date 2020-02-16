@@ -145,12 +145,45 @@ public class TurretSubsystem extends SubsystemBase {
     return atSpeed;
   }
 
-  public double getSpeedFromDist() {
-    double speed = Constants.speedkM * this.distance + Constants.speedkB;
+  public double getSpeedFromDist(double dist) {
+    double speed = Constants.speedkM * dist + Constants.speedkB;
     return speed;
   }
 
+  boolean distanceLocked = false;
+  boolean savedDistanceBool = false;
+  double savedDistance = -1;
 
+  public void lockDistance() {
+    this.distanceLocked = true;
+  }
+
+  public void unlockDistance() {
+    this.distanceLocked = false;
+  }
+
+  public double getDistance() {
+    return this.distance;
+  }
+
+  private void getDistanceEntryVal() {
+    this.distanceAverage.push(this.poseX < 0 ? -1 : (Constants.distanceLineEqM * this.poseX) + Constants.distanceLineEqB);
+    double measuredDist = this.distanceAverage.getAverage();
+    double dist;
+
+    if(this.distanceLocked) {
+      if(!this.savedDistanceBool) {
+        this.savedDistance = measuredDist;
+        this.savedDistanceBool = true;
+      }
+      dist = savedDistance;
+    } else {
+      dist = measuredDist;
+      this.savedDistanceBool = false;
+    }
+
+    this.distance = dist;
+  }
 
   public double getManualSpeed() {
     return this.shooterSetSpeed;
@@ -400,8 +433,8 @@ public class TurretSubsystem extends SubsystemBase {
     this.poseY = this.targetPoseEntry.getDoubleArray(defaultPose)[1];
     this.poseAngle = this.targetPoseEntry.getDoubleArray(defaultPose)[2];
 
-    this.distanceAverage.push(this.poseX < 0 ? -1 : (Constants.distanceLineEqM * this.poseX) + Constants.distanceLineEqB);
-    this.distance = this.distanceAverage.getAverage();
+    getDistanceEntryVal();
+
     this.turretLastTargetEntry.setDouble(this.lastTargetPos);
     this.turretLastTargetOffsetEntry.setDouble(this.turretOffset);
     this.shooterSetSpeed = this.shooterSpeedEntry.getDouble(0.5);

@@ -27,7 +27,9 @@ public class TurretCommand extends CommandBase {
   public void initialize() {
   }
 
-  
+  boolean lockedDistanceBool = false;
+  double lockedDistance = 0;
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -45,18 +47,23 @@ public class TurretCommand extends CommandBase {
 
     if (RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       this.turretSubsystem.enableShooterLogging(true);
-      double testSpeed = this.turretSubsystem.getSpeedFromDist();
-      shoot(testSpeed);
+      this.turretSubsystem.lockDistance();
+      shootAtDistance();
       runFeeder();
     } else if (RobotContainer.operator.getRawButton(OperatorMap.Y)) {
+      this.turretSubsystem.unlockDistance();
       this.turretSubsystem.enableShooterLogging(true);
-      shoot(this.turretSubsystem.getManualSpeed());
+      shootAtSpeed();
       runFeeder();
+
     } else if(RobotContainer.operator.getRawButton(OperatorMap.start)) {
+      this.turretSubsystem.unlockDistance();
       this.turretSubsystem.enableShooterLogging(true);
-      shoot(this.turretSubsystem.getManualSpeed());
+      shootAtSpeed();
       this.turretSubsystem.feedShooter();
+
     } else {
+      this.turretSubsystem.unlockDistance();
       this.turretSubsystem.enableShooterLogging(false);
       this.turretSubsystem.runShooterRaw(0);
       this.turretSubsystem.stopFeeder();
@@ -64,9 +71,17 @@ public class TurretCommand extends CommandBase {
 
   }
 
-  private void shoot(double speed) {
+  private void shootAtDistance() {
+    double dist = this.turretSubsystem.getDistance();
+    double speed = this.turretSubsystem.getSpeedFromDist(dist);
     this.turretSubsystem.runShooterAtSpeed(speed);
   }
+
+  private void shootAtSpeed() {
+    double speed = this.turretSubsystem.getManualSpeed();
+    this.turretSubsystem.runShooterAtSpeed(speed);
+  }
+
   private void runFeeder() {
     if (this.turretSubsystem.shooterAtSpeed() && RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       this.turretSubsystem.feedShooter();
