@@ -69,14 +69,16 @@ public class PID {
         this.D = builder.D;
         this.FF = builder.kFF;
         this.setpoint = builder.setpoint;
+        this.minInt = builder.minInt;
+        this.maxInt = builder.maxInt;
+        this.izone = builder.izone;
+        this.name = builder.name;  
+
         this.iterTime = new Timer();
         this.iterTime.reset();
         this.iterTime.stop();
         this.integralTimer = new Timer();
         this.integralTimer.reset();
-        this.minInt=builder.minInt;
-        this.maxInt=builder.maxInt;
-        this.izone=builder.izone;  
     }
 
     public double run(double processingVar) {
@@ -103,8 +105,8 @@ public class PID {
         final double feedforward = this.FF.getFF(this.setpoint,processingVar,iterTime);
         
         
-        Logging.info("PID time: "+iterTime,"PIDtime");
-        Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive+ ",FF:" + feedforward,"PIDOutVals");
+        Logging.info("PID time: "+iterTime, this.name + "PIDtime");
+        Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive+ ",FF:" + feedforward, this.name + "PIDOutVals");
         
         this.previousError = error;
         return this.P*error + this.I*this.integral + this.D*derivitive + feedforward;
@@ -144,7 +146,10 @@ public class PID {
         FFbase kFF = new FFbase();
         String name = "";
         public PIDBuilder (double kSetpoint, double kP, double kI, double kD){
-
+            this.setpoint = kSetpoint;
+            this.P = kP;
+            this.I = kI;
+            this.D = kD;
         }
         public PID build(){
             return new PID(this);
