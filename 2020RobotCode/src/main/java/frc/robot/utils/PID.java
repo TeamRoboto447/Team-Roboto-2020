@@ -107,34 +107,33 @@ public class PID {
         
         Logging.info("PID time: "+iterTime, this.name + "PIDtime");
         Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive+ ",FF:" + feedforward, this.name + "PIDOutVals");
-        
+        Logging.info("P:" + this.P + ",I:" + this.I + ",D:" + this.D, this.name+"PIDVals");
+
         this.previousError = error;
-        return this.P*error + this.I*this.integral + this.D*derivitive + feedforward;
+        return this.P * error + this.I * this.integral + this.D * derivitive + feedforward;
     }
     
     public void resetIntegral() {
-        Logging.debug("Integral reset prev val: "+this.integral, "shootIntegral");
+        Logging.debug("Integral reset prev val: "+this.integral, this.name+"PIDIntegralReset");
         this.integral = 0;
         this.iterTime.reset();
         this.iterTime.stop();
-        Logging.debug("Integral reset after val: "+this.integral, "shootIntegral");
+        Logging.debug("Integral reset after val: "+this.integral, this.name+"PIDIntegralReset");
     } 
     
     public void updateP(double kP){ this.P = kP; }
     public void updateI(double kI){ this.I = kI; }
     public void updateD(double kD){ this.D = kD; }
     public void updateSetpoint(double kSetpoint){ this.setpoint = kSetpoint; }
+    public void updateFF(FFbase kFF){ this.FF = kFF; }
     
     public double getP() { return this.P; }
     public double getI() { return this.I; }
-
     public double getD() { return this.D; }
-    
     public double getSetpoint() { return this.setpoint; }
-    public void updateFF(FFbase kFF){ this.FF = kFF; }
     public FFbase getFF(){ return this.FF; }
 
-    public class PIDBuilder {
+    public static class PIDBuilder {
         double
             P, 
             I, 
@@ -162,7 +161,7 @@ public class PID {
             this.minInt = minint;
             return this;
         }
-        public PIDBuilder MaxIntegeral(double maxint){
+        public PIDBuilder MaxIntegral(double maxint){
             this.maxInt = maxint;
             return this;
         }

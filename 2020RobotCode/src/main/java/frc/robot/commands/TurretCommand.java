@@ -42,18 +42,18 @@ public class TurretCommand extends CommandBase {
       turretLock();
     }
 
-    if (RobotContainer.operator.getRawButton(OperatorMap.X)) {
+    if (RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       this.turretSubsystem.enableShooterLogging(true);
       double testSpeed = this.turretSubsystem.getSpeedFromDist();
-      this.turretSubsystem.runShooterAtSpeed(testSpeed);
+      shoot(testSpeed);
       runFeeder();
     } else if (RobotContainer.operator.getRawButton(OperatorMap.Y)) {
       this.turretSubsystem.enableShooterLogging(true);
-      this.turretSubsystem.runShooterAtSpeed(this.turretSubsystem.getManualSpeed());
+      shoot(this.turretSubsystem.getManualSpeed());
       runFeeder();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.start)) {
       this.turretSubsystem.enableShooterLogging(true);
-      this.turretSubsystem.runShooterAtSpeed(this.turretSubsystem.getManualSpeed());
+      shoot(this.turretSubsystem.getManualSpeed());
       this.turretSubsystem.feedShooter();
     } else {
       this.turretSubsystem.enableShooterLogging(false);
@@ -63,6 +63,9 @@ public class TurretCommand extends CommandBase {
 
   }
 
+  private void shoot(double speed) {
+    this.turretSubsystem.runShooterAtSpeed(speed);
+  }
   private void runFeeder() {
     if (this.turretSubsystem.shooterAtSpeed() && RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       this.turretSubsystem.feedShooter();
@@ -83,17 +86,20 @@ public class TurretCommand extends CommandBase {
   }
 
   private void turretLock() {
+    this.turretSubsystem.enableTargetting(false);
     int lockPosition = 0;
     this.turretSubsystem.turnToAngle(lockPosition);
   }
 
   private void turnManual() {
+    this.turretSubsystem.enableTargetting(true);
     double position = -Utilities.adjustForDeadzone(RobotContainer.operator.getRawAxis(OperatorMap.lJoyX), 0.025);
     double angle = 180 * position;
     this.turretSubsystem.turnToAngle(angle, 5);
   }
 
   private void target() {
+    this.turretSubsystem.enableTargetting(true);
     this.turretSubsystem.turnToTarget();
   }
 }

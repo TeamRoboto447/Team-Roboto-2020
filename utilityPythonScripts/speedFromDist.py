@@ -10,8 +10,8 @@ def main():
     while not NT.isConnected():
         sleep(0.1)
 
-    table = NT.getTable('PID')
-    distance = table.getEntry('Distance')
+    table = NT.getTable('pidTuningPVs')
+    distance = table.getEntry('distanceFromTarget')
 
     iteration = 0
     measurements = [[0, 0, 0], [0, 0, 0]]

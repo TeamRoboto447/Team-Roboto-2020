@@ -42,6 +42,9 @@ public final class Constants {
                         intakeSpark = 0, // Intake Spark, PWM 0.
                         shooterFeedSpark = 1; // Shooter Feed Spark, PWM 1.
 
+        // Targetting Light Relay
+        public static final int lightRelay = 0;
+
         public static final int // Set safe current max for NEO motors (amps)
         miniNeoSafeAmps = 25, neoSafeAmps = 50;
 
@@ -61,14 +64,19 @@ public final class Constants {
 
         // Shooter PID info
         public static final double 
-                        shooterkP = 0.000170,
-                        shooterkI = 0.001275,
-                        shooterkD = 0.000014,
-                        shooterkFFm = 0.000170,
-                        shooterkFFb = -0.009414,
-                        shooterIZone = 200, shooterSZone = 100, speedkM = 0.0135274, speedkB = 0.6368884, shooterPidIntegralResetTime = 2,
-                        distanceFromInnerToOuterPort = 29.5/12, maxInnerPortAjustmentAngle = Math.PI / 4,
-                        shooterMarginOfError = 60;
+                        shooterkP = 0.000270,
+                        shooterkI = 0.001163,
+                        shooterkD = 0.000016,
+                        shooterkFFm = 0.000186,
+                        shooterkFFb = -0.018051, 
+                        shooterIZone = 150,
+                        shooterSZone = 100,
+                        speedkM = 0.015039636033160777,
+                        speedkB = 0.6302241797734098,
+                        shooterPidIntegralResetTime = 2,
+                        distanceFromInnerToOuterPort = 29.5/12,
+                        maxInnerPortAjustmentAngle = Math.PI / 4,
+                        shooterMarginOfError = 150;
 
         public static final double
         distanceLineEqM = 3.53368385,
@@ -76,7 +84,7 @@ public final class Constants {
 
 
         // Turning PID info
-        public static final double turretkP = 0.01, turretkI = 0.001, turretkD = 0.0005, turretFFm = 0, turretFFb = 0,
+        public static final double turretkP = 0.015000, turretkI = 0.072816, turretkD = 0.000773, turretFFm = 0, turretFFb = 0,
                         turretIZone = 10, turretSpinLimit = 190;
 
         public static final double encoderRes = 4096;
