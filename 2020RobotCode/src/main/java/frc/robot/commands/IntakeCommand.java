@@ -63,15 +63,16 @@ public class IntakeCommand extends CommandBase {
     return false;
   }
 
-  double systemSpeed = 0.7;
+  double indexerSpeed = 0.7;
+  double intakeSpeed = 1;
 
   private void runIntake() {
-    double speed = -this.systemSpeed/2;
+    double speed = -this.intakeSpeed;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
   private void reverseIntake() {
-    double speed = this.systemSpeed/2;
+    double speed = this.intakeSpeed;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
@@ -84,10 +85,10 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void reverseIndexer() {
-    this.indexerSubsystem.indexerRaw(this.systemSpeed);
+    this.indexerSubsystem.indexerRaw(this.indexerSpeed);
   }
 
   private void runIndexer() {
-    this.indexerSubsystem.indexerRaw(-this.systemSpeed);
+    this.indexerSubsystem.indexerRaw(-this.indexerSpeed);
   }
 }
