@@ -67,10 +67,12 @@ public class IntakeCommand extends CommandBase {
   double indexerSpeed = Constants.indexingSpeed;
   double intakeSpeed = Constants.intakeSpeed;
 
+  /*
   private void runIntake() {
     double speed = -this.intakeSpeed;
     this.indexerSubsystem.intakeRaw(speed);
   }
+  */
 
   private void reverseIntake() {
     double speed = this.intakeSpeed;
