@@ -55,6 +55,10 @@ public final class Constants {
         // Targetting Light Relay
         public static final int lightRelay = 0;
 
+        public static final double
+                intakeSpeed = 0.75,
+                indexingSpeed = 0.7;
+
         public static final int // Set safe current max for NEO motors (amps)
         miniNeoSafeAmps = 15, neoSafeAmps = 50;
 

@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,6 +20,7 @@ public class IndexerSubsystem extends SubsystemBase {
   CANSparkMax indexingMotor;
   Spark intakeMotor;
   Solenoid intakeExtension;
+  DigitalInput indexerFirstPos, indexerSecondPos, fullIndexerSensor;
 
   /**
    * Creates a new IndexerSubsystem.
@@ -28,6 +30,9 @@ public class IndexerSubsystem extends SubsystemBase {
     this.indexingMotor.setSmartCurrentLimit(Constants.miniNeoSafeAmps);
     this.intakeMotor = new Spark(Constants.intakeSpark);
     this.intakeExtension = new Solenoid(Constants.intakeExtension);
+    indexerFirstPos = new DigitalInput(Constants.indexerFirstPos);
+    indexerSecondPos = new DigitalInput(Constants.indexerSecondPos);
+    fullIndexerSensor = new DigitalInput(Constants.fullIndexerSensor);
   }
 
   @Override
@@ -36,7 +41,12 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public void intakeBall() {
-    
+    if(!fullIndexerSensor.get()) {
+      intakeRaw(Constants.intakeSpeed);
+      if(indexerFirstPos.get()) {
+        indexerRaw(Constants.indexingSpeed);
+      }
+    }
   }
 
   public void intakeRaw(double speed) {

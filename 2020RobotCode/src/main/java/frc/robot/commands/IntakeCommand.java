@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.controlmaps.OperatorMap;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -63,8 +64,8 @@ public class IntakeCommand extends CommandBase {
     return false;
   }
 
-  double indexerSpeed = 0.7;
-  double intakeSpeed = 0.75;
+  double indexerSpeed = Constants.indexingSpeed;
+  double intakeSpeed = Constants.intakeSpeed;
 
   private void runIntake() {
     double speed = -this.intakeSpeed;
