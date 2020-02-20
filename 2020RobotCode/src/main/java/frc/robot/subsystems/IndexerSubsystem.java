@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.utils.Logging;
 
 public class IndexerSubsystem extends SubsystemBase {
   CANSparkMax indexingMotor;
@@ -37,7 +38,12 @@ public class IndexerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    String status = String.format(
+      "\nFirst sensor status: %s\nSecond sensor staus: %s\nFull sensor status: %s",
+      indexerFirstPos.get(),
+      indexerSecondPos.get(),
+      fullIndexerSensor.get());
+    Logging.debug(status, "indexerStatus");
   }
 
   public void intakeBall() {

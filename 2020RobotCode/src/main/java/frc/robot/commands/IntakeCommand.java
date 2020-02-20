@@ -36,15 +36,15 @@ public class IntakeCommand extends CommandBase {
   @Override
   public void execute() {
     if(RobotContainer.operator.getRawButton(OperatorMap.X)) {
-      runIntake();
+      intake();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.RB)) {
       reverseIntake();
     } else {
       stopIntake();
     }
 
-    if(RobotContainer.operator.getRawButton(OperatorMap.LT) && this.turretSubsystem.shooterAtSpeed()) {
-      runIndexer();
+    if(!RobotContainer.operator.getRawButton(OperatorMap.X) && RobotContainer.operator.getRawButton(OperatorMap.LT) && this.turretSubsystem.shooterAtSpeed()) {
+      feedShooter();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
       reverseIndexer();
     } else {
@@ -89,7 +89,11 @@ public class IntakeCommand extends CommandBase {
     this.indexerSubsystem.indexerRaw(this.indexerSpeed);
   }
 
-  private void runIndexer() {
+  private void intake() {
+    this.indexerSubsystem.intakeBall();
+  }
+
+  private void feedShooter() {
     this.indexerSubsystem.indexerRaw(-this.indexerSpeed);
   }
 }
