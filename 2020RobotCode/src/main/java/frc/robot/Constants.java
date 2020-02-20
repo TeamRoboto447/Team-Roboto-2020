@@ -42,6 +42,16 @@ public final class Constants {
                         intakeSpark = 0, // Intake Spark, PWM 0.
                         shooterFeedSpark = 1; // Shooter Feed Spark, PWM 1.
 
+        // PCM Channels on board 1 (pneumatics)
+        public static final int 
+                transmission = 0, // Drive transmission, PCM channel 0.
+                intakeExtension = 1; // Intake extension, PCM channel 1.
+
+        public static final int
+                indexerFirstPos = 0, // Indexing sensor sensor first position, DIO channel 0.
+                indexerSecondPos = 1, // Indexing sensor second position, DIO channel 1.
+                fullIndexerSensor = 2; // Full Indexer Sensor , DIO channel 2.
+        
         // Targetting Light Relay
         public static final int lightRelay = 0;
 
@@ -54,10 +64,6 @@ public final class Constants {
                         // Wheel diameter for calculating inches per rotation
                         wheelDiameter = 6.0, wheelDiameterMeters = 0.1524;
         public static final double turretToMoterRatio = 100.0;
-
-        // PCM Channels on board 1 (pneumatics)
-        public static final int transmissionLow = 0, // Drive transmission low channel, PCM channel 0.
-                        transmissionHigh = 1; // Drive transmission high channel, PCM channel 1.
 
         public static final double drivekP = 0.1, drivekI = 0, // 1e-4
                         drivekD = 1, drivekIz = 0, drivekFF = 0, drivePIDMin = -0.5, drivePIDMax = 0.5;

@@ -33,7 +33,7 @@ public class BlingSubsystem extends SubsystemBase {
     this.blingSelect.setString("idle");
   }
 
-  public void setBling() {
-    
+  public void setBling(String blingSel) {
+    this.blingSelect.setString(blingSel);
   }
 }

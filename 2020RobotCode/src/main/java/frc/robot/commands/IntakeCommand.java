@@ -64,7 +64,7 @@ public class IntakeCommand extends CommandBase {
   }
 
   double indexerSpeed = 0.7;
-  double intakeSpeed = 1;
+  double intakeSpeed = 0.75;
 
   private void runIntake() {
     double speed = -this.intakeSpeed;
