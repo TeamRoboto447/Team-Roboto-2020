@@ -193,6 +193,10 @@ public class TurretSubsystem extends SubsystemBase {
     this.shootFeeder.set(-1);
   }
 
+  public void feedShooterRaw(double speed) {
+    this.shootFeeder.set(speed);
+  }
+
   public void stopFeeder() {
     this.shootFeeder.set(0);
   }

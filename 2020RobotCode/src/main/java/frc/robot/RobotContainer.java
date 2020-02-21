@@ -45,7 +45,7 @@ public class RobotContainer {
 
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
   public final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem);
-  public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+  public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem(turretSubsystem);
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
   public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);

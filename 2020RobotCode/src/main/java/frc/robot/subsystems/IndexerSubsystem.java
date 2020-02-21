@@ -22,11 +22,13 @@ public class IndexerSubsystem extends SubsystemBase {
   Spark intakeMotor;
   Solenoid intakeExtension;
   DigitalInput indexerFirstPos, indexerSecondPos, fullIndexerSensor;
+  TurretSubsystem turretSubsystem;
 
   /**
    * Creates a new IndexerSubsystem.
    */
-  public IndexerSubsystem() {
+  public IndexerSubsystem(TurretSubsystem tSubsystem) {
+    this.turretSubsystem = tSubsystem;
     this.indexingMotor = new CANSparkMax(Constants.indexingSparkMax, MotorType.kBrushless);
     this.indexingMotor.setSmartCurrentLimit(Constants.miniNeoSafeAmps);
     this.intakeMotor = new Spark(Constants.intakeSpark);
@@ -40,18 +42,23 @@ public class IndexerSubsystem extends SubsystemBase {
   public void periodic() {
     String status = String.format(
       "\nFirst sensor status: %s\nSecond sensor staus: %s\nFull sensor status: %s",
-      indexerFirstPos.get(),
-      indexerSecondPos.get(),
-      fullIndexerSensor.get());
+      ballAtIntake(),
+      ballAtPosOne(),
+      isFull());
     Logging.debug(status, "indexerStatus");
   }
 
   public void intakeBall() {
-    if(!fullIndexerSensor.get()) {
-      intakeRaw(Constants.intakeSpeed);
-      if(indexerFirstPos.get()) {
+    if(!isFull()) {
+      intakeRaw(-Constants.intakeSpeed);
+      if(ballAtIntake()) {
         indexerRaw(Constants.indexingSpeed);
+        this.turretSubsystem.feedShooterRaw(-0.4);
+      } else {
+        indexerRaw(0);
       }
+    } else {
+      stop();
     }
   }
 
@@ -70,5 +77,17 @@ public class IndexerSubsystem extends SubsystemBase {
   public void stop() {
     this.intakeMotor.set(0);
     this.indexingMotor.set(0);
+  }
+
+  public boolean isFull() {
+    return !fullIndexerSensor.get();
+  }
+
+  public boolean ballAtIntake() {
+    return !indexerFirstPos.get();
+  }
+
+  public boolean ballAtPosOne() {
+    return !indexerSecondPos.get();
   }
 }

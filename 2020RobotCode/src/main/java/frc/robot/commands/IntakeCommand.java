@@ -35,6 +35,7 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
     if(RobotContainer.operator.getRawButton(OperatorMap.X)) {
       intake();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.RB)) {
@@ -47,7 +48,7 @@ public class IntakeCommand extends CommandBase {
       feedShooter();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
       reverseIndexer();
-    } else {
+    } else if(!RobotContainer.operator.getRawButton(OperatorMap.X)) {
       stopIndexer();
     }
   }
@@ -88,7 +89,7 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void reverseIndexer() {
-    this.indexerSubsystem.indexerRaw(this.indexerSpeed);
+    this.indexerSubsystem.indexerRaw(-this.indexerSpeed);
   }
 
   private void intake() {
@@ -96,6 +97,6 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void feedShooter() {
-    this.indexerSubsystem.indexerRaw(-this.indexerSpeed);
+    this.indexerSubsystem.indexerRaw(this.indexerSpeed);
   }
 }
