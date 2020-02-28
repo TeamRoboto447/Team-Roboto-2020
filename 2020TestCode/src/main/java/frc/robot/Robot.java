@@ -50,16 +50,16 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    robot = new RobotContainer();
-    camera0 = CameraServer.getInstance().startAutomaticCapture(0);
-    camera0.setResolution(160, 120);
-    camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    this.robot = new RobotContainer();
+    this.camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+    this.camera0.setResolution(160, 120);
+    this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
-    camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-    camera1.setResolution(160, 120);
-    camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    this.camera1 = CameraServer.getInstance().startAutomaticCapture(1);
+    this.camera1.setResolution(160, 120);
+    this.camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
-    camServer = CameraServer.getInstance().getServer();
+    this.camServer = CameraServer.getInstance().getServer();
     
     this.table = NetworkTableInstance.getDefault();
 

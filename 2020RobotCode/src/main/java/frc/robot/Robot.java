@@ -7,6 +7,10 @@
 
 package frc.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoSink;
+import edu.wpi.cscore.VideoSource.ConnectionStrategy;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -25,9 +29,13 @@ public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
   private RobotContainer robotContainer;
-  NetworkTable pidTuningPVs;
-  NetworkTableInstance table;
-  NetworkTableEntry timeEntry;
+  private UsbCamera camera0, camera1;
+  private VideoSink camServer;
+
+  private NetworkTable pidTuningPVs;
+  private NetworkTableInstance table;
+  private NetworkTableEntry timeEntry;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -36,9 +44,19 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
-    //robotContainer.driveSubsystem.resetAngle();
+    this.robotContainer = new RobotContainer();
+    this.camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+    this.camera0.setResolution(160, 120);
+    this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+
+    this.camera1 = CameraServer.getInstance().startAutomaticCapture(1);
+    this.camera1.setResolution(160, 120);
+    this.camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+
+    this.camServer = CameraServer.getInstance().getServer();
+
     Logging.init();
+
     this.table = NetworkTableInstance.getDefault();
     this.pidTuningPVs = table.getTable("pidTuningPVs");
     this.timeEntry = pidTuningPVs.getEntry("timeMS");
@@ -60,6 +78,15 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     this.timeEntry.setDouble(System.currentTimeMillis());
+    setRobotFront();
+  }
+
+  private void setRobotFront() {
+    if(this.robotContainer.driveSubsystem.getInvertedDrive()) {
+      this.camServer.setSource(this.camera1);
+    } else {
+      this.camServer.setSource(this.camera0);
+    }
   }
 
   /**

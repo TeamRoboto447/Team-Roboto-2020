@@ -11,16 +11,19 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.utils.Toggle;
 
 public class RobotDriveCommand extends CommandBase {
   /**
    * Creates a new RobotDriveCommand.
    */
   private final RobotDriveSubsystem driveSubsystem;
+  private final Toggle invertDrive;
 
-  public RobotDriveCommand(final RobotDriveSubsystem subsystem) {
-    this.driveSubsystem = subsystem;
-    addRequirements(subsystem);
+  public RobotDriveCommand(final RobotDriveSubsystem dSubsystem) {
+    this.driveSubsystem = dSubsystem;
+    this.invertDrive = new Toggle(false);
+    addRequirements(dSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -33,7 +36,9 @@ public class RobotDriveCommand extends CommandBase {
   @Override
   public void execute() {
     this.driveSubsystem.tankDrive(RobotContainer.driverLeft.getY(), RobotContainer.driverRight.getY());
-    this.driveSubsystem.setInvertedDrive(RobotContainer.driverRight.getRawButton(1));
+
+    this.invertDrive.runToggle(RobotContainer.driverRight.getRawButton(1)); // Run toggle
+    this.driveSubsystem.setInvertedDrive(this.invertDrive.getState()); // Set inverted based on toggle status
   }
 
   // Called once the command ends or is interrupted.

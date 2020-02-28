@@ -65,14 +65,10 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.leftDrive = new CANSparkMax(Constants.leftDrive, MotorType.kBrushless);
     this.leftDriveB = new CANSparkMax(Constants.leftDriveB, MotorType.kBrushless);
 
-    this.leftDrive.setInverted(false);
-    this.leftDriveB.setInverted(false);
-
     this.rightDrive = new CANSparkMax(Constants.rightDrive, MotorType.kBrushless);
     this.rightDriveB = new CANSparkMax(Constants.rightDriveB, MotorType.kBrushless);
 
-    this.rightDrive.setInverted(true);
-    this.rightDriveB.setInverted(true);
+    setInvertedDrive(false);
     
     setMotorIdleMode(IdleMode.kCoast);
 
@@ -292,6 +288,10 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.driveInverted = invert;
     this.rightDrive.setInverted(!this.driveInverted);
     this.leftDrive.setInverted(this.driveInverted);
+  }
+
+  public boolean getInvertedDrive() {
+    return this.driveInverted;
   }
 
   public void setMotorIdleMode(IdleMode mode) {
