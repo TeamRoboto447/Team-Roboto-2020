@@ -89,7 +89,7 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   public void runShooterRaw(double speed) {
-    this.targetShooterSpeed.setDouble(speed*5420);
+    this.targetShooterSpeed.setDouble(speed * 5420);
     shootingMotorLeft.set(speed);
     shootingMotorRight.set(-speed);
   }
@@ -129,8 +129,8 @@ public class TurretSubsystem extends SubsystemBase {
     Logging.debug("Shooter:" + this.shooterEncoder.getVelocity(), "shooterPID");
     Logging.debug("Target:" + targetVel, "shooterPID");
 
-    String recordsString = String.format("%f,%f,%f,%f,%f", (double) System.currentTimeMillis(), (double) speed, (double) targetVel, (double) workingSpeed,
-    (double) this.shooterEncoder.getVelocity());
+    String recordsString = String.format("%f,%f,%f,%f,%f", (double) System.currentTimeMillis(), (double) speed,
+        (double) targetVel, (double) workingSpeed, (double) this.shooterEncoder.getVelocity());
 
     this.shooterLog(recordsString);
 
@@ -141,8 +141,16 @@ public class TurretSubsystem extends SubsystemBase {
     double setpoint = this.shootingMotorPID.getSetpoint();
     double processingVar = this.shooterEncoder.getVelocity();
     boolean atSpeed = setpoint - Constants.shooterMarginOfError < processingVar
-    && processingVar < setpoint + Constants.shooterMarginOfError;
+        && processingVar < setpoint + Constants.shooterMarginOfError;
     return atSpeed;
+  }
+
+  public boolean onTarget() {
+    double setpoint = 0;
+    double processingVar = this.yaw;
+    boolean onTarget = setpoint - Constants.turretMarginOfError < processingVar
+        && processingVar < setpoint + Constants.turretMarginOfError;
+    return onTarget;
   }
 
   public double getSpeedFromDist(double dist) {
@@ -167,12 +175,13 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   private void getDistanceEntryVal() {
-    this.distanceAverage.push(this.poseX < 0 ? -1 : (Constants.distanceLineEqM * this.poseX) + Constants.distanceLineEqB);
+    this.distanceAverage
+        .push(this.poseX < 0 ? -1 : (Constants.distanceLineEqM * this.poseX) + Constants.distanceLineEqB);
     double measuredDist = this.distanceAverage.getAverage();
     double dist;
 
-    if(this.distanceLocked) {
-      if(!this.savedDistanceBool) {
+    if (this.distanceLocked) {
+      if (!this.savedDistanceBool) {
         this.savedDistance = measuredDist;
         this.savedDistanceBool = true;
       }
@@ -249,12 +258,15 @@ public class TurretSubsystem extends SubsystemBase {
     this.turretMotor.set(speed);
   }
 
-  // private double getDistanceToInner(double angle, double distance, double targetDelta) {
-  //   return Math.sqrt(Math.pow(targetDelta, 2) + Math.pow(distance, 2) - targetDelta * distance * Math.cos(angle));
+  // private double getDistanceToInner(double angle, double distance, double
+  // targetDelta) {
+  // return Math.sqrt(Math.pow(targetDelta, 2) + Math.pow(distance, 2) -
+  // targetDelta * distance * Math.cos(angle));
   // }
 
-  // private double getAngleOffset(double angle, double distance, double targetDelta) {
-  //   return Math.asin(targetDelta / distance * Math.sin(angle));
+  // private double getAngleOffset(double angle, double distance, double
+  // targetDelta) {
+  // return Math.asin(targetDelta / distance * Math.sin(angle));
   // }
 
   boolean pastLimit = false;
@@ -262,11 +274,11 @@ public class TurretSubsystem extends SubsystemBase {
   private double lastValidTurretPos = 0;
 
   public void enableTargetting(boolean enable) {
-     if(enable) {
-       this.targettingRelay.set(Relay.Value.kForward);
-     } else {
-       this.targettingRelay.set(Relay.Value.kOff);
-     }
+    if (enable) {
+      this.targettingRelay.set(Relay.Value.kForward);
+    } else {
+      this.targettingRelay.set(Relay.Value.kOff);
+    }
   }
 
   public void turnToTarget() {
@@ -275,13 +287,16 @@ public class TurretSubsystem extends SubsystemBase {
         + "\nTurret Past Limit: " + this.pastLimit + "\nValid Target: " + this.validTarget, "turretLimits");
     if (!this.pastLimit && this.validTarget) {
       this.pastLimit = Math.abs(this.getTurretPos()) > Constants.turretSpinLimit;
-      //double distanceToInner = this.getDistanceToInner(this.poseAngle, this.distance,
-      //    Constants.distanceFromInnerToOuterPort);
-      double adjustAngle = 4;//this.getAngleOffset(this.poseAngle, distanceToInner, Constants.distanceFromInnerToOuterPort);
-      /*if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0, adjustAngle)) {
-        adjustAngle = 0.0;
-      }*/
-      double processingVar = this.yaw+adjustAngle;
+      // double distanceToInner = this.getDistanceToInner(this.poseAngle,
+      // this.distance,
+      // Constants.distanceFromInnerToOuterPort);
+      double adjustAngle = 4;// this.getAngleOffset(this.poseAngle, distanceToInner,
+                             // Constants.distanceFromInnerToOuterPort);
+      /*
+       * if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0,
+       * adjustAngle)) { adjustAngle = 0.0; }
+       */
+      double processingVar = this.yaw + adjustAngle;
       double speed = this.turretPositionPID.run(processingVar);
 
       Logging.debug("Aiming PID Output Value: " + speed + "\nAiming PV: " + processingVar, "aimingPID");
@@ -341,10 +356,10 @@ public class TurretSubsystem extends SubsystemBase {
     // Set up Motors
     this.turretMotor = new CANSparkMax(Constants.turretSparkMax, MotorType.kBrushless);
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
-    
+
     this.shootingMotorLeft = new CANSparkMax(Constants.shooterSparkMaxLeft, MotorType.kBrushless);
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
-    
+
     this.shootingMotorRight = new CANSparkMax(Constants.shooterSparkMaxRight, MotorType.kBrushless);
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
     this.shootFeeder = new Spark(Constants.shooterFeedSpark);
@@ -362,23 +377,22 @@ public class TurretSubsystem extends SubsystemBase {
 
   private void setupPIDControllers() {
     // Define PID controllers
-    this.shootingMotorPID = new PID.PIDBuilder(0,Constants.shooterkP,Constants.shooterkI,Constants.shooterkD)
-      .FF(new LinearFF(Constants.shooterkFFm, Constants.shooterkFFb))
-      .MinIntegral(-Constants.shooterSZone).MaxIntegral(Constants.shooterSZone)
-      .IZone(Constants.shooterIZone).Name("shootingMotor").build();
-    this.turretPositionPID = new PID.PIDBuilder(0,Constants.turretkP, Constants.turretkI, Constants.turretkD)
-      .MinIntegral(-Constants.turretIZone).MaxIntegral(Constants.turretIZone)
-      .Name("turretPosition").build();
+    this.shootingMotorPID = new PID.PIDBuilder(0, Constants.shooterkP, Constants.shooterkI, Constants.shooterkD)
+        .FF(new LinearFF(Constants.shooterkFFm, Constants.shooterkFFb)).MinIntegral(-Constants.shooterSZone)
+        .MaxIntegral(Constants.shooterSZone).IZone(Constants.shooterIZone).Name("shootingMotor").build();
+    this.turretPositionPID = new PID.PIDBuilder(0, Constants.turretkP, Constants.turretkI, Constants.turretkD)
+        .MinIntegral(-Constants.turretIZone).MaxIntegral(Constants.turretIZone).Name("turretPosition").build();
 
-    
-    /*this.shootingMotorPID = new PID(0, // Default setpoint
-        Constants.shooterkP, Constants.shooterkI, Constants.shooterkD,
-        new LinearFF(Constants.shooterkFFm, Constants.shooterkFFb), Constants.shooterIZone, -Constants.shooterSZone,
-        Constants.shooterSZone);
-
-    this.turretPositionPID = new PID(0, // Default setpoint
-        Constants.turretkP, Constants.turretkI, Constants.turretkD, new ConstantFF(0.0), -Constants.turretIZone,
-        Constants.turretIZone);*/
+    /*
+     * this.shootingMotorPID = new PID(0, // Default setpoint Constants.shooterkP,
+     * Constants.shooterkI, Constants.shooterkD, new LinearFF(Constants.shooterkFFm,
+     * Constants.shooterkFFb), Constants.shooterIZone, -Constants.shooterSZone,
+     * Constants.shooterSZone);
+     * 
+     * this.turretPositionPID = new PID(0, // Default setpoint Constants.turretkP,
+     * Constants.turretkI, Constants.turretkD, new ConstantFF(0.0),
+     * -Constants.turretIZone, Constants.turretIZone);
+     */
   }
 
   private void setupNetworkTables() {
@@ -507,4 +521,5 @@ public class TurretSubsystem extends SubsystemBase {
     this.shootingMotorRight.set(0);
     this.turretMotor.set(0);
   }
+
 }

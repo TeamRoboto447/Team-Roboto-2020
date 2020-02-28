@@ -78,7 +78,6 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     this.timeEntry.setDouble(System.currentTimeMillis());
-    setRobotFront();
   }
 
   private void setRobotFront() {
@@ -139,6 +138,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    setRobotFront();
   }
 
   @Override

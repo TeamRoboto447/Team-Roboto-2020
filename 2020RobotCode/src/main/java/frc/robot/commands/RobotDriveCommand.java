@@ -7,6 +7,8 @@
 
 package frc.robot.commands;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.RobotContainer;
@@ -32,6 +34,7 @@ public class RobotDriveCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.driveSubsystem.setMotorIdleMode(IdleMode.kCoast);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

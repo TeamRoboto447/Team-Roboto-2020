@@ -86,7 +86,8 @@ public final class Constants {
                         shooterPidIntegralResetTime = 2,
                         distanceFromInnerToOuterPort = 29.5/12,
                         maxInnerPortAjustmentAngle = Math.PI / 4,
-                        shooterMarginOfError = 60;
+                        shooterMarginOfError = 60,
+                        turretMarginOfError = 0.25;
 
         public static final double
         distanceLineEqM = 3.65258532089,
@@ -97,7 +98,7 @@ public final class Constants {
         public static final double turretkP = 0.03, turretkI = 0.05, turretkD = 0.0009, turretFFm = 0, turretFFb = 0,
                         turretIZone = 10, turretSpinLimit = 190;
 
-        public static final double encoderRes = 4096;
+        public static final double encoderRes = 1;
 
         // Temporary for testing:
         public static final boolean kGyroReversed = true;

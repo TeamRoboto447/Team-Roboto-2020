@@ -13,6 +13,7 @@ import frc.robot.subsystems.TurretSubsystem;
 public class AimAndShoot extends CommandBase {
   private final TurretSubsystem turretSubsystem;
   private final double startingAngle;
+
   public AimAndShoot(TurretSubsystem tSubsystem, double angle) {
     this.turretSubsystem = tSubsystem;
     this.startingAngle = angle;
@@ -27,10 +28,22 @@ public class AimAndShoot extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(!this.turretSubsystem.validTarget) {
-      this.turretSubsystem.turnToAngle(this.startingAngle);
+    if (!this.turretSubsystem.validTarget) {
+      this.turretSubsystem.turnToAngle(this.startingAngle, 0.5);
     } else {
       this.turretSubsystem.turnToTarget();
+      if (this.turretSubsystem.onTarget()) {
+        shoot();
+      }
+    }
+  }
+
+  private void shoot() {
+    double currentDistance = this.turretSubsystem.getDistance();
+    double shooterSpeed = this.turretSubsystem.getSpeedFromDist(currentDistance);
+    this.turretSubsystem.runShooterAtSpeed(shooterSpeed);
+    if (this.turretSubsystem.shooterAtSpeed()) {
+      this.turretSubsystem.feedShooter();
     }
   }
 

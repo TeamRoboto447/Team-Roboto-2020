@@ -7,17 +7,21 @@
 
 package frc.robot.commands;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.Utilities;
 import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.utils.MovingAverage;
 import frc.robot.utils.PID;
 import frc.robot.utils.ff.ConstantFF;
 
 public class DriveToPosition extends CommandBase {
 
-  private final PID drivePID;
-  private double kP, kI, kD = 0;
+  private final MovingAverage averagePosition;
 
+  private final PID drivePID;
   private final RobotDriveSubsystem driveSubsystem;
   private final double targetPosition;
 
@@ -25,12 +29,16 @@ public class DriveToPosition extends CommandBase {
     this.driveSubsystem = dSubsystem;
     this.targetPosition = targetPosition;
     addRequirements(dSubsystem);
-    this.drivePID = new PID(this.targetPosition, this.kP, this.kI, this.kD, new ConstantFF(0));
+
+    this.drivePID = new PID(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD,
+        new ConstantFF(0));
+    this.averagePosition = new MovingAverage(50);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.driveSubsystem.setMotorIdleMode(IdleMode.kBrake);
     this.driveSubsystem.resetEncoders();
     this.driveSubsystem.setCurrentGear("low");
   }
@@ -38,12 +46,14 @@ public class DriveToPosition extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
     double PV = this.driveSubsystem.getAverageEncoderDistance();
     PV = Utilities.driveshaftIntputToOutput(PV, this.driveSubsystem.getCurrentGear());
     PV = Utilities.meterToEncoder(PV);
-    double
-      leftSpeed = this.drivePID.run(PV),
-      rightSpeed = this.drivePID.run(PV);
+
+    this.averagePosition.push(PV);
+
+    double leftSpeed = this.drivePID.run(PV), rightSpeed = this.drivePID.run(PV);
     this.driveSubsystem.tankDrive(leftSpeed, rightSpeed);
   }
 
@@ -55,6 +65,7 @@ public class DriveToPosition extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return this.targetPosition - 0.5 < this.averagePosition.getAverage()
+        && this.averagePosition.getAverage() < this.targetPosition + 0.5;
   }
 }
