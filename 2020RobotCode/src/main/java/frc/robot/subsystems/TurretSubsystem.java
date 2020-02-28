@@ -48,7 +48,7 @@ public class TurretSubsystem extends SubsystemBase {
       shooterSpeedEntry, shooterCurrSpeedEntry, turretEncoderEntry, turretLastTargetEntry, turretLastTargetOffsetEntry,
       realDistanceEntry, targetShooterSpeed,
       // Declare targetting entries
-      validTargetEntry, pitchEntry, latencyEntry, targetPoseEntry, distanceEntry, yawEntry;
+      validTargetEntry, pitchEntry, latencyEntry, targetPoseEntry, distanceEntry, yawEntry, onTargetEntry;
 
   PID shootingMotorPID, turretPositionPID;
   Boolean bypassShooterPID;
@@ -421,6 +421,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.turretDEntry = this.PIDInfo.getEntry("turretkD");
 
     // Define targetting entries
+    this.onTargetEntry = this.pidTuningPVs.getEntry("onTarget");
     this.validTargetEntry = this.camInfo.getEntry("isValid");
     this.yawEntry = this.camInfo.getEntry("targetYaw");
     this.pitchEntry = this.camInfo.getEntry("targetPitch");
@@ -464,6 +465,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.turretLastTargetOffsetEntry.setDouble(this.turretOffset);
     this.shooterSetSpeed = this.shooterSpeedEntry.getDouble(0.5);
     this.distanceEntry.setDouble(this.distance);
+    this.onTargetEntry.setBoolean(this.onTarget());
   }
 
   public void resetTurretEncoder() {
