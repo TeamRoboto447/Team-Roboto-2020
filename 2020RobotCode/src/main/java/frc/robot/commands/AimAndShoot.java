@@ -22,6 +22,7 @@ public class AimAndShoot extends CommandBase {
     this.turretSubsystem = tSubsystem;
     this.indexerSubsystem = iSubsystem;
     this.startingAngle = angle;
+    this.countdownToEnd = new Timer();
 
     addRequirements(tSubsystem);
     addRequirements(iSubsystem);
