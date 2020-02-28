@@ -18,11 +18,13 @@ public class RobotDriveCommand extends CommandBase {
    * Creates a new RobotDriveCommand.
    */
   private final RobotDriveSubsystem driveSubsystem;
-  private final Toggle invertDrive;
+  private final Toggle invertDrive, transmissionToggle;
 
   public RobotDriveCommand(final RobotDriveSubsystem dSubsystem) {
     this.driveSubsystem = dSubsystem;
     this.invertDrive = new Toggle(false);
+    this.transmissionToggle = new Toggle(false);
+
     addRequirements(dSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -39,6 +41,14 @@ public class RobotDriveCommand extends CommandBase {
 
     this.invertDrive.runToggle(RobotContainer.driverRight.getRawButton(1)); // Run toggle
     this.driveSubsystem.setInvertedDrive(this.invertDrive.getState()); // Set inverted based on toggle status
+  
+    this.transmissionToggle.runToggle(RobotContainer.driverLeft.getRawButton(1));
+    
+    if(this.transmissionToggle.getState()) {
+        this.driveSubsystem.setCurrentGear("high");
+    } else {
+        this.driveSubsystem.setCurrentGear("low");
+    }
   }
 
   // Called once the command ends or is interrupted.
