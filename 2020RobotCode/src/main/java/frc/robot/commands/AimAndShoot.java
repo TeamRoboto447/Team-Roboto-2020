@@ -7,17 +7,24 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class AimAndShoot extends CommandBase {
   private final TurretSubsystem turretSubsystem;
+  private final IndexerSubsystem indexerSubsystem;
   private final double startingAngle;
+  private final Timer countdownToEnd;
 
-  public AimAndShoot(TurretSubsystem tSubsystem, double angle) {
+  public AimAndShoot(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, double angle) {
     this.turretSubsystem = tSubsystem;
+    this.indexerSubsystem = iSubsystem;
     this.startingAngle = angle;
+
     addRequirements(tSubsystem);
+    addRequirements(iSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -44,7 +51,13 @@ public class AimAndShoot extends CommandBase {
     this.turretSubsystem.runShooterAtSpeed(shooterSpeed);
     if (this.turretSubsystem.shooterAtSpeed()) {
       this.turretSubsystem.feedShooter();
+      this.indexerSubsystem.indexerRaw(0.75);
     }
+  }
+
+  private boolean ballsLeft() {
+    return this.indexerSubsystem.isFull() || this.indexerSubsystem.ballAtIntake()
+        || this.indexerSubsystem.ballAtPosOne();
   }
 
   // Called once the command ends or is interrupted.
@@ -55,6 +68,22 @@ public class AimAndShoot extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    return countdownToEnd();
+  }
+
+  private boolean countdownToEnd() {
+    if(!ballsLeft()) {
+      this.countdownToEnd.reset();
+      this.countdownToEnd.start();
+    } else {
+      this.countdownToEnd.stop();
+      this.countdownToEnd.reset();
+    }
+
+    if(this.countdownToEnd.get() == 1) {
+      return true;
+    }
+
     return false;
   }
 }
