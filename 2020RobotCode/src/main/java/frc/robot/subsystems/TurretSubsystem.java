@@ -262,11 +262,11 @@ public class TurretSubsystem extends SubsystemBase {
   private double lastValidTurretPos = 0;
 
   public void enableTargetting(boolean enable) {
-    if(enable) {
-      this.targettingRelay.set(Relay.Value.kOn);
-    } else {
-      this.targettingRelay.set(Relay.Value.kOff);
-    }
+     if(enable) {
+       this.targettingRelay.set(Relay.Value.kForward);
+     } else {
+       this.targettingRelay.set(Relay.Value.kOff);
+     }
   }
 
   public void turnToTarget() {

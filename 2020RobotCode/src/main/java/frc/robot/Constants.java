@@ -81,16 +81,16 @@ public final class Constants {
                         shooterkFFb = -0.018051, 
                         shooterIZone = 150,
                         shooterSZone = 100,
-                        speedkM = 0.0078859,
-                        speedkB = 0.6975444,
+                        speedkM = 0.0090475963905,
+                        speedkB = 0.7242320711364,
                         shooterPidIntegralResetTime = 2,
                         distanceFromInnerToOuterPort = 29.5/12,
                         maxInnerPortAjustmentAngle = Math.PI / 4,
                         shooterMarginOfError = 60;
 
         public static final double
-        distanceLineEqM = 3.322622173196587,
-        distanceLineEqB = -1.5053081308055845;
+        distanceLineEqM = 3.65258532089,
+        distanceLineEqB = -3.9005631049;
 
 
         // Turning PID info

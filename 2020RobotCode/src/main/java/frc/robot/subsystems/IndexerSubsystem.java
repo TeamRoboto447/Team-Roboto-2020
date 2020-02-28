@@ -58,7 +58,8 @@ public class IndexerSubsystem extends SubsystemBase {
         indexerRaw(0);
       }
     } else {
-      stop();
+      indexerRaw(0);
+      intakeRaw(0);
     }
   }
 
