@@ -33,8 +33,6 @@ public class RobotContainer {
   public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);
   public final IntakeCommand intakeCommand = new IntakeCommand(indexerSubsystem, turretSubsystem);
 
-  public final AimTurret aimTurretCommand = new AimTurret(turretSubsystem, 0);
-
   public static Joystick driverLeft = new Joystick(0);
   public static Joystick driverRight = new Joystick(1);
   public static Joystick operator = new Joystick(2);
@@ -42,7 +40,6 @@ public class RobotContainer {
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  public Timer movementTimer;
 
   public RobotContainer() {
     // Set default commands
@@ -50,8 +47,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-
-    this.movementTimer = new Timer();
   }
 
   /**
@@ -78,9 +73,5 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return null;
-  }
-
-  public void resetTimer() {
-    this.movementTimer.reset();
   }
 }

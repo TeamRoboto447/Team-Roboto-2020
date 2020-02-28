@@ -90,8 +90,8 @@ public class Utilities {
         return distance;
     }
 
-    public static double RPMtoMPS(double inputRPM) {
-        double outputRPM = driveshaftIntputToOutput(inputRPM, "low");
+    public static double RPMtoMPS(double inputRPM, String currentGear) {
+        double outputRPM = driveshaftIntputToOutput(inputRPM, currentGear);
         double outputRPS = outputRPM/2;
         double MPS = rotationsToMeter(outputRPS);
         return MPS;
