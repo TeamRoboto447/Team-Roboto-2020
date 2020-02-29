@@ -4,10 +4,12 @@ import time, matplotlib.pyplot as plt, threading
 NetworkTables.initialize(server='roboRIO-447-frc.local') #roboRIO-447-frc.local
 
 end=time.time()+30
+print("Connecting..")
 while not NetworkTables.isConnected():
     time.sleep(0.1)
     if time.time()>=end:
-        raise 
+        raise
+print("Connected")
 gi=NetworkTables.getTable("pidTuningPVs")
 st=NetworkTables.getTable('chameleon-vision').getSubTable('Shooter Targeting')
 
@@ -18,7 +20,7 @@ def thread():
     ltime=0
     while con:
         time.sleep(0.01)
-        mtime=gi.getEntry('Time').value/1000
+        mtime=gi.getEntry('timeMS').value/1000
         if mtime==ltime:
             continue
         ltime=mtime
