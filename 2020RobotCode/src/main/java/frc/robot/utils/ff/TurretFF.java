@@ -39,6 +39,10 @@ public class TurretFF extends FFbase {
         double targetAngularVelosityMotor = targetAngularVelosity * Constants.turretToMoterRatio;
         return this.M * targetAngularVelosityMotor + this.B;
     }
+    @Override
+    public String getValsAsString(){
+        return String.format("FFType: Turret, FFm: %f, FFb: %f", this.M, this.B);
+    }
     public void setEncoderSpeed(double encSpeed){
         //This is expected to be in rotations
         this.encoderSpeed = encSpeed;

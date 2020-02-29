@@ -105,9 +105,9 @@ public class PID {
         final double feedforward = this.FF.getFF(this.setpoint,processingVar,iterTime);
         
         
-        Logging.info("PID time: "+iterTime, this.name + "PIDtime");
-        Logging.info("P:" + this.P*error + ",I:"+this.I*this.integral + ",D:"+this.D*derivitive+ ",FF:" + feedforward, this.name + "PIDOutVals");
-        Logging.info("P:" + this.P + ",I:" + this.I + ",D:" + this.D, this.name+"PIDVals");
+        Logging.info("PID time: " + iterTime, this.name + "PIDtime");
+        Logging.info(String.format("P: %f, I: %f, D: %f, FF: %f",this.P * error, this.I * this.integral, this.D * derivitive,feedforward), this.name + "PIDOutVals");
+        Logging.info(String.format("P: %f, I: %f, D: %f, %s",this.P, this.I, this.D, this.FF.getValsAsString()), this.name + "PIDVals");
 
         this.previousError = error;
         return this.P * error + this.I * this.integral + this.D * derivitive + feedforward;
