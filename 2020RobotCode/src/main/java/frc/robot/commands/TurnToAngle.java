@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.Utilities;
 import frc.robot.subsystems.RobotDriveSubsystem;
 import frc.robot.utils.MovingAverage;
 import frc.robot.utils.PID;
