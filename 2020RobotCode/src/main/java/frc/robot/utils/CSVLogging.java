@@ -45,7 +45,7 @@ public class CSVLogging {
     public void open(){
         try {
             Path deployPath = Filesystem.getDeployDirectory().toPath();
-            Path filePath = deployPath.resolve("csv/" + name + ".csv");
+            Path filePath = deployPath.resolve("csv/" + this.name + ".csv");
             this.file = new CSVWriter(new FileWriter(filePath.toString()));
         } catch (IOException e) {
             this.open = false;
@@ -60,7 +60,7 @@ public class CSVLogging {
         if (this.level <= Constants.loggingLevel && Constants.enableCSVLogging && this.open) {
             if (this.subSystemToLogCSV.getString("errored").contains("everything;")) {
                 this.file.writeNext(row);
-            } else if ((";" + this.subSystemToLogCSV.getString("errored")).contains(";" + name + ";")) {
+            } else if ((";" + this.subSystemToLogCSV.getString("errored")).contains(";" + this.name + ";")) {
                 this.file.writeNext(row);
             }
         }
@@ -70,7 +70,7 @@ public class CSVLogging {
         if (this.level <= Constants.loggingLevel) {
             if (this.subSystemToLog.getString("errored").contains("everything;")) {
                 System.out.println(this.appendHeaders(row));
-            } else if ((";" + this.subSystemToLog.getString("errored")).contains(";" + name + ";")) {
+            } else if ((";" + this.subSystemToLog.getString("errored")).contains(";" + this.name + ";")) {
                 System.out.println(this.appendHeaders(row));
             }
         }
