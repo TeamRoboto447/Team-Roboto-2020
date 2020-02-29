@@ -97,6 +97,6 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void feedShooter() {
-    this.indexerSubsystem.indexerRaw(1);
+    this.indexerSubsystem.indexerRaw(0.75);
   }
 }

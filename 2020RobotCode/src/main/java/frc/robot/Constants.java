@@ -74,19 +74,19 @@ public final class Constants {
 
         // Shooter PID info
         public static final double 
-                        shooterkP = 0.000270,
-                        shooterkI = 0.001163,
-                        shooterkD = 0.000016,
-                        shooterkFFm = 0.000186,
-                        shooterkFFb = -0.018051, 
+                        shooterkP = 2.7e-04,
+                        shooterkI = 1.089564e-03,
+                        shooterkD = 1.672688e-05,
+                        shooterkFFm = 1.838143e-04,
+                        shooterkFFb = -6.208137e-03,
                         shooterIZone = 150,
                         shooterSZone = 100,
-                        speedkM = 0.011902391579906376,
-                        speedkB = 0.6720639326984954,
+                        speedkM = 0.008911569562544219,
+                        speedkB = 0.7534777168792539,
                         shooterPidIntegralResetTime = 2,
                         distanceFromInnerToOuterPort = 29.5/12,
                         maxInnerPortAjustmentAngle = Math.PI / 4,
-                        shooterMarginOfError = 40,
+                        shooterMarginOfError = 30,
                         turretMarginOfError = 0.25;
 
         public static final double

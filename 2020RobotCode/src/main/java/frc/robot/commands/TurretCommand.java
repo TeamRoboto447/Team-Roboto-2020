@@ -63,7 +63,7 @@ public class TurretCommand extends CommandBase {
     }
 
     if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
-      unlockDist();
+      lockDist();
     } else {
       unlockDist();
     }

@@ -76,6 +76,8 @@ public class AimAndShoot extends CommandBase {
     if (this.turretSubsystem.shooterAtSpeed()) {
       this.turretSubsystem.feedShooter();
       this.indexerSubsystem.indexerRaw(0.75);
+    } else {
+      this.indexerSubsystem.stop();
     }
   }
 
