@@ -22,6 +22,12 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 public final class Constants {
         public static int loggingLevel = 4; // Logging level (-1 = no logging, 0 = errors only, 1 = +warnings, 2 = +debug, 3 = +info)
         public static Boolean enableCSVLogging = true;
+        public static int 
+                noLogging = -1,
+                errors = 0,
+                warnings = 1,
+                debug = 2,
+                info = 3;
 
         public static final boolean bypassShooterPID = false;
 

@@ -32,7 +32,7 @@ public class CSVLogging {
     private int level;
     private String[] headers;
 
-    public CSVLogging(String name, int level, String[] headers) {
+    public CSVLogging(String[] headers, String name, int level ) {
         this.name = name;
         this.level = level;
         try {
@@ -71,9 +71,17 @@ public class CSVLogging {
             }
         }
     }
+
     public void logBoth(String[] row){
         this.logToStdOut(row);
         this.logCSV(row);
+    }
+    public void logBoth(double[] row){
+        String[] rowOut = new String[row.length];
+        for (int i = 0; i < row.length; i++) {
+            rowOut[i] = "" + row[i];
+        }
+        this.logBoth(rowOut);
     }
 
     private String appendHeaders(String[] row) {

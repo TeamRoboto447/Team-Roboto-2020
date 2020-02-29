@@ -14,7 +14,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.RobotDriveSubsystem;
 import frc.robot.utils.MovingAverage;
 import frc.robot.utils.PID;
-import frc.robot.utils.ff.ConstantFF;
+import frc.robot.utils.ff.FFbase;
 
 public class TurnToAngle extends CommandBase {
 
@@ -29,8 +29,8 @@ public class TurnToAngle extends CommandBase {
     this.targetAngle = targetAngle;
     addRequirements(dSubsystem);
 
-    this.drivePID = new PID(this.targetAngle, Constants.drivekP, Constants.drivekI, Constants.drivekD,
-        new ConstantFF(0));
+    this.drivePID = new PID.PIDBuilder(this.targetAngle, Constants.drivekP, Constants.drivekI, Constants.drivekD)
+      .FF(new FFbase()).Name("drive").build();
     this.averageAngle = new MovingAverage(50);
   }
 

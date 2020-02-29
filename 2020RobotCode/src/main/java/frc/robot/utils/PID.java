@@ -6,10 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot.utils;
+
 import edu.wpi.first.wpilibj.Timer;
+
 import frc.robot.Constants;
 import frc.robot.utils.Logging;
 import frc.robot.utils.ff.FFbase;
+import frc.robot.utils.CSVLogging;
 /*
  * Add your docs here.
  */
@@ -29,40 +32,9 @@ public class PID {
         integralTimer;
     private FFbase FF;
     private String name = "";
-
-    public PID (double kSetpoint, double kP, double kI,
-     double kD, FFbase kFF,
-     double minIntegral, double maxIntegral) {
-        this(kSetpoint, kP, kI, kD, kFF);
-        this.minInt=minIntegral;
-        this.maxInt=maxIntegral;
-    }
-    public PID (double kSetpoint, double kP, double kI, double kD, FFbase kFF, double kiZone){
-        this(kSetpoint, kP, kI, kD, kFF);
-        this.izone = kiZone;
-    }
-    public PID (double kSetpoint, double kP, double kI, double kD, FFbase kFF,
-     double kiZone, double minIntegral, double maxIntegral){
-        this(kSetpoint, kP, kI, kD, kFF);
-        this.izone=kiZone;
-        this.minInt=minIntegral;
-        this.maxInt=maxIntegral;
-    }
-    public PID (double kSetpoint, double kP, double kI, double kD, FFbase kFF) {
-        this.P = kP;
-        this.I = kI;
-        this.D = kD;
-        this.FF = kFF;
-        this.setpoint = kSetpoint;
-        this.iterTime = new Timer();
-        this.iterTime.reset();
-        this.iterTime.stop();
-        this.integralTimer = new Timer();
-        this.integralTimer.reset();
-        this.minInt=0;
-        this.maxInt=0;
-        this.izone=0;        
-    }
+    private CSVLogging 
+        valueLogging,
+        setpointLogging;
     public PID (PIDBuilder builder){
         this.P = builder.P;
         this.I = builder.I;
@@ -74,6 +46,8 @@ public class PID {
         this.izone = builder.izone;
         this.name = builder.name;  
 
+        this.valueLogging = new CSVLogging(new String[]{"time","P","I","D","FF","total"},  builder.name + "PIDOutVals", Constants.debug);
+        this.setpointLogging = new CSVLogging(new String[]{"time","setpoint","pv"}, builder.name + "PIDSetpoint", Constants.debug);
         this.iterTime = new Timer();
         this.iterTime.reset();
         this.iterTime.stop();
@@ -104,13 +78,17 @@ public class PID {
         final double derivitive = (error - this.previousError) / iterTime;
         final double feedforward = this.FF.getFF(this.setpoint,processingVar,iterTime);
         
-        
+        double total = this.P * error + this.I * this.integral + this.D * derivitive + feedforward;
+        double time = System.currentTimeMillis() / 1000;
+
         Logging.info("PID time: " + iterTime, this.name + "PIDtime");
-        Logging.info(String.format("P: %f, I: %f, D: %f, FF: %f",this.P * error, this.I * this.integral, this.D * derivitive,feedforward), this.name + "PIDOutVals");
+        //Logging.info(String.format("P: %f, I: %f, D: %f, FF: %f",this.P * error, this.I * this.integral, this.D * derivitive,feedforward), this.name + "PIDOutVals");
+        this.valueLogging.logBoth(new double[]{time, this.P * error, this.I * this.integral, this.D * derivitive, feedforward, total});
+        this.setpointLogging.logBoth(new double[]{time, this.setpoint, processingVar});
         Logging.info(String.format("P: %f, I: %f, D: %f, %s",this.P, this.I, this.D, this.FF.getValsAsString()), this.name + "PIDVals");
 
         this.previousError = error;
-        return this.P * error + this.I * this.integral + this.D * derivitive + feedforward;
+        return total;
     }
     
     public void resetIntegral() {
