@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
@@ -75,20 +76,25 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 
     SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(3)),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20)
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1),
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 5)
+    );
+
+    ParallelCommandGroup threeBallAutoFast = new ParallelCommandGroup(
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.2, 0.4),
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 0, 10)
     );
 
     SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20),
-      new ParallelCommandGroup(
-        new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(-5)),
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 5),
+      new ParallelRaceGroup(
+        new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(30), 0.5, 1),
         new IntakeBalls(this.indexerSubsystem)
       ),
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5)),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20)
+      new DriveToPosition(this.driveSubsystem, -Utilities.feetToEncoder(30), 0.5, 1),
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 5)
     );
 
-    return threeBallAuto;
+    return threeBallAutoFast;
   }
 }

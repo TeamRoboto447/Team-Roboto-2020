@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IndexerSubsystem;
 
 public class IntakeBalls extends CommandBase {
+  private int ballCount = 0;
+  private boolean wasLookingAtBall = false;
   private final IndexerSubsystem indexerSubsystem;
   public IntakeBalls(IndexerSubsystem iSubsystem) {
     this.indexerSubsystem = iSubsystem;
@@ -25,6 +27,15 @@ public class IntakeBalls extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    this.indexerSubsystem.intakeBall();
+    
+    if(!wasLookingAtBall && this.indexerSubsystem.ballAtIntake()) {
+      this.ballCount++;
+      this.wasLookingAtBall = true;
+    } else if(wasLookingAtBall && !this.indexerSubsystem.ballAtIntake()) {
+      this.wasLookingAtBall = false;
+    }
+
   }
 
   // Called once the command ends or is interrupted.
@@ -36,6 +47,6 @@ public class IntakeBalls extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return this.indexerSubsystem.isFull();
+    return this.indexerSubsystem.isFull() || this.ballCount >= 3;
   }
 }

@@ -21,17 +21,20 @@ public class DriveToPosition extends CommandBase {
 
   private final MovingAverage averagePosition;
 
-  private final PID drivePID;
+  private final PID drivePID, steerPID;
   private final RobotDriveSubsystem driveSubsystem;
   private final double targetPosition;
+  private final double maxSpeed;
 
-  public DriveToPosition(RobotDriveSubsystem dSubsystem, double targetPosition) {
+  public DriveToPosition(RobotDriveSubsystem dSubsystem, double targetPosition, double minSpeed, double maxSpeed) {
     this.driveSubsystem = dSubsystem;
     this.targetPosition = targetPosition;
+    this.maxSpeed = maxSpeed;
     addRequirements(dSubsystem);
 
     this.drivePID = new PID(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD,
-        new ConstantFF(0.5));
+        new ConstantFF(minSpeed));
+    this.steerPID = new PID(0, 0.0001, 0, 0, new ConstantFF(0));
     this.averagePosition = new MovingAverage(50);
   }
 
@@ -48,13 +51,15 @@ public class DriveToPosition extends CommandBase {
   public void execute() {
 
     double PV = this.driveSubsystem.getAverageEncoderDistance();
-    PV = Utilities.driveshaftIntputToOutput(PV, this.driveSubsystem.getCurrentGear());
+    PV = Utilities.driveshaftInputToOutput(PV, this.driveSubsystem.getCurrentGear());
     PV = Utilities.meterToEncoder(PV);
 
     this.averagePosition.push(PV);
 
-    double leftSpeed = this.drivePID.run(PV), rightSpeed = this.drivePID.run(PV);
-    this.driveSubsystem.tankDrive(leftSpeed, rightSpeed);
+    double speed = this.drivePID.run(PV);
+    double steer = this.steerPID.run(this.driveSubsystem.getHeading());
+    if(speed > this.maxSpeed) speed = this.maxSpeed;
+    this.driveSubsystem.arcadeDrive(speed, steer);
   }
 
   // Called once the command ends or is interrupted.

@@ -119,11 +119,11 @@ public class RobotDriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    double leftOutputRotations = Utilities.driveshaftIntputToOutput(this.m_leftEncoder.getPosition(),
+    double leftOutputRotations = Utilities.driveshaftInputToOutput(this.m_leftEncoder.getPosition(),
         this.getCurrentGear());
     double leftOutputMeters = Utilities.rotationsToMeter(leftOutputRotations);
 
-    double rightOutputRotations = Utilities.driveshaftIntputToOutput(this.m_rightEncoder.getPosition(),
+    double rightOutputRotations = Utilities.driveshaftInputToOutput(this.m_rightEncoder.getPosition(),
         this.getCurrentGear());
     double rightOutputMeters = Utilities.rotationsToMeter(rightOutputRotations);
 
@@ -196,7 +196,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    this.m_drive.arcadeDrive(fwd, rot);
+    double leftSpeed = fwd - rot;
+    double rightSpeed = fwd + rot;
+    this.setRelativeDrive(leftSpeed, rightSpeed);
   }
 
   /**

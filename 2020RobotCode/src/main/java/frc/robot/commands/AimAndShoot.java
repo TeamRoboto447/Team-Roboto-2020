@@ -16,13 +16,23 @@ public class AimAndShoot extends CommandBase {
   private final TurretSubsystem turretSubsystem;
   private final IndexerSubsystem indexerSubsystem;
   private final double startingAngle;
-  private final Timer countdownToEnd;
+  private final Timer countDown, overallTimer;
+  private final double maxRunTime;
+  private double ballsShot = 0;
+  private boolean wasLookingAtBall = false;
 
-  public AimAndShoot(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, double angle) {
+  public AimAndShoot(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, double angle, double maxTime) {
     this.turretSubsystem = tSubsystem;
     this.indexerSubsystem = iSubsystem;
     this.startingAngle = angle;
-    this.countdownToEnd = new Timer();
+    this.countDown = new Timer();
+    this.countDown.stop();
+    this.countDown.reset();
+    this.overallTimer = new Timer();
+    this.overallTimer.reset();
+    this.overallTimer.start();
+
+    this.maxRunTime = maxTime;
 
     addRequirements(tSubsystem);
     addRequirements(iSubsystem);
@@ -45,6 +55,18 @@ public class AimAndShoot extends CommandBase {
         shoot();
       }
     }
+
+    if (!this.wasLookingAtBall && this.indexerSubsystem.isFull()) {
+      this.ballsShot++;
+      this.wasLookingAtBall = true;
+    } else if (this.wasLookingAtBall && !this.indexerSubsystem.isFull()) {
+      this.wasLookingAtBall = false;
+    }
+
+    if(this.ballsShot >= 3) {
+      this.countDown.reset();
+      this.countDown.start();
+    }
   }
 
   private void shoot() {
@@ -53,40 +75,21 @@ public class AimAndShoot extends CommandBase {
     this.turretSubsystem.runShooterAtSpeed(shooterSpeed);
     if (this.turretSubsystem.shooterAtSpeed()) {
       this.turretSubsystem.feedShooter();
-      this.indexerSubsystem.indexerRaw(0.65);
+      this.indexerSubsystem.indexerRaw(0.75);
     }
-  }
-
-  private boolean ballsLeft() {
-    return this.indexerSubsystem.isFull() || this.indexerSubsystem.ballAtIntake()
-        || this.indexerSubsystem.ballAtPosOne();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     this.turretSubsystem.enableTargetting(false);
+    this.turretSubsystem.stop();
+    this.indexerSubsystem.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return countdownToEnd();
-  }
-
-  private boolean countdownToEnd() {
-    if(!ballsLeft()) {
-      this.countdownToEnd.reset();
-      this.countdownToEnd.start();
-    } else {
-      this.countdownToEnd.stop();
-      this.countdownToEnd.reset();
-    }
-
-    if(this.countdownToEnd.get() == 1) {
-      return true;
-    }
-
-    return false;
+    return this.countDown.get() >= 0.5 || this.overallTimer.get() >= this.maxRunTime;
   }
 }
