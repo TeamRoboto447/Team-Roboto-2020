@@ -81,8 +81,8 @@ totalTime=(constants["TransitionTime"]*2+
            len(constants["TestSpeeds"])*constants["TestTime"]+
            len(constants["FFTestSpeeds"])*constants["TestTime"])
 
-print(f"""To tune the shooter enable the robot, press B on the operator controller, then click on the terminal, and press (possibly twice) any button besides Space or Enter.
-Continue to hold {constants[ShooterButton]} on the controller for the untill done apears on the screen.
+print(f"""To tune the shooter enable the robot, press {constants['ShooterButton']} on the operator controller, then click on the terminal, and press (possibly twice) any button besides Space or Enter.
+Continue to hold {constants['ShooterButton']} on the controller for the untill done apears on the screen.
 this should take about {totalTime} seconds""")
 if msvcrt.getch() in b" \r":
     print("Wrong Button!!!!!!!!!!!!!!")
