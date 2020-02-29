@@ -36,6 +36,7 @@ public class AimAndShoot extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    this.turretSubsystem.enableTargetting(true);
     if (!this.turretSubsystem.validTarget) {
       this.turretSubsystem.turnToAngle(this.startingAngle, 0.5);
     } else {
@@ -64,6 +65,7 @@ public class AimAndShoot extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    this.turretSubsystem.enableTargetting(false);
   }
 
   // Returns true when the command should end.
