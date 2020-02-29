@@ -8,20 +8,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
-import frc.robot.Utilities;
-import frc.robot.subsystems.RobotDriveSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 
-public class TestDriveCommand extends CommandBase {
-
-  RobotDriveSubsystem driveSubsystem;
-  /**
-   * Creates a new TestDriveCommand.
-   */
-  public TestDriveCommand(RobotDriveSubsystem dSubsystem) {
-    this.driveSubsystem = dSubsystem;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.driveSubsystem);
+public class IntakeBalls extends CommandBase {
+  private int ballCount = 0;
+  private boolean wasLookingAtBall = false;
+  private final IndexerSubsystem indexerSubsystem;
+  public IntakeBalls(IndexerSubsystem iSubsystem) {
+    this.indexerSubsystem = iSubsystem;
+    addRequirements(iSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -32,18 +27,26 @@ public class TestDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.driveSubsystem.tankDriveVolts(-Utilities.adjustForDeadzone(RobotContainer.driverLeft.getY(), 0.05)*12, -Utilities.adjustForDeadzone(RobotContainer.driverRight.getY(), 0.05)*12);
+    this.indexerSubsystem.intakeBall();
+    
+    if(!wasLookingAtBall && this.indexerSubsystem.ballAtIntake()) {
+      this.ballCount++;
+      this.wasLookingAtBall = true;
+    } else if(wasLookingAtBall && !this.indexerSubsystem.ballAtIntake()) {
+      this.wasLookingAtBall = false;
+    }
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    this.driveSubsystem.stop();
+    this.indexerSubsystem.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return this.indexerSubsystem.isFull() || this.ballCount >= 3;
   }
 }

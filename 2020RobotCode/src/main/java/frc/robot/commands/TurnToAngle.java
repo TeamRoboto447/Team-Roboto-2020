@@ -10,59 +10,60 @@ package frc.robot.commands;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
-import frc.robot.RobotContainer;
+import frc.robot.Constants;
 import frc.robot.subsystems.RobotDriveSubsystem;
-import frc.robot.utils.Toggle;
+import frc.robot.utils.MovingAverage;
+import frc.robot.utils.PID;
+import frc.robot.utils.ff.ConstantFF;
 
-public class RobotDriveCommand extends CommandBase {
-  /**
-   * Creates a new RobotDriveCommand.
-   */
+public class TurnToAngle extends CommandBase {
+
+  private final MovingAverage averageAngle;
+
+  private final PID drivePID;
   private final RobotDriveSubsystem driveSubsystem;
-  private final Toggle invertDrive, transmissionToggle;
+  private final double targetAngle;
 
-  public RobotDriveCommand(final RobotDriveSubsystem dSubsystem) {
+  public TurnToAngle(RobotDriveSubsystem dSubsystem, double targetAngle) {
     this.driveSubsystem = dSubsystem;
-    this.invertDrive = new Toggle(false);
-    this.transmissionToggle = new Toggle(false);
-
+    this.targetAngle = targetAngle;
     addRequirements(dSubsystem);
-    // Use addRequirements() here to declare subsystem dependencies.
+
+    this.drivePID = new PID(this.targetAngle, Constants.drivekP, Constants.drivekI, Constants.drivekD,
+        new ConstantFF(0));
+    this.averageAngle = new MovingAverage(50);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.driveSubsystem.setMotorIdleMode(IdleMode.kCoast);
+    this.driveSubsystem.setMotorIdleMode(IdleMode.kBrake);
+    this.driveSubsystem.resetEncoders();
+    this.driveSubsystem.setCurrentGear("low");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.driveSubsystem.tankDrive(RobotContainer.driverLeft.getY(), RobotContainer.driverRight.getY());
 
-    this.invertDrive.runToggle(RobotContainer.driverRight.getRawButton(1)); // Run toggle
-    this.driveSubsystem.setInvertedDrive(this.invertDrive.getState()); // Set inverted based on toggle status
-  
-    this.transmissionToggle.runToggle(RobotContainer.driverLeft.getRawButton(1));
-    
-    if(this.transmissionToggle.getState()) {
-        this.driveSubsystem.setCurrentGear("high");
-    } else {
-        this.driveSubsystem.setCurrentGear("low");
-    }
+    double PV = this.driveSubsystem.getHeading();
+
+    this.averageAngle.push(PV);
+
+    double leftSpeed = this.drivePID.run(PV), rightSpeed = this.drivePID.run(PV);
+    this.driveSubsystem.tankDrive(leftSpeed, -rightSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(final boolean interrupted) {
+  public void end(boolean interrupted) {
     this.driveSubsystem.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return this.targetAngle - 2 < this.averageAngle.getAverage()
+        && this.averageAngle.getAverage() < this.targetAngle + 2;
   }
 }

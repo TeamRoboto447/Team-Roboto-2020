@@ -14,13 +14,14 @@ import com.kauailabs.navx.frc.AHRS;
 import com.opencsv.CSVWriter;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Utilities;
@@ -46,6 +47,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
   // The gyro sensor
   private final AHRS m_gyro;
 
+  private final Solenoid transmission;
+
   // Odometry class for tracking robot pose
   private DifferentialDriveOdometry m_odometry;
 
@@ -55,7 +58,7 @@ public class RobotDriveSubsystem extends SubsystemBase {
   public double leftOutputVoltage, rightOutputVoltage, leftSetpoint, rightSetpoint;
   public boolean odometryWriterActive, loggingEnabled = false;
   public double startingTime;
-  
+
   private boolean driveInverted;
 
   /**
@@ -65,20 +68,14 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.leftDrive = new CANSparkMax(Constants.leftDrive, MotorType.kBrushless);
     this.leftDriveB = new CANSparkMax(Constants.leftDriveB, MotorType.kBrushless);
 
-    this.leftDrive.setInverted(false);
-    this.leftDriveB.setInverted(false);
-
-    this.leftDrive.setIdleMode(IdleMode.kCoast);
-    this.leftDriveB.setIdleMode(IdleMode.kCoast);
-
     this.rightDrive = new CANSparkMax(Constants.rightDrive, MotorType.kBrushless);
     this.rightDriveB = new CANSparkMax(Constants.rightDriveB, MotorType.kBrushless);
 
-    this.rightDrive.setInverted(true);
-    this.rightDriveB.setInverted(true);
-    
-    this.rightDrive.setIdleMode(IdleMode.kCoast);
-    this.rightDriveB.setIdleMode(IdleMode.kCoast);
+    setInvertedDrive(false);
+
+    setMotorIdleMode(IdleMode.kCoast);
+
+    this.transmission = new Solenoid(Constants.transmission);
 
     this.m_leftMotors = new SpeedControllerGroup(leftDrive, leftDriveB);
     this.m_rightMotors = new SpeedControllerGroup(rightDrive, rightDriveB);
@@ -109,11 +106,11 @@ public class RobotDriveSubsystem extends SubsystemBase {
   }
 
   public void closeCSVs() {
-    if(this.odometryWriterActive) {
+    if (this.odometryWriterActive) {
       try {
         this.odometryWriter.close();
       } catch (IOException e) {
-  
+
       }
     }
     this.odometryWriterActive = false;
@@ -121,18 +118,16 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    double leftOutputRotations = Utilities.driveshaftIntputToOutput(this.m_leftEncoder.getPosition(), "low");
+
+    double leftOutputRotations = Utilities.driveshaftInputToOutput(this.m_leftEncoder.getPosition(),
+        this.getCurrentGear());
     double leftOutputMeters = Utilities.rotationsToMeter(leftOutputRotations);
 
-    double rightOutputRotations = Utilities.driveshaftIntputToOutput(this.m_rightEncoder.getPosition(), "low");
+    double rightOutputRotations = Utilities.driveshaftInputToOutput(this.m_rightEncoder.getPosition(),
+        this.getCurrentGear());
     double rightOutputMeters = Utilities.rotationsToMeter(rightOutputRotations);
 
     this.m_odometry.update(Rotation2d.fromDegrees(getHeading()), leftOutputMeters, rightOutputMeters);
-
-    // SmartDashboard.putNumber("PoseX", getPose().getTranslation().getX());
-    // SmartDashboard.putNumber("PoseY", getPose().getTranslation().getY());
-    // SmartDashboard.putNumber("Left Encoder in Meters", leftOutputMeters);
-    // SmartDashboard.putNumber("Right Encoder in Meters", rightOutputMeters);
 
     String recordsString = String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", getPose().getTranslation().getX(), // PoseX
         getPose().getTranslation().getY(), // PoseY
@@ -143,11 +138,23 @@ public class RobotDriveSubsystem extends SubsystemBase {
         this.rightOutputVoltage, // Right Voltage
         this.leftSetpoint, // Left Setpoint (m/s)
         this.rightSetpoint, // Right Setpoint (m/s)
-        System.currentTimeMillis()-this.startingTime);
+        System.currentTimeMillis() - this.startingTime);
+
     String[] records = recordsString.split(",");
+
     if (this.odometryWriterActive && this.loggingEnabled) {
       this.odometryWriter.writeNext(records);
     }
+
+    switch(this.getCurrentGear()) {
+      case "low":
+        this.transmission.set(false);
+        break;
+      case "high":
+        this.transmission.set(true);
+        break;
+    }
+
   }
 
   /**
@@ -167,8 +174,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     double leftVelocityRPM = this.m_leftEncoder.getVelocity();
     double rightVelocityRPM = this.m_rightEncoder.getVelocity();
-    double leftVelocityMPS = Utilities.RPMtoMPS(leftVelocityRPM);
-    double rightVelocityMPS = Utilities.RPMtoMPS(rightVelocityRPM);
+    double leftVelocityMPS = Utilities.RPMtoMPS(leftVelocityRPM, this.getCurrentGear());
+    double rightVelocityMPS = Utilities.RPMtoMPS(rightVelocityRPM, this.getCurrentGear());
     return new DifferentialDriveWheelSpeeds(leftVelocityMPS, rightVelocityMPS);
   }
 
@@ -189,7 +196,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    this.m_drive.arcadeDrive(fwd, rot);
+    double leftSpeed = fwd - rot;
+    double rightSpeed = fwd + rot;
+    this.setRelativeDrive(leftSpeed, rightSpeed);
   }
 
   /**
@@ -281,9 +290,10 @@ public class RobotDriveSubsystem extends SubsystemBase {
     double deadzone = 0.1;
     leftSpeed = Utilities.adjustForDeadzone(leftSpeed, deadzone);
     rightSpeed = Utilities.adjustForDeadzone(rightSpeed, deadzone);
-    
+
     this.setRelativeDrive(leftSpeed, rightSpeed);
   }
+
   private void setRelativeDrive(double leftSpeed, double rightSpeed) {
     if (this.driveInverted) {
       this.m_drive.tankDrive(-leftSpeed, rightSpeed);
@@ -296,6 +306,40 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.driveInverted = invert;
     this.rightDrive.setInverted(!this.driveInverted);
     this.leftDrive.setInverted(this.driveInverted);
+  }
+
+  public boolean getInvertedDrive() {
+    return this.driveInverted;
+  }
+
+  String currentGear = "low";
+
+  public void setCurrentGear(String gear) {
+    this.currentGear = gear.toLowerCase();
+  }
+
+  public String getCurrentGear() {
+    String output;
+
+    switch(this.currentGear) {
+      case "low":
+        output = "low";
+        break;
+      case "high":
+        output = "high";
+        break;
+      default:
+        output = "low";
+    }
+
+    return output;
+  }
+
+  public void setMotorIdleMode(IdleMode mode) {
+    this.leftDrive.setIdleMode(mode);
+    this.leftDriveB.setIdleMode(mode);
+    this.rightDrive.setIdleMode(mode);
+    this.rightDriveB.setIdleMode(mode);
   }
 
   public void stop() {

@@ -42,11 +42,25 @@ public final class Constants {
                         intakeSpark = 0, // Intake Spark, PWM 0.
                         shooterFeedSpark = 1; // Shooter Feed Spark, PWM 1.
 
+        // PCM Channels on board 1 (pneumatics)
+        public static final int 
+                transmission = 0, // Drive transmission, PCM channel 0.
+                intakeExtension = 1; // Intake extension, PCM channel 1.
+
+        public static final int
+                indexerFirstPos = 0, // Indexing sensor sensor first position, DIO channel 0.
+                indexerSecondPos = 1, // Indexing sensor second position, DIO channel 1.
+                fullIndexerSensor = 2; // Full Indexer Sensor , DIO channel 2.
+        
         // Targetting Light Relay
         public static final int lightRelay = 0;
 
+        public static final double
+                intakeSpeed = 0.75,
+                indexingSpeed = 0.7;
+
         public static final int // Set safe current max for NEO motors (amps)
-        miniNeoSafeAmps = 25, neoSafeAmps = 50;
+        miniNeoSafeAmps = 15, neoSafeAmps = 50;
 
         public static final double
         // Gear ratios for calculating encoder ticks per rotation
@@ -55,39 +69,36 @@ public final class Constants {
                         wheelDiameter = 6.0, wheelDiameterMeters = 0.1524;
         public static final double turretToMoterRatio = 100.0;
 
-        // PCM Channels on board 1 (pneumatics)
-        public static final int transmissionLow = 0, // Drive transmission low channel, PCM channel 0.
-                        transmissionHigh = 1; // Drive transmission high channel, PCM channel 1.
-
         public static final double drivekP = 0.1, drivekI = 0, // 1e-4
                         drivekD = 1, drivekIz = 0, drivekFF = 0, drivePIDMin = -0.5, drivePIDMax = 0.5;
 
         // Shooter PID info
         public static final double 
-                        shooterkP = 0.000270,
-                        shooterkI = 0.001163,
-                        shooterkD = 0.000016,
-                        shooterkFFm = 0.000186,
-                        shooterkFFb = -0.018051, 
+                        shooterkP = 2.7e-04,
+                        shooterkI = 1.089564e-03,
+                        shooterkD = 1.672688e-05,
+                        shooterkFFm = 1.838143e-04,
+                        shooterkFFb = -6.208137e-03,
                         shooterIZone = 150,
                         shooterSZone = 100,
-                        speedkM = 0.015039636033160777,
-                        speedkB = 0.6302241797734098,
+                        speedkM = 0.008911569562544219,
+                        speedkB = 0.7534777168792539,
                         shooterPidIntegralResetTime = 2,
                         distanceFromInnerToOuterPort = 29.5/12,
                         maxInnerPortAjustmentAngle = Math.PI / 4,
-                        shooterMarginOfError = 150;
+                        shooterMarginOfError = 30,
+                        turretMarginOfError = 0.25;
 
         public static final double
-        distanceLineEqM = 3.53368385,
-        distanceLineEqB = -3.637379;
+        distanceLineEqM = 3.65258532089,
+        distanceLineEqB = -3.9005631049;
 
 
         // Turning PID info
-        public static final double turretkP = 0.015000, turretkI = 0.072816, turretkD = 0.000773, turretFFm = 0, turretFFb = 0,
+        public static final double turretkP = 0.03, turretkI = 0.05, turretkD = 0.0009, turretFFm = 0, turretFFb = 0,
                         turretIZone = 10, turretSpinLimit = 190;
 
-        public static final double encoderRes = 4096;
+        public static final double encoderRes = 1;
 
         // Temporary for testing:
         public static final boolean kGyroReversed = true;
@@ -95,16 +106,16 @@ public final class Constants {
         public static final double ksVolts = 0.122;
         public static final double kvVoltSecondsPerMeter = 6.68;
         public static final double kaVoltSecondsSquaredPerMeter = 0.604;
-        public static final double kPDriveVel = 0.03;
+        public static final double kPDriveVel = 0.005;
         public static final double kIDriveVel = 0.0;
-        public static final double kDDriveVel = 0.0;
+        public static final double kDDriveVel = 0.01;
 
         public static final double kTrackWidthMeters = 0.693702941073319;
         public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
                         kTrackWidthMeters);
 
         public static final double kMaxSpeedMetersPerSecond = 2.1336;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5;
 
         public static final double kRamseteB = 2;
         public static final double kRamseteZeta = 0.7;

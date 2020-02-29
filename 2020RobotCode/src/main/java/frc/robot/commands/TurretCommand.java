@@ -44,28 +44,51 @@ public class TurretCommand extends CommandBase {
 
     if (RobotContainer.operator.getRawButton(OperatorMap.RT)) {
       this.turretSubsystem.enableShooterLogging(true);
-      double testSpeed = this.turretSubsystem.getSpeedFromDist();
-      shoot(testSpeed);
+      shootAtDistance();
       runFeeder();
     } else if (RobotContainer.operator.getRawButton(OperatorMap.Y)) {
       this.turretSubsystem.enableShooterLogging(true);
-      shoot(this.turretSubsystem.getManualSpeed());
+      shootAtSpeed();
       runFeeder();
+
     } else if(RobotContainer.operator.getRawButton(OperatorMap.start)) {
       this.turretSubsystem.enableShooterLogging(true);
-      shoot(this.turretSubsystem.getManualSpeed());
+      shootAtSpeed();
       this.turretSubsystem.feedShooter();
+
     } else {
       this.turretSubsystem.enableShooterLogging(false);
       this.turretSubsystem.runShooterRaw(0);
       this.turretSubsystem.stopFeeder();
     }
 
+    if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+      lockDist();
+    } else {
+      unlockDist();
+    }
+
   }
 
-  private void shoot(double speed) {
+  private void lockDist() {
+    this.turretSubsystem.lockDistance();
+  }
+
+  private void unlockDist() {
+    this.turretSubsystem.unlockDistance();
+  }
+
+  private void shootAtDistance() {
+    double dist = this.turretSubsystem.getDistance();
+    double speed = this.turretSubsystem.getSpeedFromDist(dist);
     this.turretSubsystem.runShooterAtSpeed(speed);
   }
+
+  private void shootAtSpeed() {
+    double speed = this.turretSubsystem.getManualSpeed();
+    this.turretSubsystem.runShooterAtSpeed(speed);
+  }
+
   private void runFeeder() {
     if (this.turretSubsystem.shooterAtSpeed() && RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       this.turretSubsystem.feedShooter();
@@ -95,7 +118,7 @@ public class TurretCommand extends CommandBase {
     this.turretSubsystem.enableTargetting(true);
     double position = -Utilities.adjustForDeadzone(RobotContainer.operator.getRawAxis(OperatorMap.lJoyX), 0.025);
     double angle = 180 * position;
-    this.turretSubsystem.turnToAngle(angle, 5);
+    this.turretSubsystem.turnToAngle(angle, 0.5);
   }
 
   private void target() {

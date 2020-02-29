@@ -16,7 +16,7 @@ def networktable():
             raise
         
     print("Connected")
-    kp=0.021
+    kp=0.054
     gi=NetworkTables.getTable("pidTuningPVs")
     cv=NetworkTables.getTable('chameleon-vision')
     PID=NetworkTables.getTable('PID')

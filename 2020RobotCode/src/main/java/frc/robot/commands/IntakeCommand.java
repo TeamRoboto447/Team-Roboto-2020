@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.controlmaps.OperatorMap;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -34,19 +35,20 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
     if(RobotContainer.operator.getRawButton(OperatorMap.X)) {
-      runIntake();
+      intake();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.RB)) {
       reverseIntake();
     } else {
       stopIntake();
     }
 
-    if(RobotContainer.operator.getRawButton(OperatorMap.LT) && this.turretSubsystem.shooterAtSpeed()) {
-      runIndexer();
+    if(!RobotContainer.operator.getRawButton(OperatorMap.X) && RobotContainer.operator.getRawButton(OperatorMap.LT) && this.turretSubsystem.shooterAtSpeed()) {
+      feedShooter();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
       reverseIndexer();
-    } else {
+    } else if(!RobotContainer.operator.getRawButton(OperatorMap.X)) {
       stopIndexer();
     }
   }
@@ -63,15 +65,18 @@ public class IntakeCommand extends CommandBase {
     return false;
   }
 
-  double systemSpeed = 0.5;
+  double indexerSpeed = Constants.indexingSpeed;
+  double intakeSpeed = Constants.intakeSpeed;
 
+  /*
   private void runIntake() {
-    double speed = -this.systemSpeed/2;
+    double speed = -this.intakeSpeed;
     this.indexerSubsystem.intakeRaw(speed);
   }
+  */
 
   private void reverseIntake() {
-    double speed = this.systemSpeed/2;
+    double speed = this.intakeSpeed;
     this.indexerSubsystem.intakeRaw(speed);
   }
 
@@ -84,10 +89,14 @@ public class IntakeCommand extends CommandBase {
   }
 
   private void reverseIndexer() {
-    this.indexerSubsystem.indexerRaw(this.systemSpeed);
+    this.indexerSubsystem.indexerRaw(-this.indexerSpeed);
   }
 
-  private void runIndexer() {
-    this.indexerSubsystem.indexerRaw(-this.systemSpeed);
+  private void intake() {
+    this.indexerSubsystem.intakeBall();
+  }
+
+  private void feedShooter() {
+    this.indexerSubsystem.indexerRaw(0.75);
   }
 }

@@ -58,7 +58,7 @@ public class Utilities {
         return output;
     }
 
-    public static double driveshaftIntputToOutput(double distance, String gear) {
+    public static double driveshaftInputToOutput(double distance, String gear) {
         switch(gear.toLowerCase()) {
             case "low":
                 distance /= Constants.lowGearRatio;
@@ -90,8 +90,8 @@ public class Utilities {
         return distance;
     }
 
-    public static double RPMtoMPS(double inputRPM) {
-        double outputRPM = driveshaftIntputToOutput(inputRPM, "low");
+    public static double RPMtoMPS(double inputRPM, String currentGear) {
+        double outputRPM = driveshaftInputToOutput(inputRPM, currentGear);
         double outputRPS = outputRPM/2;
         double MPS = rotationsToMeter(outputRPS);
         return MPS;
