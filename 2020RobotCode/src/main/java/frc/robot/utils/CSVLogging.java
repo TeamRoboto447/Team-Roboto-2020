@@ -35,25 +35,29 @@ public class CSVLogging {
     public CSVLogging(String[] headers, String name, int level ) {
         this.name = name;
         this.level = level;
+        this.headers = headers;
+        this.open();
+        this.subSystemToLogCSV = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLogCSV");
+        this.subSystemToLogCSV.setString("");
+        this.subSystemToLog = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLog");
+        this.subSystemToLog.setString("");
+    }
+    public void open(){
         try {
             Path deployPath = Filesystem.getDeployDirectory().toPath();
             Path filePath = deployPath.resolve("csv/" + name + ".csv");
             this.file = new CSVWriter(new FileWriter(filePath.toString()));
         } catch (IOException e) {
             this.open = false;
+            System.err.println("Could not start csv logging. Exception below: \n" + e.toString());
         }
         if (this.open) {
-            this.file.writeNext(headers);
+            this.file.writeNext(this.headers);
         }
-        this.subSystemToLogCSV = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLogCSV");
-        this.subSystemToLogCSV.setString("");
-        this.subSystemToLog = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLog");
-        this.subSystemToLog.setString("");
-        this.headers = headers;
     }
 
     public void logCSV(String[] row) {
-        if (this.level <= Constants.loggingLevel && Constants.enableCSVLogging) {
+        if (this.level <= Constants.loggingLevel && Constants.enableCSVLogging && this.open) {
             if (this.subSystemToLogCSV.getString("errored").contains("everything;")) {
                 this.file.writeNext(row);
             } else if ((";" + this.subSystemToLogCSV.getString("errored")).contains(";" + name + ";")) {
