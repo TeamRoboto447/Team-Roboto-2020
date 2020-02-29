@@ -77,7 +77,7 @@ public class RobotContainer {
 
     SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
       new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 5)
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 10)
     );
 
     ParallelCommandGroup threeBallAutoFast = new ParallelCommandGroup(
@@ -95,6 +95,6 @@ public class RobotContainer {
       new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 5)
     );
 
-    return threeBallAutoFast;
+    return threeBallAuto;
   }
 }

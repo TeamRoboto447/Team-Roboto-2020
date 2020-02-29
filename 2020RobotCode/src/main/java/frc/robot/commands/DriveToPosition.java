@@ -41,7 +41,7 @@ public class DriveToPosition extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.driveSubsystem.setMotorIdleMode(IdleMode.kBrake);
+    this.driveSubsystem.setMotorIdleMode(IdleMode.kCoast);
     this.driveSubsystem.resetEncoders();
     this.driveSubsystem.setCurrentGear("low");
   }
