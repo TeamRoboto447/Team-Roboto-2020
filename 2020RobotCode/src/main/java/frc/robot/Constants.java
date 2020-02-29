@@ -81,12 +81,12 @@ public final class Constants {
                         shooterkFFb = -0.018051, 
                         shooterIZone = 150,
                         shooterSZone = 100,
-                        speedkM = 0.0090475963905,
-                        speedkB = 0.7242320711364,
+                        speedkM = 0.011902391579906376,
+                        speedkB = 0.6720639326984954,
                         shooterPidIntegralResetTime = 2,
                         distanceFromInnerToOuterPort = 29.5/12,
                         maxInnerPortAjustmentAngle = Math.PI / 4,
-                        shooterMarginOfError = 60,
+                        shooterMarginOfError = 40,
                         turretMarginOfError = 0.25;
 
         public static final double

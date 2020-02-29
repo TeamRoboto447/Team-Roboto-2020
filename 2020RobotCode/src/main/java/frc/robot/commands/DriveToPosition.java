@@ -31,7 +31,7 @@ public class DriveToPosition extends CommandBase {
     addRequirements(dSubsystem);
 
     this.drivePID = new PID(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD,
-        new ConstantFF(0));
+        new ConstantFF(0.5));
     this.averagePosition = new MovingAverage(50);
   }
 
