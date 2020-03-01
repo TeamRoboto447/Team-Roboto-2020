@@ -36,7 +36,7 @@ public class CSVLogging {
         this.name = name;
         this.level = level;
         this.headers = headers;
-        this.open();
+        //this.open();
         this.subSystemToLogCSV = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLogCSV");
         this.subSystemToLogCSV.setString("");
         this.subSystemToLog = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLog");

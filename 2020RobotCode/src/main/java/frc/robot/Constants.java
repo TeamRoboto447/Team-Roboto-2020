@@ -69,18 +69,26 @@ public final class Constants {
     // Gear ratios for calculating encoder ticks per rotation
     lowGearRatio = 25.9, highGearRatio = 8.63, thirdStageRatio = 1.41,
             // Wheel diameter for calculating inches per rotation
-            wheelDiameter = 6.0, wheelDiameterMeters = 0.1524;
+            wheelDiameter = 6.0, wheelDiameterMeters = 0.1524, shooterWheelDiameter = 4;
     public static final double turretToMoterRatio = 100.0;
 
     public static final double drivekP = 0.1, drivekI = 0, // 1e-4
             drivekD = 1, drivekIz = 0, drivekFF = 0, drivePIDMin = -0.5, drivePIDMax = 0.5;
 
     // Shooter PID info
-    public static final double shooterkP = 2.7e-04, shooterkI = 1.089564e-03, shooterkD = 1.672688e-05,
-            shooterkFFm = 1.838143e-04, shooterkFFb = -6.208137e-03, shooterIZone = 150, shooterSZone = 100,
-            speedkM = 0.00747276483014958, speedkB = 0.7571066018984297, shooterPidIntegralResetTime = 2,
-            distanceFromInnerToOuterPort = 29.5 / 12, maxInnerPortAjustmentAngle = Math.PI / 4,
-            shooterMarginOfError = 50, turretMarginOfError = 0.25;
+    public static final double shooterkP = 2.7e-04,
+        shooterkI = 1.077605e-03,
+        shooterkD = 1.69125e-05,
+        shooterkFFm = 1.734411e-04,
+        shooterkFFb = -1.372668e-02, 
+        shooterIZone = 100,
+        shooterSZone = 100,
+        speedkM = 0.00747276483014958,
+        speedkB = 0.7571066018984297,
+        shooterPidIntegralResetTime = 2,
+        distanceFromInnerToOuterPort = 29.5 / 12,
+        maxInnerPortAjustmentAngle = Math.PI / 4,
+        shooterMarginOfError = 40, turretMarginOfError = 0.25;
 
     public static final double distanceLineEqM = 3.65258532089, distanceLineEqB = -3.9005631049;
 

@@ -58,6 +58,13 @@ public class Utilities {
         return output;
     }
 
+    public static double shooterRotationsToFeet(double rotations) {
+        double circum = (Constants.shooterWheelDiameter/12) * Math.PI;
+        double rotationsPerFoot = 1 / circum;
+        double output = rotations / rotationsPerFoot;
+        return output;
+    }
+
     public static double driveshaftInputToOutput(double distance, String gear) {
         switch(gear.toLowerCase()) {
             case "low":
@@ -92,8 +99,14 @@ public class Utilities {
 
     public static double RPMtoMPS(double inputRPM, String currentGear) {
         double outputRPM = driveshaftInputToOutput(inputRPM, currentGear);
-        double outputRPS = outputRPM/2;
+        double outputRPS = outputRPM/60;
         double MPS = rotationsToMeter(outputRPS);
         return MPS;
+    }
+
+    public static double shooterRPMtoFPS(double inputRPM) {
+        double RPS = inputRPM/60;
+        double FPS = shooterRotationsToFeet(RPS);
+        return FPS;
     }
 }

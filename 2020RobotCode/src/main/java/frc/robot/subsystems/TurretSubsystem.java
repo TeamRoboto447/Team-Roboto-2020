@@ -19,6 +19,7 @@ import frc.robot.Constants;
 import frc.robot.utils.ff.LinearFF;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -359,10 +360,13 @@ public class TurretSubsystem extends SubsystemBase {
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
 
     this.shootingMotorLeft = new CANSparkMax(Constants.shooterSparkMaxLeft, MotorType.kBrushless);
-    this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorLeft.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorLeft.setIdleMode(IdleMode.kCoast);
 
     this.shootingMotorRight = new CANSparkMax(Constants.shooterSparkMaxRight, MotorType.kBrushless);
-    this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorRight.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorRight.setIdleMode(IdleMode.kCoast);
+
     this.shootFeeder = new Spark(Constants.shooterFeedSpark);
 
     // Set up targetting relay
@@ -380,7 +384,7 @@ public class TurretSubsystem extends SubsystemBase {
     // Define PID controllers
     this.shootingMotorPID = new PID.PIDBuilder(0, Constants.shooterkP, Constants.shooterkI, Constants.shooterkD)
         .FF(new LinearFF(Constants.shooterkFFm, Constants.shooterkFFb)).MinIntegral(-Constants.shooterSZone)
-        .MaxIntegral(Constants.shooterSZone).IZone(Constants.shooterIZone).Name("shootingMotor").build();
+        .MaxIntegral(Constants.shooterSZone).IZone(Constants.shooterIZone).Name("shooting").build();
     this.turretPositionPID = new PID.PIDBuilder(0, Constants.turretkP, Constants.turretkI, Constants.turretkD)
         .MinIntegral(-Constants.turretIZone).MaxIntegral(Constants.turretIZone).Name("turretPosition").build();
 
