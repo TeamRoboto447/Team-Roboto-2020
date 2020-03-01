@@ -56,6 +56,8 @@ public final class Constants {
             climberVerticalSensor = 3; // climber vertical sensor, DIO channel 3.
 
     // Targetting Light Relay
+
+    // Targetting Light Relay
     public static final int lightRelay = 0;
 
     public static final double intakeSpeed = 0.75, indexingSpeed = 0.7;
