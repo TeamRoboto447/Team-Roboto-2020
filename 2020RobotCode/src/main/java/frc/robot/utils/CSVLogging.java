@@ -32,7 +32,7 @@ public class CSVLogging {
     private int level;
     private String[] headers;
 
-    public CSVLogging(String[] headers, String name, int level ) {
+    public CSVLogging(String[] headers, String name, int level) {
         this.name = name;
         this.level = level;
         this.headers = headers;
@@ -42,11 +42,13 @@ public class CSVLogging {
         this.subSystemToLog = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLog");
         this.subSystemToLog.setString("");
     }
-    public void open(){
+
+    public boolean open() {
         try {
             Path deployPath = Filesystem.getDeployDirectory().toPath();
             Path filePath = deployPath.resolve("csv/" + this.name + ".csv");
             this.file = new CSVWriter(new FileWriter(filePath.toString()));
+            this.open = true;
         } catch (IOException e) {
             this.open = false;
             System.err.println("Could not start csv logging. Exception below: \n" + e.toString());
@@ -54,14 +56,31 @@ public class CSVLogging {
         if (this.open) {
             this.file.writeNext(this.headers);
         }
+        return this.open();
+    }
+
+    public void close() {
+        try {
+            this.file.close();
+        } catch (IOException e) {
+
+        }
     }
 
     public void logCSV(String[] row) {
-        if (this.level <= Constants.loggingLevel && Constants.enableCSVLogging && this.open) {
+        if (this.level <= Constants.loggingLevel && Constants.enableCSVLogging) {
             if (this.subSystemToLogCSV.getString("errored").contains("everything;")) {
+                if (!this.open && !this.open()) {
+                    return;
+                }
                 this.file.writeNext(row);
             } else if ((";" + this.subSystemToLogCSV.getString("errored")).contains(";" + this.name + ";")) {
+                if (!this.open && !this.open()) {
+                    return;
+                }
                 this.file.writeNext(row);
+            } else if (this.open) {
+                this.close();
             }
         }
     }
@@ -76,11 +95,12 @@ public class CSVLogging {
         }
     }
 
-    public void logBoth(String[] row){
+    public void logBoth(String[] row) {
         this.logToStdOut(row);
         this.logCSV(row);
     }
-    public void logBoth(double[] row){
+
+    public void logBoth(double[] row) {
         String[] rowOut = new String[row.length];
         for (int i = 0; i < row.length; i++) {
             rowOut[i] = "" + row[i];
@@ -90,8 +110,8 @@ public class CSVLogging {
 
     private String appendHeaders(String[] row) {
         String out = "";
-        for (int i = 0; i < row.length; i++){
-            out += String.format("%s: %s, ",this.headers[i],row[i]);
+        for (int i = 0; i < row.length; i++) {
+            out += String.format("%s: %s, ", this.headers[i], row[i]);
         }
         return out.substring(0, out.length() - 2);
     }

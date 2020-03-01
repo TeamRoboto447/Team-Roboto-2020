@@ -46,6 +46,7 @@ public class IndexerSubsystem extends SubsystemBase {
       ballAtPosOne(),
       isFull());
     Logging.debug(status, "indexerStatus");
+    this.extendIntake(true);
   }
 
   public void intakeBall() {

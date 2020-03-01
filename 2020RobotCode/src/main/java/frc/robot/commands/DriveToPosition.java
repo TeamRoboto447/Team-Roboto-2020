@@ -32,9 +32,10 @@ public class DriveToPosition extends CommandBase {
     this.maxSpeed = maxSpeed;
     addRequirements(dSubsystem);
 
-    this.drivePID = new PID(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD,
-        new ConstantFF(minSpeed));
-    this.steerPID = new PID(0, 0.0001, 0, 0, new ConstantFF(0));
+    this.drivePID = new PID.PIDBuilder(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD)
+      .FF(new ConstantFF(minSpeed)).Name("drive").build();
+    this.steerPID = new PID.PIDBuilder(0, 0.0001, 0, 0)
+      .FF(new ConstantFF(0)).Name("steer").build();
     this.averagePosition = new MovingAverage(50);
   }
 

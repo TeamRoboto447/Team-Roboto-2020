@@ -39,17 +39,21 @@ public final class Constants {
             shooterSparkMaxRight = 7, // Shooter Right Spark Max, CAN ID 7.
             indexingSparkMax = 8, // Indexer Spark Max, CAN ID 8.
             wheelOfFortuneSparkMax = 9, // WOF Spark Max, CAN ID 9.
-            climberSparkMax = 10, // Climber Spark Max, CAN ID 10.
             intakeSpark = 0, // Intake Spark, PWM 0.
-            shooterFeedSpark = 1; // Shooter Feed Spark, PWM 1.
+            shooterFeedSpark = 1, // Shooter Feed Spark, PWM 1.
+            climberSpark = 2; // Climber Spark, PWM 2.
 
     // PCM Channels on board 1 (pneumatics)
     public static final int transmission = 0, // Drive transmission, PCM channel 0.
-            intakeExtension = 1; // Intake extension, PCM channel 1.
+            intakeExtension = 1, // Intake extension, PCM channel 1.
+            climberLift = 2, // Climber lift cylinder, PCM channel 2.
+            climberRelease = 3, // Climber release, PCM channel 3.
+            climberLock = 4; // Climber lock, PCM channel 4.
 
     public static final int indexerFirstPos = 0, // Indexing sensor sensor first position, DIO channel 0.
             indexerSecondPos = 1, // Indexing sensor second position, DIO channel 1.
-            fullIndexerSensor = 2; // Full Indexer Sensor , DIO channel 2.
+            fullIndexerSensor = 2, // Full Indexer Sensor , DIO channel 2.
+            climberVerticalSensor = 3; // climber vertical sensor, DIO channel 3.
 
     // Targetting Light Relay
     public static final int lightRelay = 0;
