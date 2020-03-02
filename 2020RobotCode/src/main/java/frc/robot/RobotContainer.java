@@ -78,27 +78,29 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    final boolean scanLeft = false;
+    final boolean scanRight = true;
 
     SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1),
-      new AimAndShootStationary(this.turretSubsystem, this.indexerSubsystem, 10, 10, 3)
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, scanRight, 10, 3),
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1)
     );
 
-    ParallelCommandGroup threeBallAutoFast = new ParallelCommandGroup(
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.3, 1),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 10, 10, 3)
+    SequentialCommandGroup threeBallAutoFast = new SequentialCommandGroup(
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanRight, 6, 3),
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1)
     );
 
     SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
-      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, 20, 5, 3),
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanRight, 5, 3),
       new ParallelRaceGroup(
         new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(16), 0.5, 1),
         new IntakeBalls(this.indexerSubsystem, 3)
       ),
       new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(-3), 0.5, 1),
-      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, 20, 5, 3)
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 10, 3)
     );
 
-    return threeBallAuto;
+    return threeBallAutoFast;
   }
 }

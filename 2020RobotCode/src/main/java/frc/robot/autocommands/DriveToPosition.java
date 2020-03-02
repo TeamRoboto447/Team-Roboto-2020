@@ -48,7 +48,7 @@ public class DriveToPosition extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println(this.targetPosition);
+    //System.out.println(this.targetPosition);
     this.driveSubsystem.setMotorIdleMode(IdleMode.kCoast);
     this.driveSubsystem.resetEncoders();
     this.driveSubsystem.setCurrentGear("low");

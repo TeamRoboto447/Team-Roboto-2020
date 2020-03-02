@@ -360,7 +360,7 @@ public class TurretSubsystem extends SubsystemBase {
     return turretPosition;
   }
 
-  private double getTurretPos() {
+  public double getTurretPos() {
     double turretPositionDegrees = (this.turretEncoder.getPosition() * 3.6) % 360;
     double turretPositionClamped = this.clamp(turretPositionDegrees);
     return turretPositionClamped;

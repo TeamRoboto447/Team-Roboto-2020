@@ -15,21 +15,27 @@ import frc.robot.subsystems.TurretSubsystem;
 public class AimAndDump extends CommandBase {
   private final TurretSubsystem turretSubsystem;
   private final IndexerSubsystem indexerSubsystem;
-  private final double startingAngle;
-  private final Timer countDown, overallTimer;
+  private final Timer countDown, overallTimer, distanceTimer;
   private final double maxRunTime;
   private final int ballsToShoot;
+  private double scanAngle;
   private int ballsShot = 0;
   private boolean wasLookingAtBall = false;
 
-  public AimAndDump(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, double angle, double maxTime,
+  public AimAndDump(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, boolean scanRight, double maxTime,
       int ballsToShoot) {
     this.turretSubsystem = tSubsystem;
     this.indexerSubsystem = iSubsystem;
-    this.startingAngle = angle;
+    this.scanAngle = scanRight ? -45 : 45;
+
+    this.distanceTimer = new Timer();
+    this.distanceTimer.stop();
+    this.distanceTimer.reset();
+
     this.countDown = new Timer();
     this.countDown.stop();
     this.countDown.reset();
+
     this.overallTimer = new Timer();
     this.overallTimer.reset();
     this.overallTimer.start();
@@ -51,7 +57,12 @@ public class AimAndDump extends CommandBase {
   public void execute() {
     this.turretSubsystem.enableTargetting(true);
     if (!this.turretSubsystem.validTarget) {
-      this.turretSubsystem.turnToAngle(this.startingAngle, 0.5);
+      if (this.turretSubsystem.getTurretPos() < -40) {
+        this.scanAngle = 45;
+      } else if (this.turretSubsystem.getTurretPos() > 40) {
+        this.scanAngle = -45;
+      }
+      this.turretSubsystem.turnToAngle(this.scanAngle, 0.5);
       spinUp();
     } else {
       this.turretSubsystem.turnToTarget();
@@ -75,20 +86,23 @@ public class AimAndDump extends CommandBase {
     }
   }
 
-  boolean spunUp = false;
+  private boolean spunUp = false;
 
   private void shoot() {
     double currentDistance = this.turretSubsystem.getDistance();
     double shooterSpeed = this.turretSubsystem.getSpeedFromDist(currentDistance);
-    this.turretSubsystem.runShooterAtSpeed(shooterSpeed+0.035);
-    if (this.turretSubsystem.shooterAtSpeed()) {
+    this.turretSubsystem.runShooterAtSpeed(shooterSpeed);
+    if (this.turretSubsystem.shooterAtSpeed() && !this.spunUp) {
       this.spunUp = true;
-    } else {
-      this.indexerSubsystem.stop();
+      this.distanceTimer.start();
     }
+
     if (this.spunUp) {
-      this.turretSubsystem.feedShooter();
-      this.indexerSubsystem.indexerRaw(0.5);
+      if (this.distanceTimer.get() > 0.2) {
+        this.turretSubsystem.lockDistance();
+        this.turretSubsystem.feedShooter();
+        this.indexerSubsystem.indexerRaw(0.35);
+      }
     }
   }
 
@@ -102,6 +116,7 @@ public class AimAndDump extends CommandBase {
     this.turretSubsystem.enableTargetting(false);
     this.turretSubsystem.stop();
     this.indexerSubsystem.stop();
+    this.turretSubsystem.unlockDistance();
   }
 
   // Returns true when the command should end.
