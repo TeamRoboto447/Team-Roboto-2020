@@ -72,8 +72,15 @@ public final class Constants {
             wheelDiameter = 6.0, wheelDiameterMeters = 0.1524, shooterWheelDiameter = 4;
     public static final double turretToMoterRatio = 100.0;
 
-    public static final double drivekP = 0.1, drivekI = 0, // 1e-4
-            drivekD = 1, drivekIz = 0, drivekFF = 0, drivePIDMin = -0.5, drivePIDMax = 0.5;
+    public static final double 
+        drivekP = 0.1,
+        drivekI = 0, // 1e-4
+        drivekD = 0.5,
+        drivekIz = 0,
+        drivekFF = 0,
+        steerkP = 0.0001,
+        steerkI = 0,
+        steerkD = 0;
 
     // Shooter PID info
     public static final double shooterkP = 2.7e-04,
@@ -83,18 +90,26 @@ public final class Constants {
         shooterkFFb = -1.372668e-02, 
         shooterIZone = 100,
         shooterSZone = 100,
-        speedkM = 0.00747276483014958,
-        speedkB = 0.7571066018984297,
+        speedkM = 0.010753713215270848,
+        speedkB = 0.6993407381533456,
         shooterPidIntegralResetTime = 2,
         distanceFromInnerToOuterPort = 29.5 / 12,
         maxInnerPortAjustmentAngle = Math.PI / 4,
-        shooterMarginOfError = 40, turretMarginOfError = 0.25;
+        shooterMarginOfError = 60;
 
     public static final double distanceLineEqM = 3.65258532089, distanceLineEqB = -3.9005631049;
 
     // Turning PID info
-    public static final double turretkP = 0.03, turretkI = 0.05, turretkD = 0.0009, turretFFm = 0, turretFFb = 0,
-            turretIZone = 10, turretSpinLimit = 190;
+    public static final double
+        turretkP = 0.03,
+        turretkI = 0.05,
+        turretkD = 0.0009,
+        turretFFm = 0,
+        turretFFb = 0,
+        turretIZone = 10,
+        turretSpinLimit = 190,
+        turretMarginOfError = 2,
+        staticAimOffset = 4;
 
     public static final double encoderRes = 1;
 

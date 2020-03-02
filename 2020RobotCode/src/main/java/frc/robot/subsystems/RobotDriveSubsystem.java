@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+//import edu.wpi.first.wpilibj.smartdashboard.SmaartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Utilities;
@@ -49,8 +51,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
   private final Solenoid transmission;
 
-  // Odometry class for tracking robot pose
+  // Odometry class for tracking robot pose and speed
   private DifferentialDriveOdometry m_odometry;
+  private DifferentialDriveKinematics kinematics;
 
   private CSVWriter odometryWriter;
   private Path deployPath;
@@ -97,6 +100,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
       System.err.println(e.toString());
       this.odometryWriterActive = false;
     }
+
+    this.kinematics = new DifferentialDriveKinematics(Constants.kTrackWidthMeters);
 
     this.startingTime = System.currentTimeMillis();
   }
@@ -177,6 +182,20 @@ public class RobotDriveSubsystem extends SubsystemBase {
     double leftVelocityMPS = Utilities.RPMtoMPS(leftVelocityRPM, this.getCurrentGear());
     double rightVelocityMPS = Utilities.RPMtoMPS(rightVelocityRPM, this.getCurrentGear());
     return new DifferentialDriveWheelSpeeds(leftVelocityMPS, rightVelocityMPS);
+  }
+
+  public ChassisSpeeds getChassisSpeed() {
+    ChassisSpeeds speeds = kinematics.toChassisSpeeds(this.getWheelSpeeds());
+    return speeds;
+  }
+  
+  public double[] getFieldRelativeSpeed() {
+    ChassisSpeeds chassisSpeeds = this.getChassisSpeed();
+    double angle = this.getHeading();
+    double Vx = Math.sin(Math.toRadians(angle)) * chassisSpeeds.vxMetersPerSecond;
+    double Vy = Math.cos(Math.toRadians(angle)) * chassisSpeeds.vxMetersPerSecond;
+    double[] speeds = new double[]{Vx, Vy};
+    return speeds;
   }
 
   /**

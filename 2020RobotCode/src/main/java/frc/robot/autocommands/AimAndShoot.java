@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.autocommands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -18,10 +18,12 @@ public class AimAndShoot extends CommandBase {
   private final double startingAngle;
   private final Timer countDown, overallTimer;
   private final double maxRunTime;
-  private double ballsShot = 0;
+  private final int ballsToShoot;
+  private int ballsShot = 0;
   private boolean wasLookingAtBall = false;
 
-  public AimAndShoot(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, double angle, double maxTime) {
+  public AimAndShoot(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, double angle, double maxTime,
+      int ballsToShoot) {
     this.turretSubsystem = tSubsystem;
     this.indexerSubsystem = iSubsystem;
     this.startingAngle = angle;
@@ -33,6 +35,7 @@ public class AimAndShoot extends CommandBase {
     this.overallTimer.start();
 
     this.maxRunTime = maxTime;
+    this.ballsToShoot = ballsToShoot;
 
     addRequirements(tSubsystem);
     addRequirements(iSubsystem);
@@ -49,10 +52,13 @@ public class AimAndShoot extends CommandBase {
     this.turretSubsystem.enableTargetting(true);
     if (!this.turretSubsystem.validTarget) {
       this.turretSubsystem.turnToAngle(this.startingAngle, 0.5);
+      spinUp();
     } else {
       this.turretSubsystem.turnToTarget();
       if (this.turretSubsystem.onTarget()) {
         shoot();
+      } else {
+        spinUp();
       }
     }
 
@@ -63,7 +69,7 @@ public class AimAndShoot extends CommandBase {
       this.wasLookingAtBall = false;
     }
 
-    if(this.ballsShot >= 3) {
+    if (this.ballsShot >= this.ballsToShoot) {
       this.countDown.reset();
       this.countDown.start();
     }
@@ -77,8 +83,13 @@ public class AimAndShoot extends CommandBase {
       this.turretSubsystem.feedShooter();
       this.indexerSubsystem.indexerRaw(0.75);
     } else {
+      this.turretSubsystem.stopFeeder();
       this.indexerSubsystem.stop();
     }
+  }
+
+  private void spinUp() {
+    this.turretSubsystem.runShooterAtSpeed(0.8);
   }
 
   // Called once the command ends or is interrupted.

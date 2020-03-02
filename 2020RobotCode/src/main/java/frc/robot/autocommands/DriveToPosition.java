@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.autocommands;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -24,24 +24,31 @@ public class DriveToPosition extends CommandBase {
   private final PID drivePID, steerPID;
   private final RobotDriveSubsystem driveSubsystem;
   private final double targetPosition;
-  private final double maxSpeed;
+  private final double minSpeed, maxSpeed;
+  private final boolean drivingForward;
+
+  private boolean done = false;
 
   public DriveToPosition(RobotDriveSubsystem dSubsystem, double targetPosition, double minSpeed, double maxSpeed) {
     this.driveSubsystem = dSubsystem;
-    this.targetPosition = targetPosition;
+    this.targetPosition = Utilities.driveshaftOutputToInput(targetPosition, "low");
+    this.minSpeed = minSpeed;
     this.maxSpeed = maxSpeed;
+    this.drivingForward = targetPosition > 0;
+
     addRequirements(dSubsystem);
 
     this.drivePID = new PID.PIDBuilder(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD)
-      .FF(new ConstantFF(minSpeed)).Name("drive").build();
-    this.steerPID = new PID.PIDBuilder(0, 0.0001, 0, 0)
-      .FF(new ConstantFF(0)).Name("steer").build();
-    this.averagePosition = new MovingAverage(50);
+        .FF(new ConstantFF(0.2)).Name("drive").build();
+    this.steerPID = new PID.PIDBuilder(0, Constants.steerkP, Constants.steerkI, Constants.steerkD).FF(new ConstantFF(0))
+        .Name("steer").build();
+    this.averagePosition = new MovingAverage(5);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    System.out.println(this.targetPosition);
     this.driveSubsystem.setMotorIdleMode(IdleMode.kCoast);
     this.driveSubsystem.resetEncoders();
     this.driveSubsystem.setCurrentGear("low");
@@ -52,27 +59,48 @@ public class DriveToPosition extends CommandBase {
   public void execute() {
 
     double PV = this.driveSubsystem.getAverageEncoderDistance();
-    PV = Utilities.driveshaftInputToOutput(PV, this.driveSubsystem.getCurrentGear());
     PV = Utilities.meterToEncoder(PV);
 
     this.averagePosition.push(PV);
 
     double speed = this.drivePID.run(PV);
     double steer = this.steerPID.run(this.driveSubsystem.getHeading());
-    if(speed > this.maxSpeed) speed = this.maxSpeed;
-    this.driveSubsystem.arcadeDrive(speed, steer);
+
+    if (this.drivingForward) {
+      if (speed > this.maxSpeed) {
+        speed = this.maxSpeed;
+      } else if (speed < this.minSpeed) {
+        speed = this.minSpeed;
+      }
+    } else {
+      if (Math.abs(speed) > this.maxSpeed) {
+        speed = -this.maxSpeed;
+      } else if (Math.abs(speed) < this.minSpeed) {
+        speed = -this.minSpeed;
+      }
+    }
+
+    if (!done) {
+      this.driveSubsystem.arcadeDrive(speed, steer);
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // System.out.println("Ended drive command");
+    this.done = true;
     this.driveSubsystem.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return this.targetPosition - 0.5 < this.averagePosition.getAverage()
+    boolean finished = this.targetPosition - 0.5 < this.averagePosition.getAverage()
         && this.averagePosition.getAverage() < this.targetPosition + 0.5;
+    // if (finished){
+    // System.out.println("DriveToPosition finished");
+    // }
+    return finished;
   }
 }

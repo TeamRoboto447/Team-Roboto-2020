@@ -12,14 +12,13 @@ public class Utilities {
         }
         return value;
     }
-
-    public static double feetToEncoder(double target) {
-        return inchToEncoder(target * 12);
-    }
-
     public static boolean marginOfError(double maxError, double setpoint, double processingVar) {
         double error = Math.abs(setpoint - processingVar);
         return error <= maxError;
+    }
+
+    public static double feetToEncoder(double target) {
+        return inchToEncoder(target * 12);
     }
 
     public static double inchToEncoder(double target) {
@@ -40,7 +39,7 @@ public class Utilities {
     public static double meterToEncoder(double target) {
         double circum = Constants.wheelDiameterMeters * Math.PI;
         double encodePerMeter = Constants.encoderRes / circum;
-        double output = Math.round(encodePerMeter * target);
+        double output = encodePerMeter * target;
         return output;
     }
 

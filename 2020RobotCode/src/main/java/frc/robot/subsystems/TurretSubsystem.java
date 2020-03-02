@@ -16,6 +16,7 @@ import frc.robot.utils.Logging;
 import frc.robot.utils.MovingAverage;
 import frc.robot.utils.PID;
 import frc.robot.Constants;
+import frc.robot.Utilities;
 import frc.robot.utils.ff.LinearFF;
 
 import com.revrobotics.CANSparkMax;
@@ -58,6 +59,8 @@ public class TurretSubsystem extends SubsystemBase {
   double shooterSetSpeed;
 
   double turretOffset;
+  private double dynamicAimOffset = 0;
+  private double dynamicSpeedOffset = 0;
 
   double poseX, poseY, poseAngle, yaw, pitch, latency, distance;
   public Boolean validTarget;
@@ -148,8 +151,8 @@ public class TurretSubsystem extends SubsystemBase {
 
   public boolean onTarget() {
     double setpoint = 0;
-    double adjustmentAngle = 4;
-    double processingVar = this.yaw+adjustmentAngle;
+    double adjustmentAngle = Constants.staticAimOffset + this.dynamicAimOffset;
+    double processingVar = this.yaw + adjustmentAngle;
     boolean onTarget = setpoint - Constants.turretMarginOfError < processingVar
         && processingVar < setpoint + Constants.turretMarginOfError;
     return onTarget;
@@ -283,6 +286,34 @@ public class TurretSubsystem extends SubsystemBase {
     }
   }
 
+  public void setDynamicOffset(double offset) {
+    this.dynamicAimOffset = offset;
+  }
+
+  public double getDynamicOffset() {
+    return this.dynamicAimOffset;
+  }
+
+  public void setSpeedOffset(double offset) {
+    this.dynamicSpeedOffset = offset;
+  }
+
+  public double getSpeedOffselt() {
+    return this.dynamicSpeedOffset;
+  }
+
+  public double getShooterSpeedRPM() {
+    return this.shooterEncoder.getVelocity();
+  }
+
+  public double getShooterSpeedFPS() {
+    return Utilities.shooterRPMtoFPS(this.shooterEncoder.getVelocity());
+  }
+
+  public double getTargetAngle() {
+    return this.poseAngle;
+  }
+
   public void turnToTarget() {
     setTurretTarget(0);
     Logging.debug("Turret limit: " + Constants.turretSpinLimit + "\nTurret Position: " + this.getTurretPos()
@@ -292,8 +323,9 @@ public class TurretSubsystem extends SubsystemBase {
       // double distanceToInner = this.getDistanceToInner(this.poseAngle,
       // this.distance,
       // Constants.distanceFromInnerToOuterPort);
-      double adjustAngle = 4;// this.getAngleOffset(this.poseAngle, distanceToInner,
-                             // Constants.distanceFromInnerToOuterPort);
+      double adjustAngle = Constants.staticAimOffset + this.dynamicAimOffset;// this.getAngleOffset(this.poseAngle,
+                                                                             // distanceToInner,
+      // Constants.distanceFromInnerToOuterPort);
       /*
        * if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0,
        * adjustAngle)) { adjustAngle = 0.0; }

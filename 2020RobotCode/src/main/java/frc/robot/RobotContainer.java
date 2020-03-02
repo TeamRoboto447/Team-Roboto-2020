@@ -9,6 +9,7 @@ package frc.robot;
 
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
+import frc.robot.autocommands.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -30,10 +31,12 @@ public class RobotContainer {
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
   public final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem);
   public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem(turretSubsystem);
+  public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
   public final RobotDriveCommand driveCommand = new RobotDriveCommand(driveSubsystem);
-  public final TurretCommand turretCommand = new TurretCommand(turretSubsystem);
+  public final TurretCommand turretCommand = new TurretCommand(turretSubsystem, driveSubsystem);
   public final IntakeCommand intakeCommand = new IntakeCommand(indexerSubsystem, turretSubsystem);
+  public final ClimbCommand climbCommand = new ClimbCommand(climberSubsystem);
 
   public static Joystick driverLeft = new Joystick(0);
   public static Joystick driverRight = new Joystick(1);
@@ -65,6 +68,7 @@ public class RobotContainer {
     this.driveSubsystem.setDefaultCommand(this.driveCommand);
     this.turretSubsystem.setDefaultCommand(this.turretCommand);
     this.indexerSubsystem.setDefaultCommand(this.intakeCommand);
+    this.climberSubsystem.setDefaultCommand(this.climbCommand);
 
   }
 
@@ -77,22 +81,22 @@ public class RobotContainer {
 
     SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
       new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 10)
+      new AimAndShootStationary(this.turretSubsystem, this.indexerSubsystem, 10, 10, 3)
     );
 
     ParallelCommandGroup threeBallAutoFast = new ParallelCommandGroup(
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.2, 0.4),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 0, 10)
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.3, 1),
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 10, 10, 3)
     );
 
     SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 5),
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, 20, 5, 3),
       new ParallelRaceGroup(
-        new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(30), 0.5, 1),
-        new IntakeBalls(this.indexerSubsystem)
+        new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(16), 0.5, 1),
+        new IntakeBalls(this.indexerSubsystem, 3)
       ),
-      new DriveToPosition(this.driveSubsystem, -Utilities.feetToEncoder(30), 0.5, 1),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20, 5)
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(-3), 0.5, 1),
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, 20, 5, 3)
     );
 
     return threeBallAuto;
