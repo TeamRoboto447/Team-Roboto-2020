@@ -13,6 +13,7 @@ import frc.robot.autocommands.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -38,6 +39,8 @@ public class RobotContainer {
   public final IntakeCommand intakeCommand = new IntakeCommand(indexerSubsystem, turretSubsystem);
   public final ClimbCommand climbCommand = new ClimbCommand(climberSubsystem);
 
+  public final SendableChooser<Command> autonomousSelector;
+
   public static Joystick driverLeft = new Joystick(0);
   public static Joystick driverRight = new Joystick(1);
   public static Joystick operator = new Joystick(2);
@@ -52,6 +55,10 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Set up autonomous selector
+    this.autonomousSelector = new SendableChooser<>();
+    addAutonomousCommands();
   }
 
   /**
@@ -61,6 +68,26 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+  }
+
+  private final boolean scanLeft = false;
+  private final boolean scanRight = true;
+  SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
+      new InstantCommand(this.indexerSubsystem::lowerIntake, this.indexerSubsystem),
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanRight, 6, 3),
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1));
+
+  SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
+      new InstantCommand(this.indexerSubsystem::lowerIntake, this.indexerSubsystem),
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanRight, 5, 3),
+      new ParallelRaceGroup(new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(16), 0.5, 1),
+          new IntakeBalls(this.indexerSubsystem, 3)),
+      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(-3), 0.5, 1),
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 10, 3));
+
+  private void addAutonomousCommands() {
+    this.autonomousSelector.setDefaultOption("Three Ball Auto", this.threeBallAuto);
+    this.autonomousSelector.addOption("Buggy Six Ball Auto", this.sixBallAuto);
   }
 
   private void setDefaultCommands() {
@@ -78,26 +105,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    final boolean scanLeft = false;
-    final boolean scanRight = true;
 
-    SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
-      new InstantCommand(this.indexerSubsystem::lowerIntake, this.indexerSubsystem),
-      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanRight, 6, 3),
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1)
-    );
-
-    SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
-      new InstantCommand(this.indexerSubsystem::lowerIntake, this.indexerSubsystem),
-      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanRight, 5, 3),
-      new ParallelRaceGroup(
-        new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(16), 0.5, 1),
-        new IntakeBalls(this.indexerSubsystem, 3)
-      ),
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(-3), 0.5, 1),
-      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 10, 3)
-    );
-
-    return threeBallAuto;
+    return this.autonomousSelector.getSelected();
   }
 }
