@@ -52,8 +52,7 @@ public final class Constants {
 
     public static final int indexerFirstPos = 0, // Indexing sensor sensor first position, DIO channel 0.
             indexerSecondPos = 1, // Indexing sensor second position, DIO channel 1.
-            fullIndexerSensor = 2, // Full Indexer Sensor , DIO channel 2.
-            climberVerticalSensor = 3; // climber vertical sensor, DIO channel 3.
+            fullIndexerSensor = 2; // Full Indexer Sensor , DIO channel 2.
 
     // Targetting Light Relay
 

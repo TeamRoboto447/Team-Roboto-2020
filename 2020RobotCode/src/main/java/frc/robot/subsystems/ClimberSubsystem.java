@@ -18,14 +18,12 @@ public class ClimberSubsystem extends SubsystemBase {
   private final Solenoid climberLift;
   private final Solenoid climberRelease;
   private final Solenoid climberLock;
-  private final DigitalInput climberVertical;
   private final Spark climbMotor;
 
   public ClimberSubsystem() {
     this.climberLift = new Solenoid(Constants.climberLift);
     this.climberRelease = new Solenoid(Constants.climberRelease);
     this.climberLock = new Solenoid(Constants.climberLock);
-    this.climberVertical = new DigitalInput(Constants.climberVerticalSensor);
     this.climbMotor = new Spark(Constants.climberSpark);
   }
 
@@ -35,10 +33,10 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void climberLock(){
-    this.climberLock.set(true);
+    this.climberLock.set(false);
   }
   public void climberUnlock(){
-    this.climberLock.set(false);
+    this.climberLock.set(true);
   }
 
   public void climberRelease() {
@@ -57,7 +55,7 @@ public class ClimberSubsystem extends SubsystemBase {
     this.climberLift.set(false);
   }
 
-  public boolean isLiftVertical() {
-    return this.climberVertical.get();
-  }
+  public void stop() {
+    this.climbMotor.set(0);
+  } 
 }
