@@ -46,9 +46,9 @@ public final class Constants {
     // PCM Channels on board 1 (pneumatics)
     public static final int transmission = 0, // Drive transmission, PCM channel 0.
             intakeExtension = 1, // Intake extension, PCM channel 1.
-            climberLift = 2, // Climber lift cylinder, PCM channel 2.
-            climberRelease = 3, // Climber release, PCM channel 3.
-            climberLock = 4; // Climber lock, PCM channel 4.
+            climberLock = 2, // Climber lock, PCM channel 2.
+            climberLift = 3, // Climber lift cylinder, PCM channel 3.
+            climberRelease = 4; // Climber release, PCM channel 4.
 
     public static final int indexerFirstPos = 0, // Indexing sensor sensor first position, DIO channel 0.
             indexerSecondPos = 1, // Indexing sensor second position, DIO channel 1.

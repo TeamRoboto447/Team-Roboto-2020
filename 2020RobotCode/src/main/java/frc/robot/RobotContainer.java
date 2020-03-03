@@ -82,11 +82,6 @@ public class RobotContainer {
     final boolean scanRight = true;
 
     SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, scanRight, 10, 3),
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1)
-    );
-
-    SequentialCommandGroup threeBallAutoFast = new SequentialCommandGroup(
       new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanRight, 6, 3),
       new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5), 0.5, 1)
     );
@@ -101,6 +96,6 @@ public class RobotContainer {
       new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 10, 3)
     );
 
-    return threeBallAutoFast;
+    return threeBallAuto;
   }
 }

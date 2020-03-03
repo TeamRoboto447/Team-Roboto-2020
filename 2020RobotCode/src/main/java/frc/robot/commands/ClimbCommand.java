@@ -29,7 +29,19 @@ public class ClimbCommand extends CommandBase {
   @Override
   public void execute() {
     if(RobotContainer.operator.getPOV() == 0) {
-      this.climberSubsystem.climb(RobotContainer.operator.getRawAxis(OperatorMap.lJoyX));
+      this.climberSubsystem.climberUnlock();
+      this.climberSubsystem.climberRelease();
+      this.climberSubsystem.climb(RobotContainer.operator.getRawAxis(OperatorMap.rJoyY));
+    } else {
+      this.climberSubsystem.climberLock();
+    }
+
+    if(RobotContainer.operator.getPOV() == 180) {
+      if(-RobotContainer.operator.getRawAxis(OperatorMap.rJoyY) > 0.5) {
+        this.climberSubsystem.liftClimber();
+      } else if(-RobotContainer.operator.getRawAxis(OperatorMap.rJoyY) < -0.5) {
+        this.climberSubsystem.lowerClimber();
+      }
     }
   }
 
