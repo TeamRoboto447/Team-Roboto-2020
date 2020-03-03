@@ -46,7 +46,6 @@ public class IndexerSubsystem extends SubsystemBase {
       ballAtPosOne(),
       isFull());
     Logging.debug(status, "indexerStatus");
-    this.extendIntake(true);
   }
 
   public void intakeBall() {
@@ -72,8 +71,12 @@ public class IndexerSubsystem extends SubsystemBase {
     this.indexingMotor.set(speed);
   }
 
-  public void extendIntake(boolean extend) {
-    this.intakeExtension.set(extend);
+  public void lowerIntake() {
+    this.intakeExtension.set(true);
+  }
+
+  public void raiseIntake() {
+    this.intakeExtension.set(true);
   }
 
   public void stop() {
