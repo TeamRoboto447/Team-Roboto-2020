@@ -9,7 +9,7 @@ public class Utilities {
     public static double encoderToInch(double target) {
         double encoderRes = 4096;
         double wheelDiameter = 6;
-        double circum = wheelDiameter*3.1415926;
+        double circum = wheelDiameter * Math.PI;
         double encodePerInch = encoderRes/circum;
         double output = Math.round(encodePerInch * target);
         

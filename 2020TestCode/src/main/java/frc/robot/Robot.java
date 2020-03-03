@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.lang.Runtime;
 import java.lang.Math;
@@ -49,16 +50,16 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    robot = new RobotContainer();
-    camera0 = CameraServer.getInstance().startAutomaticCapture(0);
-    camera0.setResolution(160, 120);
-    camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    this.robot = new RobotContainer();
+    this.camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+    this.camera0.setResolution(160, 120);
+    this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
-    camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-    camera1.setResolution(160, 120);
-    camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    this.camera1 = CameraServer.getInstance().startAutomaticCapture(1);
+    this.camera1.setResolution(160, 120);
+    this.camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
-    camServer = CameraServer.getInstance().getServer();
+    this.camServer = CameraServer.getInstance().getServer();
     
     this.table = NetworkTableInstance.getDefault();
 
@@ -112,6 +113,7 @@ public class Robot extends TimedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+    iterTimer.reset();
     CommandScheduler.getInstance().run();
     // logLowMemory();
   }
@@ -202,5 +204,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+  }
+
+  private void setRobotFront() {
+    if(this.lookForward.getState()) {
+      this.camServer.setSource(this.camera1);
+    } else {
+      this.camServer.setSource(this.camera0);
+    }
+    this.robot.driveSubsystem.setDriveInverted(!this.lookForward.getState());
   }
 }

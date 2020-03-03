@@ -23,6 +23,7 @@ public class VisionCommand extends CommandBase {
   Double
     poseX,
     poseY,
+    poseAngle,
     yaw,
     pitch,
     latency,
@@ -97,14 +98,14 @@ public class VisionCommand extends CommandBase {
     if (RobotContainer.operator.getRawButton(7)) {
       this.driveTargetCalculated = false;
       turnToTarget();
-    } else if(RobotContainer.operator.getRawButton(8)) {
+    } else if(RobotContainer.operator.getRawButton(OperaterMap.RT)) {
       driveToTarget();
     } else {
       this.driveTargetCalculated = false;
       stop();
     }
-
-    if(RobotContainer.operator.getRawButton(6)) {
+    
+    if(RobotContainer.operator.getRawButton(OperaterMap.RB)) {
       this.driveSubsystem.tankDrive(0.2, 0.2, false);
     }
 
@@ -149,6 +150,12 @@ public class VisionCommand extends CommandBase {
     } else {
       this.driveSubsystem.turnToZeroVeryInnacurate();
     }
+  }
+  private double getDistanceToInner( double angle, double distance, double targetDelta ){
+    return Math.sqrt(Math.pow(targetDelta, 2) + Math.pow(distance,2) - targetDelta*distance*Math.cos(angle));
+  }
+  private double getAngleOffset( double angle, double distance, double targetDelta){
+    return Math.asin(targetDelta / distance * Math.sin(angle));
   }
 
   private void driveToTarget() {

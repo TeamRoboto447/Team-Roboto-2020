@@ -19,6 +19,10 @@ import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+import frc.robot.controlmaps.OperaterMap;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
+
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -44,7 +48,7 @@ public class RobotContainer {
     configureButtonBindings();
     
     driveSubsystem.setDefaultCommand(driveCommand);
-    //driveSubsystem.setDefaultCommand(visionCommand);
+    turretSubsystem.setDefaultCommand(turretCommand);
 
   }
 
@@ -52,7 +56,7 @@ public class RobotContainer {
   public static Joystick driverRight = new Joystick(1);
   public static Joystick operator = new Joystick(2);
 
-  public static JoystickButton visionButton = new JoystickButton(operator, 5);
+  public static JoystickButton visionButton = new JoystickButton(operator, OperaterMap.LB);
 
   /**
    * Use this method to define your button->command mappings.  Buttons can be created by
@@ -61,7 +65,7 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    visionButton.whileHeld(visionCommand);
+    visionButton.whileHeld(this.visionCommand);
   }
 
 
