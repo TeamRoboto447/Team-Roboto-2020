@@ -16,9 +16,11 @@ import frc.robot.utils.Logging;
 import frc.robot.utils.MovingAverage;
 import frc.robot.utils.PID;
 import frc.robot.Constants;
+import frc.robot.Utilities;
 import frc.robot.utils.ff.LinearFF;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -57,6 +59,8 @@ public class TurretSubsystem extends SubsystemBase {
   double shooterSetSpeed;
 
   double turretOffset;
+  private double dynamicAimOffset = 0;
+  private double dynamicSpeedOffset = 0;
 
   double poseX, poseY, poseAngle, yaw, pitch, latency, distance;
   public Boolean validTarget;
@@ -147,8 +151,13 @@ public class TurretSubsystem extends SubsystemBase {
 
   public boolean onTarget() {
     double setpoint = 0;
+<<<<<<< HEAD
     double adjustAngle = 4;
     double processingVar = this.yaw + adjustAngle;
+=======
+    double adjustmentAngle = Constants.staticAimOffset + this.dynamicAimOffset;
+    double processingVar = this.yaw + adjustmentAngle;
+>>>>>>> e95d18fc533059d20f33108d343be5872c0d6767
     boolean onTarget = setpoint - Constants.turretMarginOfError < processingVar
         && processingVar < setpoint + Constants.turretMarginOfError;
     return onTarget;
@@ -282,6 +291,34 @@ public class TurretSubsystem extends SubsystemBase {
     }
   }
 
+  public void setDynamicOffset(double offset) {
+    this.dynamicAimOffset = offset;
+  }
+
+  public double getDynamicOffset() {
+    return this.dynamicAimOffset;
+  }
+
+  public void setSpeedOffset(double offset) {
+    this.dynamicSpeedOffset = offset;
+  }
+
+  public double getSpeedOffselt() {
+    return this.dynamicSpeedOffset;
+  }
+
+  public double getShooterSpeedRPM() {
+    return this.shooterEncoder.getVelocity();
+  }
+
+  public double getShooterSpeedFPS() {
+    return Utilities.shooterRPMtoFPS(this.shooterEncoder.getVelocity());
+  }
+
+  public double getTargetAngle() {
+    return this.poseAngle;
+  }
+
   public void turnToTarget() {
     setTurretTarget(0);
     Logging.debug("Turret limit: " + Constants.turretSpinLimit + "\nTurret Position: " + this.getTurretPos()
@@ -291,8 +328,9 @@ public class TurretSubsystem extends SubsystemBase {
       // double distanceToInner = this.getDistanceToInner(this.poseAngle,
       // this.distance,
       // Constants.distanceFromInnerToOuterPort);
-      double adjustAngle = 4;// this.getAngleOffset(this.poseAngle, distanceToInner,
-                             // Constants.distanceFromInnerToOuterPort);
+      double adjustAngle = Constants.staticAimOffset + this.dynamicAimOffset;// this.getAngleOffset(this.poseAngle,
+                                                                             // distanceToInner,
+      // Constants.distanceFromInnerToOuterPort);
       /*
        * if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0,
        * adjustAngle)) { adjustAngle = 0.0; }
@@ -327,7 +365,7 @@ public class TurretSubsystem extends SubsystemBase {
     return turretPosition;
   }
 
-  private double getTurretPos() {
+  public double getTurretPos() {
     double turretPositionDegrees = (this.turretEncoder.getPosition() * 3.6) % 360;
     double turretPositionClamped = this.clamp(turretPositionDegrees);
     return turretPositionClamped;
@@ -359,10 +397,13 @@ public class TurretSubsystem extends SubsystemBase {
     this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
 
     this.shootingMotorLeft = new CANSparkMax(Constants.shooterSparkMaxLeft, MotorType.kBrushless);
-    this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorLeft.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorLeft.setIdleMode(IdleMode.kCoast);
 
     this.shootingMotorRight = new CANSparkMax(Constants.shooterSparkMaxRight, MotorType.kBrushless);
-    this.turretMotor.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorRight.setSmartCurrentLimit(Constants.neoSafeAmps);
+    this.shootingMotorRight.setIdleMode(IdleMode.kCoast);
+
     this.shootFeeder = new Spark(Constants.shooterFeedSpark);
 
     // Set up targetting relay
@@ -380,7 +421,7 @@ public class TurretSubsystem extends SubsystemBase {
     // Define PID controllers
     this.shootingMotorPID = new PID.PIDBuilder(0, Constants.shooterkP, Constants.shooterkI, Constants.shooterkD)
         .FF(new LinearFF(Constants.shooterkFFm, Constants.shooterkFFb)).MinIntegral(-Constants.shooterSZone)
-        .MaxIntegral(Constants.shooterSZone).IZone(Constants.shooterIZone).Name("shootingMotor").build();
+        .MaxIntegral(Constants.shooterSZone).IZone(Constants.shooterIZone).Name("shooting").build();
     this.turretPositionPID = new PID.PIDBuilder(0, Constants.turretkP, Constants.turretkI, Constants.turretkD)
         .MinIntegral(-Constants.turretIZone).MaxIntegral(Constants.turretIZone).Name("turretPosition").build();
 

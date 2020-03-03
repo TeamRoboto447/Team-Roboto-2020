@@ -12,14 +12,13 @@ public class Utilities {
         }
         return value;
     }
-
-    public static double feetToEncoder(double target) {
-        return inchToEncoder(target * 12);
-    }
-
     public static boolean marginOfError(double maxError, double setpoint, double processingVar) {
         double error = Math.abs(setpoint - processingVar);
         return error <= maxError;
+    }
+
+    public static double feetToEncoder(double target) {
+        return inchToEncoder(target * 12);
     }
 
     public static double inchToEncoder(double target) {
@@ -40,7 +39,7 @@ public class Utilities {
     public static double meterToEncoder(double target) {
         double circum = Constants.wheelDiameterMeters * Math.PI;
         double encodePerMeter = Constants.encoderRes / circum;
-        double output = Math.round(encodePerMeter * target);
+        double output = encodePerMeter * target;
         return output;
     }
 
@@ -58,7 +57,14 @@ public class Utilities {
         return output;
     }
 
-    public static double driveshaftIntputToOutput(double distance, String gear) {
+    public static double shooterRotationsToFeet(double rotations) {
+        double circum = (Constants.shooterWheelDiameter/12) * Math.PI;
+        double rotationsPerFoot = 1 / circum;
+        double output = rotations / rotationsPerFoot;
+        return output;
+    }
+
+    public static double driveshaftInputToOutput(double distance, String gear) {
         switch(gear.toLowerCase()) {
             case "low":
                 distance /= Constants.lowGearRatio;
@@ -91,9 +97,15 @@ public class Utilities {
     }
 
     public static double RPMtoMPS(double inputRPM, String currentGear) {
-        double outputRPM = driveshaftIntputToOutput(inputRPM, currentGear);
-        double outputRPS = outputRPM/2;
+        double outputRPM = driveshaftInputToOutput(inputRPM, currentGear);
+        double outputRPS = outputRPM/60;
         double MPS = rotationsToMeter(outputRPS);
         return MPS;
+    }
+
+    public static double shooterRPMtoFPS(double inputRPM) {
+        double RPS = inputRPM/60;
+        double FPS = shooterRotationsToFeet(RPS);
+        return FPS;
     }
 }

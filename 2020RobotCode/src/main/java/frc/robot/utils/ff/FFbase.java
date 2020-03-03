@@ -11,12 +11,8 @@ package frc.robot.utils.ff;
  * Add your docs here.
  */
 public class FFbase {
-    public double getFF(double setpoint, double processingVar, double iterTime){
-        return 0.0;
-    }
-    public double[] getValues(){
-        return new double[]{};
-    }
+    public double getFF(double setpoint, double processingVar, double iterTime){return 0.0;}
+    public double[] getValues(){return new double[]{};}
     public void updateValues(double[] Values){}
-    
+    public String getValsAsString(){return "";}
 }

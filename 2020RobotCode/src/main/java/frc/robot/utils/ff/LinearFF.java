@@ -31,6 +31,10 @@ public class LinearFF extends FFbase {
         this.M = values[0];
         this.B = values[1];
     }
+    @Override
+    public String getValsAsString(){
+        return String.format("FFType: Linear, FFm: %f, FFb: %f",this.M,this.B);
+    }
     public double getM(){
         return this.M;
     }

@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+//import edu.wpi.first.wpilibj.smartdashboard.SmaartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Utilities;
@@ -49,8 +51,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
   private final Solenoid transmission;
 
-  // Odometry class for tracking robot pose
+  // Odometry class for tracking robot pose and speed
   private DifferentialDriveOdometry m_odometry;
+  private DifferentialDriveKinematics kinematics;
 
   private CSVWriter odometryWriter;
   private Path deployPath;
@@ -98,6 +101,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
       this.odometryWriterActive = false;
     }
 
+    this.kinematics = new DifferentialDriveKinematics(Constants.kTrackWidthMeters);
+
     this.startingTime = System.currentTimeMillis();
   }
 
@@ -119,11 +124,11 @@ public class RobotDriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
 
-    double leftOutputRotations = Utilities.driveshaftIntputToOutput(this.m_leftEncoder.getPosition(),
+    double leftOutputRotations = Utilities.driveshaftInputToOutput(this.m_leftEncoder.getPosition(),
         this.getCurrentGear());
     double leftOutputMeters = Utilities.rotationsToMeter(leftOutputRotations);
 
-    double rightOutputRotations = Utilities.driveshaftIntputToOutput(this.m_rightEncoder.getPosition(),
+    double rightOutputRotations = Utilities.driveshaftInputToOutput(this.m_rightEncoder.getPosition(),
         this.getCurrentGear());
     double rightOutputMeters = Utilities.rotationsToMeter(rightOutputRotations);
 
@@ -179,6 +184,20 @@ public class RobotDriveSubsystem extends SubsystemBase {
     return new DifferentialDriveWheelSpeeds(leftVelocityMPS, rightVelocityMPS);
   }
 
+  public ChassisSpeeds getChassisSpeed() {
+    ChassisSpeeds speeds = kinematics.toChassisSpeeds(this.getWheelSpeeds());
+    return speeds;
+  }
+  
+  public double[] getFieldRelativeSpeed() {
+    ChassisSpeeds chassisSpeeds = this.getChassisSpeed();
+    double angle = this.getHeading();
+    double Vx = Math.sin(Math.toRadians(angle)) * chassisSpeeds.vxMetersPerSecond;
+    double Vy = Math.cos(Math.toRadians(angle)) * chassisSpeeds.vxMetersPerSecond;
+    double[] speeds = new double[]{Vx, Vy};
+    return speeds;
+  }
+
   /**
    * Resets the odometry to the specified pose.
    *
@@ -196,7 +215,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    this.m_drive.arcadeDrive(fwd, rot);
+    double leftSpeed = fwd - rot;
+    double rightSpeed = fwd + rot;
+    this.setRelativeDrive(leftSpeed, rightSpeed);
   }
 
   /**
@@ -303,7 +324,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
   public void setInvertedDrive(boolean invert) {
     this.driveInverted = invert;
     this.rightDrive.setInverted(!this.driveInverted);
+    this.rightDriveB.setInverted(!this.driveInverted);
     this.leftDrive.setInverted(this.driveInverted);
+    this.leftDriveB.setInverted(this.driveInverted);
   }
 
   public boolean getInvertedDrive() {

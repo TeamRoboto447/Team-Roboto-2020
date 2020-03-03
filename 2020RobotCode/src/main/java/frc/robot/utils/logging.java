@@ -48,7 +48,7 @@ public class Logging {
     }
 
     public static void init() {
-        subsystemToDebug = NetworkTableInstance.getDefault().getTable("adenLogging").getEntry("subsysToLog");
+        subsystemToDebug = NetworkTableInstance.getDefault().getTable("logging").getEntry("subsysToLog");
         subsystemToDebug.setString("");
     }
 }

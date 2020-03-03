@@ -29,5 +29,9 @@ public class ConstantFF extends FFbase {
     public void updateValues(double[] values){
         this.v = values[0];
     }
+    @Override
+    public String getValsAsString(){
+        return  String.format("FFType: Constant, FFv: %f",this.v);
+    }
 
 }

@@ -7,18 +7,21 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.Utilities;
 import frc.robot.controlmaps.OperatorMap;
+import frc.robot.subsystems.RobotDriveSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class TurretCommand extends CommandBase {
-  TurretSubsystem turretSubsystem;
+  private final TurretSubsystem turretSubsystem;
+  private final RobotDriveSubsystem driveSubsystem;
 
-  public TurretCommand(TurretSubsystem turretSub) {
-    this.turretSubsystem = turretSub;
-
+  public TurretCommand(TurretSubsystem tSubsystem, RobotDriveSubsystem dSubsystem) {
+    this.turretSubsystem = tSubsystem;
+    this.driveSubsystem = dSubsystem;
     addRequirements(this.turretSubsystem);
   }
 
@@ -51,7 +54,7 @@ public class TurretCommand extends CommandBase {
       shootAtSpeed();
       runFeeder();
 
-    } else if(RobotContainer.operator.getRawButton(OperatorMap.start)) {
+    } else if (RobotContainer.operator.getRawButton(OperatorMap.start)) {
       this.turretSubsystem.enableShooterLogging(true);
       shootAtSpeed();
       this.turretSubsystem.feedShooter();
@@ -62,7 +65,7 @@ public class TurretCommand extends CommandBase {
       this.turretSubsystem.stopFeeder();
     }
 
-    if(RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+    if (RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       lockDist();
     } else {
       unlockDist();
@@ -96,6 +99,7 @@ public class TurretCommand extends CommandBase {
       this.turretSubsystem.stopFeeder();
     }
   }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
@@ -124,5 +128,24 @@ public class TurretCommand extends CommandBase {
   private void target() {
     this.turretSubsystem.enableTargetting(true);
     this.turretSubsystem.turnToTarget();
+  }
+
+  private double calculateAngleOffset() {
+    double[] speeds = this.driveSubsystem.getFieldRelativeSpeed();
+    double dist = this.turretSubsystem.getDistance();
+    double shooterSpeed = this.turretSubsystem.getShooterSpeedFPS();
+    double targetAngle = this.turretSubsystem.getTargetAngle();
+    double distm = Units.feetToMeters(dist);
+    double offsetDistance = dist / shooterSpeed * speeds[1];
+    double adjustedDist = Math.sqrt(Math.pow(offsetDistance,2) + Math.pow(distm,2) - 2 * offsetDistance * distm * Math.cos(targetAngle));
+    double offsetAngle = Math.asin(Math.sin(targetAngle) / adjustedDist *distm);
+    return Math.toDegrees(offsetAngle);
+  }
+
+  private double calculateSpeedOffset() {
+    double[] speeds = this.driveSubsystem.getFieldRelativeSpeed();
+    double dist = this.turretSubsystem.getDistance();
+    double shooterSpeed = this.turretSubsystem.getShooterSpeedFPS();
+    return 0;
   }
 }
