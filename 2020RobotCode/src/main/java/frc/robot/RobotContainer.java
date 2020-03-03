@@ -13,6 +13,7 @@ import frc.robot.autocommands.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -88,6 +89,7 @@ public class RobotContainer {
   private void addAutonomousCommands() {
     this.autonomousSelector.setDefaultOption("Three Ball Auto", this.threeBallAuto);
     this.autonomousSelector.addOption("Buggy Six Ball Auto", this.sixBallAuto);
+    Shuffleboard.getTab("Autonomous").add(this.autonomousSelector);
   }
 
   private void setDefaultCommands() {
