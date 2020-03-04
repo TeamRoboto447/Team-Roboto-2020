@@ -151,13 +151,8 @@ public class TurretSubsystem extends SubsystemBase {
 
   public boolean onTarget() {
     double setpoint = 0;
-<<<<<<< HEAD
-    double adjustAngle = 4;
-    double processingVar = this.yaw + adjustAngle;
-=======
     double adjustmentAngle = Constants.staticAimOffset + this.dynamicAimOffset;
     double processingVar = this.yaw + adjustmentAngle;
->>>>>>> e95d18fc533059d20f33108d343be5872c0d6767
     boolean onTarget = setpoint - Constants.turretMarginOfError < processingVar
         && processingVar < setpoint + Constants.turretMarginOfError;
     return onTarget;

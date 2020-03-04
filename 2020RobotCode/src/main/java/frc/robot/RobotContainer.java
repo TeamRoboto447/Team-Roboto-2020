@@ -108,25 +108,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
 
-<<<<<<< HEAD
-    SequentialCommandGroup threeBallAuto = new SequentialCommandGroup(
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(3)),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, 20)
-    );
-
-    SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, -5),
-      new ParallelCommandGroup(
-        new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(-45)),
-        new IntakeBalls(this.indexerSubsystem)
-      ),
-      new DriveToPosition(this.driveSubsystem, Utilities.feetToEncoder(5)),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, -45)
-    );
-
-    return threeBallAuto;
-=======
     return this.autonomousSelector.getSelected();
->>>>>>> e95d18fc533059d20f33108d343be5872c0d6767
   }
 }
