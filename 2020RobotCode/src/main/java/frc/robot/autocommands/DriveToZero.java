@@ -33,11 +33,17 @@ public class DriveToZero extends CommandBase {
     this.maxSpeed = maxSpeed;
     addRequirements(dSubsystem);
 
+<<<<<<< HEAD:2020RobotCode/src/main/java/frc/robot/commands/DriveToPosition.java
+    this.drivePID = new PID(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD,
+        new ConstantFF(0.25));
+    this.averagePosition = new MovingAverage(50);
+=======
     this.drivePID = new PID.PIDBuilder(0, Constants.drivekP, Constants.drivekI, Constants.drivekD)
         .FF(new ConstantFF(0.2)).Name("drive").build();
     this.steerPID = new PID.PIDBuilder(0, Constants.steerkP, Constants.steerkI, Constants.steerkD).FF(new ConstantFF(0))
         .Name("steer").build();
     this.averagePosition = new MovingAverage(5);
+>>>>>>> e95d18fc533059d20f33108d343be5872c0d6767:2020RobotCode/src/main/java/frc/robot/autocommands/DriveToZero.java
   }
 
   // Called when the command is initially scheduled.
