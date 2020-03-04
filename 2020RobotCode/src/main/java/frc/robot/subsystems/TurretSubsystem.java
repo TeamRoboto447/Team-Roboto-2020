@@ -478,7 +478,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.shootFFbEntry.setDouble(Constants.shooterkFFb);
     this.bypassShooterPIDEntry.setBoolean(Constants.bypassShooterPID);
     this.shooterCurrSpeedEntry.setDouble(0);
-    this.shooterSpeedEntry.setDouble(0.5);
+    this.shooterSpeedEntry.setDouble(0.85);
     this.targetShooterSpeed.setDouble(0);
 
     this.turretPEntry.setDouble(Constants.turretkP);

@@ -28,7 +28,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  
+  public final BlingSubsystem blingSubsystem = new BlingSubsystem();
 
   public final RobotDriveSubsystem driveSubsystem = new RobotDriveSubsystem();
   public final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem);
