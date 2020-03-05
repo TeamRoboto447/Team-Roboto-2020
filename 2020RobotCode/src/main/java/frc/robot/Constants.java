@@ -66,7 +66,7 @@ public final class Constants {
 
     public static final double
     // Gear ratios for calculating encoder ticks per rotation
-    lowGearRatio = 25.9, highGearRatio = 8.63, thirdStageRatio = 1.41,
+    lowGearRatio = 25.9, highGearRatio = 6.86, thirdStageRatio = 1.14,
             // Wheel diameter for calculating inches per rotation
             wheelDiameter = 6.0, wheelDiameterMeters = 0.1524, shooterWheelDiameter = 4;
     public static final double turretToMoterRatio = 100.0;
@@ -77,7 +77,7 @@ public final class Constants {
         drivekD = 0.5,
         drivekIz = 0,
         drivekFF = 0,
-        steerkP = 0.0001,
+        steerkP = 0.0005,
         steerkI = 0,
         steerkD = 0;
 
@@ -101,12 +101,12 @@ public final class Constants {
     // Turning PID info
     public static final double
         turretkP = 0.03,
-        turretkI = 0.05,
-        turretkD = 0.0009,
+        turretkI = 0.04,
+        turretkD = 0.0007,
         turretFFm = 0,
         turretFFb = 0,
         turretIZone = 10,
-        turretSpinLimit = 190,
+        turretSpinLimit = 125,
         turretMarginOfError = 2,
         staticAimOffset = 4;
 

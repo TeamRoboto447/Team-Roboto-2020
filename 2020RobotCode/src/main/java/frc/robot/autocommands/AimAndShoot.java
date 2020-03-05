@@ -9,6 +9,7 @@ package frc.robot.autocommands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
@@ -19,30 +20,25 @@ public class AimAndShoot extends CommandBase {
   private final double maxRunTime;
   private final int ballsToShoot;
   private double scanAngle;
+  private final double scanSpeed;
   private int ballsShot = 0;
   private boolean wasLookingAtBall = false;
 
-  public AimAndShoot(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, boolean scanRight, double maxTime,
-      int ballsToShoot) {
+  public AimAndShoot(TurretSubsystem tSubsystem, IndexerSubsystem iSubsystem, boolean scanRight, double scanSpeed,
+      double maxTime, int ballsToShoot) {
     this.turretSubsystem = tSubsystem;
     this.indexerSubsystem = iSubsystem;
+    this.scanAngle = scanRight ? -45 : 45;
+    this.scanSpeed = scanSpeed;
 
     this.distanceTimer = new Timer();
-    this.distanceTimer.stop();
-    this.distanceTimer.reset();
 
     this.countDown = new Timer();
-    this.countDown.stop();
-    this.countDown.reset();
 
     this.overallTimer = new Timer();
-    this.overallTimer.reset();
-    this.overallTimer.start();
 
     this.maxRunTime = maxTime;
     this.ballsToShoot = ballsToShoot;
-
-    this.scanAngle = scanRight ? -45 : 45;
 
     addRequirements(tSubsystem);
     addRequirements(iSubsystem);
@@ -51,9 +47,13 @@ public class AimAndShoot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.distanceTimer.stop();
+    this.distanceTimer.reset();
+    this.countDown.stop();
+    this.countDown.reset();
+    this.overallTimer.reset();
+    this.overallTimer.start();
   }
-
-  private boolean timerStarted = false;
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -65,23 +65,14 @@ public class AimAndShoot extends CommandBase {
       } else if (this.turretSubsystem.getTurretPos() > 40) {
         this.scanAngle = -45;
       }
-
-      this.turretSubsystem.turnToAngle(this.scanAngle, 0.5);
+      this.turretSubsystem.turnToAngle(this.scanAngle, this.scanSpeed);
       spinUp();
     } else {
-      this.turretSubsystem.turnToTarget();
+      this.turretSubsystem.turnToTarget(0.5);
       if (this.turretSubsystem.onTarget()) {
-        if (!this.timerStarted) {
-          this.distanceTimer.start();
-          this.timerStarted = true;
-        }
-        if (this.distanceTimer.get() > 0.2) {
-          this.turretSubsystem.lockDistance();
-          shoot();
-        }
+        shoot();
       } else {
-        this.turretSubsystem.unlockDistance();
-        // spinUp();
+        spinUp();
       }
     }
 
@@ -102,13 +93,16 @@ public class AimAndShoot extends CommandBase {
     double currentDistance = this.turretSubsystem.getDistance();
     double shooterSpeed = this.turretSubsystem.getSpeedFromDist(currentDistance);
     this.turretSubsystem.runShooterAtSpeed(shooterSpeed);
+    this.indexerSubsystem.intakeRaw(-Constants.intakeSpeed);
+    this.distanceTimer.start();
     if (this.turretSubsystem.shooterAtSpeed()) {
-      this.turretSubsystem.feedShooter();
-      this.indexerSubsystem.indexerRaw(0.75);
-    } else {
-      this.turretSubsystem.stopFeeder();
-      this.indexerSubsystem.stop();
+      if (this.distanceTimer.get() > 0.5) {
+        this.turretSubsystem.lockDistance();
+        this.turretSubsystem.feedShooter();
+        this.indexerSubsystem.indexerRaw(0.75);
+      }
     }
+
   }
 
   private void spinUp() {
@@ -119,15 +113,15 @@ public class AimAndShoot extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     this.turretSubsystem.enableTargetting(false);
-    this.turretSubsystem.enableTargetting(false);
-    this.turretSubsystem.unlockDistance();
     this.turretSubsystem.stop();
     this.indexerSubsystem.stop();
+    this.turretSubsystem.unlockDistance();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return this.countDown.get() >= 0.5 || this.overallTimer.get() >= this.maxRunTime;
+    // this.countDown.get() >= 0.5 ||
+    return this.overallTimer.get() >= this.maxRunTime;
   }
 }

@@ -323,10 +323,10 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
   public void setInvertedDrive(boolean invert) {
     this.driveInverted = invert;
-    this.rightDrive.setInverted(!this.driveInverted);
-    this.rightDriveB.setInverted(!this.driveInverted);
-    this.leftDrive.setInverted(this.driveInverted);
-    this.leftDriveB.setInverted(this.driveInverted);
+    this.rightDrive.setInverted(!invert);
+    this.rightDriveB.setInverted(!invert);
+    this.leftDrive.setInverted(invert);
+    this.leftDriveB.setInverted(invert);
   }
 
   public boolean getInvertedDrive() {

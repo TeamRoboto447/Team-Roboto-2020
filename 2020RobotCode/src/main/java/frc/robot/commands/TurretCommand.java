@@ -34,8 +34,6 @@ public class TurretCommand extends CommandBase {
   @Override
   public void execute() {
     if (RobotContainer.operator.getRawButton(OperatorMap.A)) {
-      target();
-    } else if (RobotContainer.operator.getRawButton(OperatorMap.B)) {
       if (this.turretSubsystem.validTarget) {
         target();
       } else {

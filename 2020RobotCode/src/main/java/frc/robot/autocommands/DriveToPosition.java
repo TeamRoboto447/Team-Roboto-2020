@@ -26,12 +26,14 @@ public class DriveToPosition extends CommandBase {
   private final double targetPosition;
   private final double minSpeed, maxSpeed;
   private final boolean drivingForward;
+  private final String currentGear;
 
   private boolean done = false;
 
-  public DriveToPosition(RobotDriveSubsystem dSubsystem, double targetPosition, double minSpeed, double maxSpeed) {
+  public DriveToPosition(RobotDriveSubsystem dSubsystem, String currentGear, double targetPosition, double minSpeed, double maxSpeed) {
     this.driveSubsystem = dSubsystem;
-    this.targetPosition = Utilities.driveshaftOutputToInput(targetPosition, "low");
+    this.currentGear = currentGear;
+    this.targetPosition = Utilities.driveshaftOutputToInput(targetPosition, currentGear);
     this.minSpeed = minSpeed;
     this.maxSpeed = maxSpeed;
     this.drivingForward = targetPosition > 0;
@@ -40,7 +42,7 @@ public class DriveToPosition extends CommandBase {
 
     this.drivePID = new PID.PIDBuilder(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD)
         .FF(new ConstantFF(0.2)).Name("drive").build();
-    this.steerPID = new PID.PIDBuilder(0, Constants.steerkP, Constants.steerkI, Constants.steerkD).FF(new ConstantFF(0))
+    this.steerPID = new PID.PIDBuilder(this.driveSubsystem.getHeading(), Constants.steerkP, Constants.steerkI, Constants.steerkD).FF(new ConstantFF(0))
         .Name("steer").build();
     this.averagePosition = new MovingAverage(5);
   }
@@ -51,7 +53,7 @@ public class DriveToPosition extends CommandBase {
     //System.out.println(this.targetPosition);
     this.driveSubsystem.setMotorIdleMode(IdleMode.kCoast);
     this.driveSubsystem.resetEncoders();
-    this.driveSubsystem.setCurrentGear("low");
+    this.driveSubsystem.setCurrentGear(this.currentGear);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -59,7 +61,6 @@ public class DriveToPosition extends CommandBase {
   public void execute() {
 
     double PV = this.driveSubsystem.getAverageEncoderDistance();
-    PV = Utilities.meterToEncoder(PV);
 
     this.averagePosition.push(PV);
 
@@ -90,6 +91,7 @@ public class DriveToPosition extends CommandBase {
   public void end(boolean interrupted) {
     // System.out.println("Ended drive command");
     this.done = true;
+    this.driveSubsystem.setMotorIdleMode(IdleMode.kBrake);
     this.driveSubsystem.stop();
   }
 

@@ -30,8 +30,10 @@ public class ClimbCommand extends CommandBase {
   public void execute() {
     if(RobotContainer.operator.getPOV() == 0) {
       this.climberSubsystem.climberUnlock();
-      //this.climberSubsystem.climberRelease();
-      this.climberSubsystem.climb(RobotContainer.operator.getRawAxis(OperatorMap.rJoyY));
+      this.climberSubsystem.climb(1);
+    } else if(RobotContainer.operator.getRawButton(OperatorMap.back)) {
+      this.climberSubsystem.climberUnlock();
+      this.climberSubsystem.climb(-1);
     } else {
       this.climberSubsystem.climberLock();
       this.climberSubsystem.stop();

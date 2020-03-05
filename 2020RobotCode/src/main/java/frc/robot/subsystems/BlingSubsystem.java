@@ -19,14 +19,17 @@ public class BlingSubsystem extends SubsystemBase {
   NetworkTableEntry blingSelect;
   NetworkTableInstance table;
   SendableChooser<String> blingSelector;
+  boolean ignoreSelector = false;
 
   public BlingSubsystem() {
     setupNetworkTables();
   }
 
   @Override
-  public void periodic() {  
-    this.blingSelect.setString(this.blingSelector.getSelected());
+  public void periodic() {
+    if (!this.ignoreSelector) {
+      this.blingSelect.setString(this.blingSelector.getSelected());
+    }
   }
 
   private void setupNetworkTables() {
@@ -35,7 +38,8 @@ public class BlingSubsystem extends SubsystemBase {
     this.blingSelect = this.bling.getEntry("blingSelect");
     this.blingSelector = new SendableChooser<>();
 
-    this.blingSelector.setDefaultOption("Red vs Blue", "fight");
+    this.blingSelector.setDefaultOption("Fancy Idle Mode", "fancyidle");
+    this.blingSelector.addOption("Red vs Blue", "fight");
     this.blingSelector.addOption("Idle Mode", "idle");
     this.blingSelector.addOption("Bling Test", "grade");
     this.blingSelector.addOption("Disable Bling", "off");
@@ -45,5 +49,9 @@ public class BlingSubsystem extends SubsystemBase {
 
   public void setBling(String blingSel) {
     this.blingSelect.setString(blingSel);
+  }
+
+  public void setSelectorIgnore(boolean ignore) {
+    this.ignoreSelector = ignore;
   }
 }

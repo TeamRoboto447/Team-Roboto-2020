@@ -33,17 +33,11 @@ public class DriveToZero extends CommandBase {
     this.maxSpeed = maxSpeed;
     addRequirements(dSubsystem);
 
-<<<<<<< HEAD:2020RobotCode/src/main/java/frc/robot/commands/DriveToPosition.java
-    this.drivePID = new PID(this.targetPosition, Constants.drivekP, Constants.drivekI, Constants.drivekD,
-        new ConstantFF(0.25));
-    this.averagePosition = new MovingAverage(50);
-=======
     this.drivePID = new PID.PIDBuilder(0, Constants.drivekP, Constants.drivekI, Constants.drivekD)
         .FF(new ConstantFF(0.2)).Name("drive").build();
-    this.steerPID = new PID.PIDBuilder(0, Constants.steerkP, Constants.steerkI, Constants.steerkD).FF(new ConstantFF(0))
-        .Name("steer").build();
+    this.steerPID = new PID.PIDBuilder(this.driveSubsystem.getHeading(), Constants.steerkP, Constants.steerkI,
+        Constants.steerkD).FF(new ConstantFF(0)).Name("steer").build();
     this.averagePosition = new MovingAverage(5);
->>>>>>> e95d18fc533059d20f33108d343be5872c0d6767:2020RobotCode/src/main/java/frc/robot/autocommands/DriveToZero.java
   }
 
   // Called when the command is initially scheduled.
@@ -59,7 +53,6 @@ public class DriveToZero extends CommandBase {
 
     double PV = this.driveSubsystem.getAverageEncoderDistance();
     PV = Utilities.driveshaftInputToOutput(PV, this.driveSubsystem.getCurrentGear());
-    PV = Utilities.meterToEncoder(PV);
 
     this.averagePosition.push(PV);
 
@@ -68,7 +61,7 @@ public class DriveToZero extends CommandBase {
 
     if (speed > this.maxSpeed) {
       speed = this.maxSpeed;
-    } else if(speed < this.minSpeed) {
+    } else if (speed < this.minSpeed) {
       speed = this.minSpeed;
     }
 
@@ -80,6 +73,7 @@ public class DriveToZero extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    this.driveSubsystem.setMotorIdleMode(IdleMode.kBrake);
     this.done = true;
     this.driveSubsystem.stop();
   }
@@ -87,7 +81,6 @@ public class DriveToZero extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return 0.5 < this.averagePosition.getAverage()
-        && this.averagePosition.getAverage() < 0.5;
+    return 0.5 < this.averagePosition.getAverage() && this.averagePosition.getAverage() < 0.5;
   }
 }

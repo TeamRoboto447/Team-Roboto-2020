@@ -12,6 +12,7 @@ public class Utilities {
         }
         return value;
     }
+
     public static boolean marginOfError(double maxError, double setpoint, double processingVar) {
         double error = Math.abs(setpoint - processingVar);
         return error <= maxError;
@@ -58,39 +59,39 @@ public class Utilities {
     }
 
     public static double shooterRotationsToFeet(double rotations) {
-        double circum = (Constants.shooterWheelDiameter/12) * Math.PI;
+        double circum = (Constants.shooterWheelDiameter / 12) * Math.PI;
         double rotationsPerFoot = 1 / circum;
         double output = rotations / rotationsPerFoot;
         return output;
     }
 
     public static double driveshaftInputToOutput(double distance, String gear) {
-        switch(gear.toLowerCase()) {
-            case "low":
-                distance /= Constants.lowGearRatio;
-                break;
-            case "high":
-                distance /= Constants.highGearRatio;
-                break;
-            default:
-                distance /= Constants.lowGearRatio;
-                break;
+        switch (gear.toLowerCase()) {
+        case "low":
+            distance /= Constants.lowGearRatio;
+            break;
+        case "high":
+            distance /= Constants.highGearRatio / Constants.thirdStageRatio;
+            break;
+        default:
+            distance /= Constants.lowGearRatio;
+            break;
         }
 
         return distance;
     }
 
     public static double driveshaftOutputToInput(double distance, String gear) {
-        switch(gear.toLowerCase()) {
-            case "low":
-                distance *= Constants.lowGearRatio;
-                break;
-            case "high":
-                distance *= Constants.highGearRatio;
-                break;
-            default:
-                distance *= Constants.lowGearRatio;
-                break;
+        switch (gear.toLowerCase()) {
+        case "low":
+            distance *= Constants.lowGearRatio;
+            break;
+        case "high":
+            distance *= Constants.highGearRatio / Constants.thirdStageRatio;
+            break;
+        default:
+            distance *= Constants.lowGearRatio;
+            break;
         }
 
         return distance;
@@ -98,13 +99,13 @@ public class Utilities {
 
     public static double RPMtoMPS(double inputRPM, String currentGear) {
         double outputRPM = driveshaftInputToOutput(inputRPM, currentGear);
-        double outputRPS = outputRPM/60;
+        double outputRPS = outputRPM / 60;
         double MPS = rotationsToMeter(outputRPS);
         return MPS;
     }
 
     public static double shooterRPMtoFPS(double inputRPM) {
-        double RPS = inputRPM/60;
+        double RPS = inputRPM / 60;
         double FPS = shooterRotationsToFeet(RPS);
         return FPS;
     }

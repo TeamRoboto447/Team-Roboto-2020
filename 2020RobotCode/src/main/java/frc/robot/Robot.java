@@ -30,8 +30,8 @@ public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
   private RobotContainer robotContainer;
-  // private UsbCamera camera0, camera1;
-  // private VideoSink camServer;
+  private UsbCamera camera0, camera1;
+  private VideoSink camServer;
 
   private NetworkTable pidTuningPVs;
   private NetworkTableInstance table;
@@ -47,17 +47,16 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     this.robotContainer = new RobotContainer();
-    /*
-     * this.camera0 = CameraServer.getInstance().startAutomaticCapture(0);
-     * this.camera0.setResolution(160, 120);
-     * this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-     * 
-     * this.camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-     * this.camera1.setResolution(160, 120);
-     * this.camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-     * 
-     * this.camServer = CameraServer.getInstance().getServer();
-     */
+
+    this.camera0 = CameraServer.getInstance().startAutomaticCapture(0);
+    this.camera0.setResolution(160, 120);
+    this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+
+    this.camera1 = CameraServer.getInstance().startAutomaticCapture(1);
+    this.camera1.setResolution(160, 120);
+    this.camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+
+    this.camServer = CameraServer.getInstance().getServer();
 
     Logging.init();
 
@@ -91,9 +90,9 @@ public class Robot extends TimedRobot {
 
   private void setRobotFront() {
     if (this.robotContainer.driveSubsystem.getInvertedDrive()) {
-      // this.camServer.setSource(this.camera1);
+      this.camServer.setSource(this.camera1);
     } else {
-      // this.camServer.setSource(this.camera0);
+      this.camServer.setSource(this.camera0);
     }
   }
 
@@ -116,8 +115,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     robotContainer.driveSubsystem.enableLogging(false);
+    robotContainer.indexerSubsystem.lowerIntake();
     autonomousCommand = robotContainer.getAutonomousCommand();
-    
+
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
