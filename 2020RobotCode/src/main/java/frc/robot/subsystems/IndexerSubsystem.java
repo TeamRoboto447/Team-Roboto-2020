@@ -14,6 +14,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTable;
+
 import frc.robot.Constants;
 import frc.robot.utils.Logging;
 
@@ -23,10 +27,18 @@ public class IndexerSubsystem extends SubsystemBase {
   Solenoid intakeExtension;
   DigitalInput indexerFirstPos, indexerSecondPos, fullIndexerSensor;
   TurretSubsystem turretSubsystem;
+  
+  NetworkTableInstance table;
+  NetworkTableEntry isFullEntry;
+  NetworkTable pidTuningPVs;
 
+
+  
+  
   /**
    * Creates a new IndexerSubsystem.
    */
+  
   public IndexerSubsystem(TurretSubsystem tSubsystem) {
     this.turretSubsystem = tSubsystem;
     this.indexingMotor = new CANSparkMax(Constants.indexingSparkMax, MotorType.kBrushless);
@@ -36,6 +48,15 @@ public class IndexerSubsystem extends SubsystemBase {
     indexerFirstPos = new DigitalInput(Constants.indexerFirstPos);
     indexerSecondPos = new DigitalInput(Constants.indexerSecondPos);
     fullIndexerSensor = new DigitalInput(Constants.fullIndexerSensor);
+    this.setupNetworkTables();
+  }
+  private void setupNetworkTables() {
+    this.table = NetworkTableInstance.getDefault();
+    this.pidTuningPVs = this.table.getTable("pidTuningPVs");
+    this.isFullEntry = this.pidTuningPVs.getEntry("Is Indexer Full");
+  }
+  private void updateNetworkTables(){
+    this.isFullEntry.setBoolean(this.isFull());
   }
 
   @Override
@@ -46,6 +67,7 @@ public class IndexerSubsystem extends SubsystemBase {
       ballAtPosOne(),
       isFull());
     Logging.debug(status, "indexerStatus");
+    this.updateNetworkTables();
   }
 
   public void intakeBall() {
@@ -76,7 +98,7 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public void raiseIntake() {
-    this.intakeExtension.set(true);
+    this.intakeExtension.set(false);
   }
 
   public void stop() {

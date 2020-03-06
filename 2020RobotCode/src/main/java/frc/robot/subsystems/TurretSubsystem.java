@@ -37,7 +37,7 @@ public class TurretSubsystem extends SubsystemBase {
   CSVWriter shooterLogging;
   boolean shooterWriterActive, enableShooterLogging = false;
 
-  MovingAverage distanceAverage;
+  MovingAverage distanceAverage, shooterSpeedAverage;
 
   NetworkTableInstance table;
   NetworkTable PIDInfo, pidTuningPVs, camInfo;
@@ -47,7 +47,7 @@ public class TurretSubsystem extends SubsystemBase {
       // Declare Turret PID tuning entries
       turretPEntry, turretIEntry, turretDEntry, turretFFmEntry, turretFFbEntry,
       // Declare information entries
-      shooterSpeedEntry, shooterCurrSpeedEntry, turretEncoderEntry, turretLastTargetEntry, turretLastTargetOffsetEntry,
+      shooterSpeedEntry, shooterCurrSpeedEntry, shooterAtSpeedEntry, turretEncoderEntry, turretLastTargetEntry, turretLastTargetOffsetEntry,
       realDistanceEntry, targetShooterSpeed,
       // Declare targetting entries
       validTargetEntry, pitchEntry, latencyEntry, targetPoseEntry, distanceEntry, yawEntry, onTargetEntry;
@@ -77,6 +77,7 @@ public class TurretSubsystem extends SubsystemBase {
   public TurretSubsystem(RobotDriveSubsystem driveSub) {
     this.driveSubsystem = driveSub;
     this.distanceAverage = new MovingAverage(50);
+    this.shooterSpeedAverage = new MovingAverage(5);
     setupLogging();
     setupNetworkTables();
     setupMotorsAndEncoders();
@@ -144,6 +145,10 @@ public class TurretSubsystem extends SubsystemBase {
   public boolean shooterAtSpeed() {
     double setpoint = this.shootingMotorPID.getSetpoint();
     double processingVar = this.shooterEncoder.getVelocity();
+    this.shooterSpeedAverage.push(processingVar);
+    double setpointAverage = this.shooterSpeedAverage.getAverage();
+    boolean averageAtSpeed = setpointAverage - Constants.shooterMarginOfError < processingVar
+    && processingVar < setpointAverage + Constants.shooterMarginOfError; 
     boolean atSpeed = setpoint - Constants.shooterMarginOfError < processingVar
         && processingVar < setpoint + Constants.shooterMarginOfError;
     return atSpeed;
@@ -395,6 +400,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.shooterCurrSpeedEntry.setDouble(this.shooterEncoder.getVelocity());
     this.turretEncoderEntry.setDouble(this.getTurretPos()); // 360 degrees = 100
     this.distanceEntry.setDouble(this.distance);
+    this.shooterAtSpeedEntry.setBoolean(this.shooterAtSpeed());
   }
 
   private void setupMotorsAndEncoders() {
@@ -453,8 +459,9 @@ public class TurretSubsystem extends SubsystemBase {
     this.shooterSpeedEntry = this.PIDInfo.getEntry("shootTargetSpeed");
     this.shooterCurrSpeedEntry = this.pidTuningPVs.getEntry("Shooter Speed");
     this.targetShooterSpeed = this.pidTuningPVs.getEntry("shooterTargetSpeed");
+    this.shooterAtSpeedEntry = this.pidTuningPVs.getEntry("Shooter at Speed");
     this.turretEncoderEntry = this.pidTuningPVs.getEntry("Turret Position");
-
+    
     // Define Shooter PID entries
     this.shootPEntry = this.PIDInfo.getEntry("shootkP");
     this.shootIEntry = this.PIDInfo.getEntry("shootkI");
@@ -489,6 +496,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.shootFFbEntry.setDouble(Constants.shooterkFFb);
     this.bypassShooterPIDEntry.setBoolean(Constants.bypassShooterPID);
     this.shooterCurrSpeedEntry.setDouble(0);
+    this.shooterAtSpeedEntry.setBoolean(false);
     this.shooterSpeedEntry.setDouble(0.85);
     this.targetShooterSpeed.setDouble(0);
 

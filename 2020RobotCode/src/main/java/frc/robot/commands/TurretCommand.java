@@ -51,12 +51,14 @@ public class TurretCommand extends CommandBase {
       this.turretSubsystem.enableShooterLogging(true);
       shootAtSpeed();
       runFeeder();
-
     } else if (RobotContainer.operator.getRawButton(OperatorMap.start)) {
       this.turretSubsystem.enableShooterLogging(true);
       shootAtSpeed();
       this.turretSubsystem.feedShooter();
-
+    } else if (RobotContainer.operator.getRawButton(OperatorMap.LB)) {
+      this.turretSubsystem.enableShooterLogging(false);
+      this.turretSubsystem.runShooterRaw(0);
+      this.runFeeder();
     } else {
       this.turretSubsystem.enableShooterLogging(false);
       this.turretSubsystem.runShooterRaw(0);
@@ -135,8 +137,9 @@ public class TurretCommand extends CommandBase {
     double targetAngle = this.turretSubsystem.getTargetAngle();
     double distm = Units.feetToMeters(dist);
     double offsetDistance = dist / shooterSpeed * speeds[1];
-    double adjustedDist = Math.sqrt(Math.pow(offsetDistance,2) + Math.pow(distm,2) - 2 * offsetDistance * distm * Math.cos(targetAngle));
-    double offsetAngle = Math.asin(Math.sin(targetAngle) / adjustedDist *distm);
+    double adjustedDist = Math
+        .sqrt(Math.pow(offsetDistance, 2) + Math.pow(distm, 2) - 2 * offsetDistance * distm * Math.cos(targetAngle));
+    double offsetAngle = Math.asin(Math.sin(targetAngle) / adjustedDist * distm);
     return Math.toDegrees(offsetAngle);
   }
 
