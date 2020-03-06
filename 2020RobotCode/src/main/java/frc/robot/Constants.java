@@ -59,7 +59,7 @@ public final class Constants {
     // Targetting Light Relay
     public static final int lightRelay = 0;
 
-    public static final double intakeSpeed = 0.7, indexingSpeed = 0.65;
+    public static final double intakeSpeed = 0.8, indexingSpeed = 0.8;
 
     public static final int // Set safe current max for NEO motors (amps)
     miniNeoSafeAmps = 15, neoSafeAmps = 50;
@@ -89,8 +89,8 @@ public final class Constants {
         shooterkFFb = -1.372668e-02, 
         shooterIZone = 100,
         shooterSZone = 100,
-        speedkM = 0.010753713215270848,
-        speedkB = 0.6993407381533456,
+        speedkM = 0.008341422543530399,
+        speedkB = 0.7108668194674579,
         shooterPidIntegralResetTime = 2,
         distanceFromInnerToOuterPort = 29.5 / 12,
         maxInnerPortAjustmentAngle = Math.PI / 4,

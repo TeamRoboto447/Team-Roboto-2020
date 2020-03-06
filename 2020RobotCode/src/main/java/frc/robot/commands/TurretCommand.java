@@ -58,7 +58,7 @@ public class TurretCommand extends CommandBase {
     } else if (RobotContainer.operator.getRawButton(OperatorMap.LB)) {
       this.turretSubsystem.enableShooterLogging(false);
       this.turretSubsystem.runShooterRaw(0);
-      this.runFeeder();
+      this.reverseFeeder();
     } else {
       this.turretSubsystem.enableShooterLogging(false);
       this.turretSubsystem.runShooterRaw(0);
@@ -98,6 +98,10 @@ public class TurretCommand extends CommandBase {
     } else {
       this.turretSubsystem.stopFeeder();
     }
+  }
+
+  private void reverseFeeder() {
+    this.turretSubsystem.feedShooterRaw(1);
   }
 
   // Called once the command ends or is interrupted.
