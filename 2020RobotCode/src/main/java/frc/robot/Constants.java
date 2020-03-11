@@ -62,7 +62,7 @@ public final class Constants {
     public static final double intakeSpeed = 0.8, indexingSpeed = 0.8;
 
     public static final int // Set safe current max for NEO motors (amps)
-    miniNeoSafeAmps = 15, neoSafeAmps = 50;
+    miniNeoSafeAmps = 15, neoSafeAmps = 40;
 
     public static final double
     // Gear ratios for calculating encoder ticks per rotation
@@ -90,7 +90,7 @@ public final class Constants {
         shooterIZone = 100,
         shooterSZone = 100,
         speedkM = 0.008341422543530399,
-        speedkB = 0.7108668194674579,
+        speedkB = 0.7258668194674579, //0.7258668194674579 - 0.015 well used
         shooterPidIntegralResetTime = 2,
         distanceFromInnerToOuterPort = 29.5 / 12,
         maxInnerPortAjustmentAngle = Math.PI / 4,

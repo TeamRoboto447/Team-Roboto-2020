@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -80,26 +78,35 @@ public class RobotContainer {
       new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 0.5, 6, 3),
       new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(2.5), 0.2, 1));
 
+  SequentialCommandGroup threeBallAutoManualAim = new SequentialCommandGroup(
+      new StaticDump(this.turretSubsystem, this.indexerSubsystem, 10.11, 0, 6, 3),
+      new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(2.5), 0.2, 1));
+
+  SequentialCommandGroup threeBallAutoPush = new SequentialCommandGroup(
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 0.5, 6, 3),
+      new DriveToPosition(this.driveSubsystem, "low", Utilities.feetToEncoder(-2), 0.4, 1),
+      new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(5), 0.2, 1));
+
   SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
       new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 0.4, 5, 3),
-      new ParallelRaceGroup(new IntakeBalls(this.indexerSubsystem, 3),
+      new ParallelRaceGroup(new KeepShooterRevved(this.turretSubsystem), new IntakeBalls(this.indexerSubsystem, 3),
           new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(15), 0.5, 1)),
-      new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(-3), 0.2, 1),
+      new ParallelRaceGroup(new KeepShooterRevved(this.turretSubsystem),
+          new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(-3), 0.2, 1)),
       new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 0.3, 10, 3));
 
   SequentialCommandGroup fiveBallAuto = new SequentialCommandGroup(
-      new ParallelRaceGroup(
-        new IntakeBalls(this.indexerSubsystem, 2),
-        new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(4), 0.5, 1)
-      ),
-      new ParallelDeadlineGroup(
-        new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(-4), 0.5, 1), 
-        new IntakeBalls(this.indexerSubsystem, 2)),
-      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, scanRight, 0.2, 15, 5)
-    );
+      new ParallelRaceGroup(new KeepShooterRevved(this.turretSubsystem), new IntakeBalls(this.indexerSubsystem, 2),
+          new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(4), 0.5, 1)),
+      new ParallelDeadlineGroup(new KeepShooterRevved(this.turretSubsystem),
+          new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(-4), 0.5, 1),
+          new IntakeBalls(this.indexerSubsystem, 2)),
+      new AimAndShoot(this.turretSubsystem, this.indexerSubsystem, scanRight, 0.2, 15, 5));
 
   private void addAutonomousCommands() {
     this.autonomousSelector.setDefaultOption("Three Ball Auto", this.threeBallAuto);
+    this.autonomousSelector.addOption("Three Ball Auto (Manual Target)", this.threeBallAutoManualAim);
+    this.autonomousSelector.addOption("Three Ball Auto With Assist", this.threeBallAutoPush);
     this.autonomousSelector.addOption("Buggy Six Ball Auto", this.sixBallAuto);
     this.autonomousSelector.addOption("WIP Five Ball", this.fiveBallAuto);
     Shuffleboard.getTab("Autonomous").add(this.autonomousSelector);

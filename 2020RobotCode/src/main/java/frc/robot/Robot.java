@@ -14,7 +14,10 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utils.Logging;
@@ -30,12 +33,14 @@ public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
   private RobotContainer robotContainer;
-  private UsbCamera camera0, camera1;
+  private UsbCamera camera0;
   private VideoSink camServer;
 
   private NetworkTable pidTuningPVs;
   private NetworkTableInstance table;
   private NetworkTableEntry timeEntry;
+
+  private PowerDistributionPanel pdp;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -52,10 +57,6 @@ public class Robot extends TimedRobot {
     this.camera0.setResolution(160, 120);
     this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
-    this.camera1 = CameraServer.getInstance().startAutomaticCapture(1);
-    this.camera1.setResolution(160, 120);
-    this.camera1.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-
     this.camServer = CameraServer.getInstance().getServer();
 
     Logging.init();
@@ -63,6 +64,9 @@ public class Robot extends TimedRobot {
     this.table = NetworkTableInstance.getDefault();
     this.pidTuningPVs = table.getTable("pidTuningPVs");
     this.timeEntry = pidTuningPVs.getEntry("timeMS");
+
+    this.pdp = new PowerDistributionPanel();
+    Shuffleboard.getTab("PDP").add("PDP", this.pdp).withWidget(BuiltInWidgets.kPowerDistributionPanel);
   }
 
   /**
@@ -89,11 +93,7 @@ public class Robot extends TimedRobot {
   }
 
   private void setRobotFront() {
-    if (this.robotContainer.driveSubsystem.getInvertedDrive()) {
-      this.camServer.setSource(this.camera1);
-    } else {
-      this.camServer.setSource(this.camera0);
-    }
+    this.camServer.setSource(this.camera0);
   }
 
   /**
