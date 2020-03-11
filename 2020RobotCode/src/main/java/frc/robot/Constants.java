@@ -112,6 +112,10 @@ public final class Constants {
 
     public static final double encoderRes = 1;
 
+    public static final double 
+        driveTrainRampMaxPerSecond = 2,
+        driveTrainRampMaxTimeDelta = 0.4; 
+
     // Temporary for testing:
     public static final boolean kGyroReversed = true;
 

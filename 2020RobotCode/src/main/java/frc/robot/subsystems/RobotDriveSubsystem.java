@@ -25,8 +25,10 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 //import edu.wpi.first.wpilibj.smartdashboard.SmaartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.Constants;
 import frc.robot.Utilities;
+import frc.robot.utils.Ramp;
 
 public class RobotDriveSubsystem extends SubsystemBase {
   private final CANSparkMax leftDrive, leftDriveB, rightDrive, rightDriveB;
@@ -64,6 +66,7 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
   private boolean driveInverted;
 
+  private Ramp rightRamp, leftRamp;
   /**
    * Creates a new DriveSubsystem.
    */
@@ -73,6 +76,9 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
     this.rightDrive = new CANSparkMax(Constants.rightDrive, MotorType.kBrushless);
     this.rightDriveB = new CANSparkMax(Constants.rightDriveB, MotorType.kBrushless);
+
+    this.rightRamp = new Ramp(Constants.driveTrainRampMaxPerSecond, Constants.driveTrainRampMaxTimeDelta, this.getCurrentGear() == "high");
+    this.leftRamp = new Ramp(Constants.driveTrainRampMaxPerSecond, Constants.driveTrainRampMaxTimeDelta, this.getCurrentGear() == "high");
 
     setInvertedDrive(false);
 
@@ -309,6 +315,12 @@ public class RobotDriveSubsystem extends SubsystemBase {
     double deadzone = 0.1;
     leftSpeed = Utilities.adjustForDeadzone(leftSpeed, deadzone);
     rightSpeed = Utilities.adjustForDeadzone(rightSpeed, deadzone);
+
+    this.leftRamp.setEnable(this.getCurrentGear() == "high");
+    this.rightRamp.setEnable(this.getCurrentGear() == "high");
+
+    leftSpeed = this.leftRamp.run(leftSpeed);
+    rightSpeed = this.rightRamp.run(rightSpeed);
 
     this.setRelativeDrive(leftSpeed, rightSpeed);
   }
