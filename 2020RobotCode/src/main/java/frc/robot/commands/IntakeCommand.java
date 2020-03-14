@@ -50,7 +50,7 @@ public class IntakeCommand extends CommandBase {
       stopIntake();
     }
 
-    if(!RobotContainer.operator.getRawButton(OperatorMap.X) && RobotContainer.operator.getRawButton(OperatorMap.LT) && this.turretSubsystem.shooterAtSpeed()) {
+    if(!RobotContainer.operator.getRawButton(OperatorMap.X) && RobotContainer.operator.getRawButton(OperatorMap.LT) /*&& this.turretSubsystem.shooterAtSpeed()*/) {
       feedShooter();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
       reverseIndexer();

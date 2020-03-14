@@ -20,8 +20,8 @@ public class Ramp {
         maxTimeDelta;
     boolean enabled;
     Timer timeSinceLast;
-    public Ramp(double kMaxChangePerSecond, double kMaxTimeDelta, boolean kEnabled){
-        this.maxChangePerSecond = kMaxChangePerSecond;
+    public Ramp(double timeToMax, double kMaxTimeDelta, boolean kEnabled){
+        this.maxChangePerSecond = 1 / timeToMax;
         this.lastValue = 0;
         this.timeSinceLast = new Timer();
         this.timeSinceLast.reset();

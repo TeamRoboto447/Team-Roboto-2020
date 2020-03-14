@@ -47,8 +47,8 @@ public class TurretSubsystem extends SubsystemBase {
       // Declare Turret PID tuning entries
       turretPEntry, turretIEntry, turretDEntry, turretFFmEntry, turretFFbEntry,
       // Declare information entries
-      shooterSpeedEntry, shooterCurrSpeedEntry, shooterAtSpeedEntry, turretEncoderEntry, turretLastTargetEntry, turretLastTargetOffsetEntry,
-      realDistanceEntry, targetShooterSpeed,
+      shooterSpeedEntry, shooterCurrSpeedEntry, shooterAtSpeedEntry, turretEncoderEntry, turretLastTargetEntry,
+      turretLastTargetOffsetEntry, realDistanceEntry, targetShooterSpeed,
       // Declare targetting entries
       validTargetEntry, pitchEntry, latencyEntry, targetPoseEntry, distanceEntry, yawEntry, onTargetEntry;
 
@@ -148,7 +148,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.shooterSpeedAverage.push(processingVar);
     double setpointAverage = this.shooterSpeedAverage.getAverage();
     boolean averageAtSpeed = setpointAverage - Constants.shooterMarginOfError < processingVar
-    && processingVar < setpointAverage + Constants.shooterMarginOfError; 
+        && processingVar < setpointAverage + Constants.shooterMarginOfError;
     boolean atSpeed = setpoint - Constants.shooterMarginOfError < processingVar
         && processingVar < setpoint + Constants.shooterMarginOfError;
     return atSpeed;
@@ -248,9 +248,9 @@ public class TurretSubsystem extends SubsystemBase {
 
   // Directly related to turret
   public void turnToAngle(double angle) {
-    if (Math.abs(angle) > Constants.turretSpinLimit){
+    if (Math.abs(angle) > Constants.turretSpinLimit) {
       angle = Math.copySign(Constants.turretSpinLimit, angle);
-    } 
+    }
     this.setTurretTarget(angle);
     double speed = this.turretPositionPID.run(this.getTurretPosRaw());
     this.turretMotor.set(speed);
@@ -322,55 +322,75 @@ public class TurretSubsystem extends SubsystemBase {
     return this.poseAngle;
   }
 
+  private double storedTurretAngle = 0;
+  private boolean turretLocked = false;
+
+  public void lockTurret() {
+    if (!this.turretLocked) {
+      this.turretLocked = true;
+      this.storedTurretAngle = this.getTurretPos();
+    }
+  }
+
+  public void unlockTurret() {
+    this.turretLocked = false;
+    this.storedTurretAngle = this.getTurretPos();
+  }
+
   public void turnToTarget() {
     turnToTarget(1);
   }
 
   public void turnToTarget(double maxspeed) {
-    setTurretTarget(0);
-    Logging.debug("Turret limit: " + Constants.turretSpinLimit + "\nTurret Position: " + this.getTurretPos()
-        + "\nTurret Past Limit: " + this.pastLimit + "\nValid Target: " + this.validTarget, "turretLimits");
-    if (!this.pastLimit && this.validTarget) {
-      this.pastLimit = Math.abs(this.getTurretPosRaw()) > Constants.turretSpinLimit;
-      // double distanceToInner = this.getDistanceToInner(this.poseAngle,
-      // this.distance,
-      // Constants.distanceFromInnerToOuterPort);
-      double adjustAngle = Constants.staticAimOffset + this.dynamicAimOffset;// this.getAngleOffset(this.poseAngle,
-                                                                             // distanceToInner,
-      // Constants.distanceFromInnerToOuterPort);
-      /*
-       * if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0,
-       * adjustAngle)) { adjustAngle = 0.0; }
-       */
-      double processingVar = this.yaw + adjustAngle;
-      double speed = this.turretPositionPID.run(processingVar);
+    if (!this.turretLocked) {
+      setTurretTarget(0);
+      Logging.debug("Turret limit: " + Constants.turretSpinLimit + "\nTurret Position: " + this.getTurretPos()
+          + "\nTurret Past Limit: " + this.pastLimit + "\nValid Target: " + this.validTarget, "turretLimits");
+      if (!this.pastLimit && this.validTarget) {
+        this.pastLimit = Math.abs(this.getTurretPosRaw()) > Constants.turretSpinLimit;
+        // double distanceToInner = this.getDistanceToInner(this.poseAngle,
+        // this.distance,
+        // Constants.distanceFromInnerToOuterPort);
+        double adjustAngle = Constants.staticAimOffset + this.dynamicAimOffset;// this.getAngleOffset(this.poseAngle,
+                                                                               // distanceToInner,
+        // Constants.distanceFromInnerToOuterPort);
+        /*
+         * if (!Utilities.marginOfError(Constants.maxInnerPortAjustmentAngle, 0.0,
+         * adjustAngle)) { adjustAngle = 0.0; }
+         */
+        double processingVar = this.yaw + adjustAngle;
+        double speed = this.turretPositionPID.run(processingVar);
 
-      Logging.debug("Aiming PID Output Value: " + speed + "\nAiming PV: " + processingVar, "aimingPID");
+        Logging.debug("Aiming PID Output Value: " + speed + "\nAiming PV: " + processingVar, "aimingPID");
 
-      if (Math.abs(speed) > maxspeed){
-        speed = Math.copySign(maxspeed, speed);
+        if (Math.abs(speed) > maxspeed) {
+          speed = Math.copySign(maxspeed, speed);
+        }
+
+        this.turnRaw(speed);
+        this.lastTargetPos = this.lastValidTurretPos = this.getTurretPos();
+      } else if (!this.pastLimit) {
+
+        double targetPos = this.lastTargetPos;
+
+        Logging.debug("Turret Position: " + this.getTurretPos() + "\nTarget Position: " + targetPos, "turret180");
+        this.turnToAngle(targetPos, 0.5);
+
+      } else if (this.pastLimit) {
+
+        this.pastLimit = Math.abs(this.getTurretPosRaw()) > 45;
+        double targetPos = this.lastValidTurretPos;
+        Logging.debug("Turret Position: " + this.getTurretPos() + "\nTarget Position: " + targetPos, "turret180");
+        this.turnToAngle(targetPos, 0.75);
+
       }
-
-      this.turnRaw(speed);
-      this.lastTargetPos = this.lastValidTurretPos = this.getTurretPos();
-    } else if (!this.pastLimit) {
-
-      double targetPos = this.lastTargetPos;
-
-      Logging.debug("Turret Position: " + this.getTurretPos() + "\nTarget Position: " + targetPos, "turret180");
-      this.turnToAngle(targetPos, 0.5);
-
-    } else if (this.pastLimit) {
-
-      this.pastLimit = Math.abs(this.getTurretPosRaw()) > 45;
-      double targetPos = this.lastValidTurretPos;
-      Logging.debug("Turret Position: " + this.getTurretPos() + "\nTarget Position: " + targetPos, "turret180");
-      this.turnToAngle(targetPos, 0.75);
-
+      // System.out.println(this.pastLimit);
+    } else {
+      this.turnToAngle(this.storedTurretAngle);
     }
-    // System.out.println(this.pastLimit);
 
   }
+
   private double getTurretPosRaw() {
     double turretPosition = (this.turretEncoder.getPosition() * 3.6);
     return turretPosition;
@@ -461,7 +481,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.targetShooterSpeed = this.pidTuningPVs.getEntry("shooterTargetSpeed");
     this.shooterAtSpeedEntry = this.pidTuningPVs.getEntry("Shooter at Speed");
     this.turretEncoderEntry = this.pidTuningPVs.getEntry("Turret Position");
-    
+
     // Define Shooter PID entries
     this.shootPEntry = this.PIDInfo.getEntry("shootkP");
     this.shootIEntry = this.PIDInfo.getEntry("shootkI");

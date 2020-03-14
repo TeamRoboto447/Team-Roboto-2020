@@ -67,8 +67,10 @@ public class TurretCommand extends CommandBase {
 
     if (RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       lockDist();
+      lockTurret();
     } else {
       unlockDist();
+      unlockTurret();
     }
 
   }
@@ -79,6 +81,14 @@ public class TurretCommand extends CommandBase {
 
   private void unlockDist() {
     this.turretSubsystem.unlockDistance();
+  }
+
+  private void lockTurret() {
+    this.turretSubsystem.lockTurret();
+  }
+
+  private void unlockTurret() {
+    this.turretSubsystem.unlockTurret();
   }
 
   private void shootAtDistance() {
@@ -93,7 +103,7 @@ public class TurretCommand extends CommandBase {
   }
 
   private void runFeeder() {
-    if (this.turretSubsystem.shooterAtSpeed() && RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+    if (/*this.turretSubsystem.shooterAtSpeed() &&*/ RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       this.turretSubsystem.feedShooter();
     } else {
       this.turretSubsystem.stopFeeder();

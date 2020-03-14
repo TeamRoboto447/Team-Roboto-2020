@@ -77,8 +77,8 @@ public class RobotDriveSubsystem extends SubsystemBase {
     this.rightDrive = new CANSparkMax(Constants.rightDrive, MotorType.kBrushless);
     this.rightDriveB = new CANSparkMax(Constants.rightDriveB, MotorType.kBrushless);
 
-    this.rightRamp = new Ramp(Constants.driveTrainRampMaxPerSecond, Constants.driveTrainRampMaxTimeDelta, this.getCurrentGear() == "high");
-    this.leftRamp = new Ramp(Constants.driveTrainRampMaxPerSecond, Constants.driveTrainRampMaxTimeDelta, this.getCurrentGear() == "high");
+    this.rightRamp = new Ramp(Constants.driveTrainRampTimeToMax, Constants.driveTrainRampMaxTimeDelta, this.getCurrentGear() == "high");
+    this.leftRamp = new Ramp(Constants.driveTrainRampTimeToMax, Constants.driveTrainRampMaxTimeDelta, this.getCurrentGear() == "high");
 
     setInvertedDrive(false);
 
@@ -316,16 +316,15 @@ public class RobotDriveSubsystem extends SubsystemBase {
     leftSpeed = Utilities.adjustForDeadzone(leftSpeed, deadzone);
     rightSpeed = Utilities.adjustForDeadzone(rightSpeed, deadzone);
 
+    this.setRelativeDrive(leftSpeed, rightSpeed);
+  }
+
+  private void setRelativeDrive(double leftSpeed, double rightSpeed) {
     this.leftRamp.setEnable(this.getCurrentGear() == "high");
     this.rightRamp.setEnable(this.getCurrentGear() == "high");
 
     leftSpeed = this.leftRamp.run(leftSpeed);
     rightSpeed = this.rightRamp.run(rightSpeed);
-
-    this.setRelativeDrive(leftSpeed, rightSpeed);
-  }
-
-  private void setRelativeDrive(double leftSpeed, double rightSpeed) {
     if (this.driveInverted) {
       this.m_drive.tankDrive(leftSpeed, -rightSpeed);
     } else {

@@ -88,7 +88,7 @@ public class RobotContainer {
       new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(5), 0.2, 1));
 
   SequentialCommandGroup sixBallAuto = new SequentialCommandGroup(
-      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 0.4, 5, 3),
+      new AimAndDump(this.turretSubsystem, this.indexerSubsystem, scanLeft, 0.4, 4, 3),
       new ParallelRaceGroup(new KeepShooterRevved(this.turretSubsystem), new IntakeBalls(this.indexerSubsystem, 3),
           new DriveToPosition(this.driveSubsystem, "high", Utilities.feetToEncoder(15), 0.5, 1)),
       new ParallelRaceGroup(new KeepShooterRevved(this.turretSubsystem),

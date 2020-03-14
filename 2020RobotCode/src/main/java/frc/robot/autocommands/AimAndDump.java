@@ -105,7 +105,7 @@ public class AimAndDump extends CommandBase {
       this.turretSubsystem.lockDistance();
       if (this.distanceTimer.get() > 0.3) {
         this.turretSubsystem.feedShooter();
-        this.indexerSubsystem.indexerRaw(0.35);
+        this.indexerSubsystem.indexerRaw(0.75);
       }
     }
   }

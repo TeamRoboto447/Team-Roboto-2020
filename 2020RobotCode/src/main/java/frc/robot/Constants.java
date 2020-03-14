@@ -89,14 +89,14 @@ public final class Constants {
         shooterkFFb = -1.372668e-02, 
         shooterIZone = 100,
         shooterSZone = 100,
-        speedkM = 0.008341422543530399,
-        speedkB = 0.7258668194674579, //0.7258668194674579 - 0.015 well used
+        speedkM = 0.014566739586865,
+        speedkB = 0.427238873791768,
         shooterPidIntegralResetTime = 2,
         distanceFromInnerToOuterPort = 29.5 / 12,
         maxInnerPortAjustmentAngle = Math.PI / 4,
         shooterMarginOfError = 60;
 
-    public static final double distanceLineEqM = 3.65258532089, distanceLineEqB = -3.9005631049;
+    public static final double distanceLineEqM = 4.076545627333885, distanceLineEqB = -4.046285991880239;
 
     // Turning PID info
     public static final double
@@ -113,7 +113,7 @@ public final class Constants {
     public static final double encoderRes = 1;
 
     public static final double 
-        driveTrainRampMaxPerSecond = 2,
+        driveTrainRampTimeToMax = 0.75,
         driveTrainRampMaxTimeDelta = 0.4; 
 
     // Temporary for testing:
