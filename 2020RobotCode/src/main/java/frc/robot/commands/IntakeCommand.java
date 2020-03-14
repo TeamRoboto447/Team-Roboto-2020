@@ -50,7 +50,7 @@ public class IntakeCommand extends CommandBase {
       stopIntake();
     }
 
-    if(!RobotContainer.operator.getRawButton(OperatorMap.X) && RobotContainer.operator.getRawButton(OperatorMap.LT) /*&& this.turretSubsystem.shooterAtSpeed()*/) {
+    if(!RobotContainer.operator.getRawButton(OperatorMap.X) && RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       feedShooter();
     } else if(RobotContainer.operator.getRawButton(OperatorMap.LB)) {
       reverseIndexer();
@@ -58,7 +58,6 @@ public class IntakeCommand extends CommandBase {
       stopIndexer();
     }
   }
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
@@ -90,11 +89,15 @@ public class IntakeCommand extends CommandBase {
     this.indexerSubsystem.intakeRaw(0);
   }
 
+  private boolean shooterSpunUp = false;
+
   private void stopIndexer() {
+    this.shooterSpunUp = false;
     this.indexerSubsystem.indexerRaw(0);
   }
 
   private void reverseIndexer() {
+    this.shooterSpunUp = false;
     this.indexerSubsystem.indexerRaw(-this.indexerSpeed);
   }
 
@@ -102,7 +105,9 @@ public class IntakeCommand extends CommandBase {
     this.indexerSubsystem.intakeBall();
   }
 
+
   private void feedShooter() {
+    if(this.turretSubsystem.shooterAtSpeed()) this.shooterSpunUp = false;
     this.indexerSubsystem.indexerRaw(0.75);
   }
 }

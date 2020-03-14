@@ -59,7 +59,10 @@ public final class Constants {
     // Targetting Light Relay
     public static final int lightRelay = 0;
 
+    //set speeds for intaking balls
     public static final double intakeSpeed = 0.8, indexingSpeed = 0.8;
+    //set how long after a ball is shot it will take for vision to reenable.
+    public static final double shotInProgressTime = 0.1;
 
     public static final int // Set safe current max for NEO motors (amps)
     miniNeoSafeAmps = 15, neoSafeAmps = 40;
@@ -89,12 +92,13 @@ public final class Constants {
         shooterkFFb = -1.372668e-02, 
         shooterIZone = 100,
         shooterSZone = 100,
-        speedkM = 0.014566739586865,
+        speedkM = 0.014066739586865,
         speedkB = 0.427238873791768,
         shooterPidIntegralResetTime = 2,
         distanceFromInnerToOuterPort = 29.5 / 12,
         maxInnerPortAjustmentAngle = Math.PI / 4,
-        shooterMarginOfError = 60;
+        shooterMarginOfError = 60,
+        shooterDefaultSpeed = 0.65;
 
     public static final double distanceLineEqM = 4.076545627333885, distanceLineEqB = -4.046285991880239;
 

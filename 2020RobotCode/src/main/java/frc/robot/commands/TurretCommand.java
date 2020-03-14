@@ -9,6 +9,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import frc.robot.RobotContainer;
 import frc.robot.Utilities;
 import frc.robot.controlmaps.OperatorMap;
@@ -65,13 +66,13 @@ public class TurretCommand extends CommandBase {
       this.turretSubsystem.stopFeeder();
     }
 
-    if (RobotContainer.operator.getRawButton(OperatorMap.LT)) {
+    /*if (RobotContainer.operator.getRawButton(OperatorMap.LT)) {
       lockDist();
       lockTurret();
     } else {
       unlockDist();
       unlockTurret();
-    }
+    }*/
 
   }
 

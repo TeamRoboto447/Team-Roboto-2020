@@ -17,9 +17,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.Timer;
 
 import frc.robot.Constants;
 import frc.robot.utils.Logging;
+import frc.robot.utils.EdgeDetector;
 
 public class IndexerSubsystem extends SubsystemBase {
   CANSparkMax indexingMotor;
@@ -27,6 +29,9 @@ public class IndexerSubsystem extends SubsystemBase {
   Solenoid intakeExtension;
   DigitalInput indexerFirstPos, indexerSecondPos, fullIndexerSensor;
   TurretSubsystem turretSubsystem;
+  Boolean shotInProgress;
+  Timer shotInProgressTimer;
+  EdgeDetector shooting;
   
   NetworkTableInstance table;
   NetworkTableEntry isFullEntry;
@@ -49,6 +54,11 @@ public class IndexerSubsystem extends SubsystemBase {
     indexerSecondPos = new DigitalInput(Constants.indexerSecondPos);
     fullIndexerSensor = new DigitalInput(Constants.fullIndexerSensor);
     this.setupNetworkTables();
+    this.shotInProgress = false;
+    this.shotInProgressTimer = new Timer();
+    this.shotInProgressTimer.reset();
+    this.shotInProgressTimer.start();
+    this.shooting = new EdgeDetector(true);
   }
   private void setupNetworkTables() {
     this.table = NetworkTableInstance.getDefault();
@@ -68,6 +78,7 @@ public class IndexerSubsystem extends SubsystemBase {
       isFull());
     Logging.debug(status, "indexerStatus");
     this.updateNetworkTables();
+    this.updateShotInProgress();
   }
 
   public void intakeBall() {
@@ -83,6 +94,14 @@ public class IndexerSubsystem extends SubsystemBase {
       indexerRaw(0);
       intakeRaw(0);
     }
+  }
+
+  private void updateShotInProgress(){
+    if (this.shooting.detect(this.isFull())) {
+      this.shotInProgressTimer.reset();
+    }
+    this.shotInProgress = !this.shotInProgressTimer.hasPeriodPassed(Constants.shotInProgressTime);
+    this.turretSubsystem.setShotInProgress(this.shotInProgress);
   }
 
   public void intakeRaw(double speed) {
@@ -106,6 +125,9 @@ public class IndexerSubsystem extends SubsystemBase {
     this.indexingMotor.set(0);
   }
 
+  public boolean isShotInProgress(){
+    return this.shotInProgress;
+  }
   public boolean isFull() {
     return !fullIndexerSensor.get();
   }

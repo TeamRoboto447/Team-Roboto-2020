@@ -74,10 +74,13 @@ public class TurretSubsystem extends SubsystemBase {
 
   RobotDriveSubsystem driveSubsystem;
 
+  Boolean shotInProgress;
+
   public TurretSubsystem(RobotDriveSubsystem driveSub) {
     this.driveSubsystem = driveSub;
     this.distanceAverage = new MovingAverage(50);
     this.shooterSpeedAverage = new MovingAverage(5);
+    this.shotInProgress = true;
     setupLogging();
     setupNetworkTables();
     setupMotorsAndEncoders();
@@ -517,7 +520,7 @@ public class TurretSubsystem extends SubsystemBase {
     this.bypassShooterPIDEntry.setBoolean(Constants.bypassShooterPID);
     this.shooterCurrSpeedEntry.setDouble(0);
     this.shooterAtSpeedEntry.setBoolean(false);
-    this.shooterSpeedEntry.setDouble(0.85);
+    this.shooterSpeedEntry.setDouble(Constants.shooterDefaultSpeed);
     this.targetShooterSpeed.setDouble(0);
 
     this.turretPEntry.setDouble(Constants.turretkP);
@@ -526,22 +529,24 @@ public class TurretSubsystem extends SubsystemBase {
   }
 
   private void getValues() {
-    this.validTarget = this.validTargetEntry.getBoolean(false);
-    this.yaw = this.yawEntry.getDouble(-1);
-    this.pitch = this.pitchEntry.getDouble(-1);
-    this.latency = this.latencyEntry.getDouble(-1);
-    double defaultPose[] = new double[] { -1, -1, -1 };
-    this.poseX = this.targetPoseEntry.getDoubleArray(defaultPose)[0];
-    this.poseY = this.targetPoseEntry.getDoubleArray(defaultPose)[1];
-    this.poseAngle = this.targetPoseEntry.getDoubleArray(defaultPose)[2];
+    if (!this.shotInProgress){
+      this.validTarget = this.validTargetEntry.getBoolean(false);
+      this.yaw = this.yawEntry.getDouble(-1);
+      this.pitch = this.pitchEntry.getDouble(-1);
+      this.latency = this.latencyEntry.getDouble(-1);
+      double defaultPose[] = new double[] { -1, -1, -1 };
+      this.poseX = this.targetPoseEntry.getDoubleArray(defaultPose)[0];
+      this.poseY = this.targetPoseEntry.getDoubleArray(defaultPose)[1];
+      this.poseAngle = this.targetPoseEntry.getDoubleArray(defaultPose)[2];
 
-    getDistanceEntryVal();
+      getDistanceEntryVal();
 
-    this.turretLastTargetEntry.setDouble(this.lastTargetPos);
-    this.turretLastTargetOffsetEntry.setDouble(this.turretOffset);
-    this.shooterSetSpeed = this.shooterSpeedEntry.getDouble(0.5);
-    this.distanceEntry.setDouble(this.distance);
-    this.onTargetEntry.setBoolean(this.onTarget());
+      this.turretLastTargetEntry.setDouble(this.lastTargetPos);
+      this.turretLastTargetOffsetEntry.setDouble(this.turretOffset);
+      this.distanceEntry.setDouble(this.distance);
+      this.onTargetEntry.setBoolean(this.onTarget());
+    }
+    this.shooterSetSpeed = this.shooterSpeedEntry.getDouble(Constants.shooterDefaultSpeed);
   }
 
   public void resetTurretEncoder() {
@@ -598,6 +603,14 @@ public class TurretSubsystem extends SubsystemBase {
     this.shootingMotorLeft.set(0);
     this.shootingMotorRight.set(0);
     this.turretMotor.set(0);
+  }
+
+  public void setShotInProgress(boolean ShotInProgress){
+    this.shotInProgress = ShotInProgress;
+  }
+
+  public boolean getShotInProgress(){
+    return this.shotInProgress;
   }
 
 }
