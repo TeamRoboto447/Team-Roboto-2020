@@ -55,11 +55,11 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     this.robotContainer = new RobotContainer();
 
-    this.camera0 = CameraServer.startAutomaticCapture(0);
-    this.camera0.setResolution(160, 120);
-    this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    // this.camera0 = CameraServer.startAutomaticCapture(0);
+    // this.camera0.setResolution(160, 120);
+    // this.camera0.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
 
-    this.camServer = CameraServer.getServer();
+    // this.camServer = CameraServer.getServer();
 
     Logging.init();
 
@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
   }
 
   private void setRobotFront() {
-    this.camServer.setSource(this.camera0);
+    // this.camServer.setSource(this.camera0);
   }
 
   /**

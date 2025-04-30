@@ -56,7 +56,7 @@ public class RobotDriveSubsystem extends SubsystemBase {
   private DifferentialDriveKinematics kinematics;
 
   // private CSVWriter odometryWriter;
-  private Path deployPath;
+  // private Path deployPath;
 
   public double leftOutputVoltage, rightOutputVoltage, leftSetpoint, rightSetpoint;
   public boolean odometryWriterActive, loggingEnabled = false;
@@ -100,7 +100,7 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
     resetEncoders();
     this.m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()), 0, 0);
-    this.deployPath = Filesystem.getDeployDirectory().toPath();
+    // this.deployPath = Filesystem.getDeployDirectory().toPath();
     // File odometryLogging = new File(deployPath.resolve("csv/Odometry.csv").toString());
     // try {
     //   this.odometryWriter = new CSVWriter(new FileWriter(odometryLogging));
@@ -144,18 +144,18 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
     this.m_odometry.update(Rotation2d.fromDegrees(getHeading()), leftOutputMeters, rightOutputMeters);
 
-    String recordsString = String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", getPose().getTranslation().getX(), // PoseX
-        getPose().getTranslation().getY(), // PoseY
-        getHeading(), // PoseHeading
-        getWheelSpeeds().leftMetersPerSecond, // Left Wheel Speed (m/s)
-        getWheelSpeeds().rightMetersPerSecond, // Right Wheel Speed (m/s)
-        this.leftOutputVoltage, // Left Voltage
-        this.rightOutputVoltage, // Right Voltage
-        this.leftSetpoint, // Left Setpoint (m/s)
-        this.rightSetpoint, // Right Setpoint (m/s)
-        System.currentTimeMillis() - this.startingTime);
+    // String recordsString = String.format("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f", getPose().getTranslation().getX(), // PoseX
+    //     getPose().getTranslation().getY(), // PoseY
+    //     getHeading(), // PoseHeading
+    //     getWheelSpeeds().leftMetersPerSecond, // Left Wheel Speed (m/s)
+    //     getWheelSpeeds().rightMetersPerSecond, // Right Wheel Speed (m/s)
+    //     this.leftOutputVoltage, // Left Voltage
+    //     this.rightOutputVoltage, // Right Voltage
+    //     this.leftSetpoint, // Left Setpoint (m/s)
+    //     this.rightSetpoint, // Right Setpoint (m/s)
+    //     System.currentTimeMillis() - this.startingTime);
 
-    String[] records = recordsString.split(",");
+    // String[] records = recordsString.split(",");
 
     // if (this.odometryWriterActive && this.loggingEnabled) {
     //   this.odometryWriter.writeNext(records);
@@ -323,10 +323,14 @@ public class RobotDriveSubsystem extends SubsystemBase {
 
   public void setInvertedDrive(boolean invert) {
     this.driveInverted = invert;
-    this.rightDrive.setInverted(!invert);
-    this.rightDriveB.setInverted(!invert);
-    this.leftDrive.setInverted(invert);
-    this.leftDriveB.setInverted(invert);
+    SparkMaxConfig leftMotorConfig = new SparkMaxConfig();
+    leftMotorConfig.inverted(invert);
+    this.leftDrive.configure(leftMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    this.leftDriveB.configure(leftMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    SparkMaxConfig rightMotorConfig = new SparkMaxConfig();
+    rightMotorConfig.inverted(invert);
+    this.rightDrive.configure(rightMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    this.rightDriveB.configure(rightMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   public boolean getInvertedDrive() {
